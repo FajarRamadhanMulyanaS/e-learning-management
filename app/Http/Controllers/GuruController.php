@@ -90,7 +90,7 @@ public function exportExcel($ujian_id)
 
     // Ambil data siswa yang sudah mengikuti ujian
     $siswaSudahUjian = DB::table('siswa')
-        ->join('users', 'siswa.user_id', '=', 'users.id')
+        ->join('users', 'siswa.user_id', '=', 'user_id')
         ->join('kelas', 'users.kelas_id', '=', 'kelas.id')
         ->leftJoin('jawaban_siswa_pilgan', function ($join) use ($ujian_id) {
             $join->on('siswa.id', '=', 'jawaban_siswa_pilgan.siswa_id')

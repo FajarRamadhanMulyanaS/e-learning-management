@@ -62,6 +62,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="{{ route('guru.presensi.index') }}">
+            <i class="mdi mdi-clipboard-check menu-icon"></i>
+            <span class="menu-title">Presensi Online</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
             <i class="icon-head menu-icon"></i>
             <span class="menu-title">User Pages</span>
@@ -161,6 +167,13 @@
             <a class="nav-link" href="{{ route('siswa.tugas.index') }}">
                 <i class="mdi mdi-clipboard-text menu-icon"></i>
             <span class="menu-title">Tugas</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('siswa.presensi.index') }}">
+                <i class="mdi mdi-clipboard-check menu-icon"></i>
+            <span class="menu-title">Presensi Online</span>
             </a>
         </li>
 
