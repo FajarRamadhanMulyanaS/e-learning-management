@@ -1,6 +1,5 @@
 <div class="container-fluid page-body-wrapper">
 
-    <!-- partial:partials/_sidebar.html -->
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
 
 
@@ -41,6 +40,13 @@
           <a class="nav-link" href="{{ route('guru.manajemen-ujian.index') }}">
             <i class="mdi mdi-file-document-edit menu-icon"></i>
             <span class="menu-title">Management Ujian</span>
+          </a>
+        </li>
+        {{-- Menu Kuis Baru Ditambahkan Di Sini --}}
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('guru.quiz.index') }}">
+            <i class="mdi mdi-puzzle menu-icon"></i>
+            <span class="menu-title">Manajemen Kuis</span>
           </a>
         </li>
         <li class="nav-item">
@@ -226,6 +232,5 @@
     @endif
 
     </nav>
-<!-- partial -->
 <div class="main-panel">
     <div class="content-wrapper">

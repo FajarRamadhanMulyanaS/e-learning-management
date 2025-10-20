@@ -31,7 +31,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\SiswaPresensiController;
 use App\Http\Controllers\AdminPresensiController;
-
+use App\Http\Controllers\QuizController;
 
 Route::get('/', function () {
     return redirect()->route('homepage'); // Redirect to login page
@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     // =====================================================================================================================================
-// =====================================================================================================================================
+    // =====================================================================================================================================
 
 
 
@@ -77,15 +77,8 @@ Route::middleware(['auth'])->group(function () {
         }, 'guru'); // Hanya guru yang dapat mengakses route ini
     })->name('guru.profil_guru');
 
-    // Route Profile Admin
-    // Route::get('/admin/profile/{id}', function () {
-    //     return (new RoleMiddleware)->handle(request(), function () {
-    //         return app()->call('App\Http\Controllers\AdminController@profil', ['id' => request()->route('id')]);
-    //     }, 'admin');
-    // })->name('admin.profil_admin');
-
     // =====================================================================================================================================
-// =====================================================================================================================================
+    // =====================================================================================================================================
 
 
     // CRUD untuk Siswa (Hanya admin yang bisa mengakses)
@@ -145,7 +138,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('admin.siswa.downloadTemplateSiswa');
 
     // =====================================================================================================================================
-// =====================================================================================================================================
+    // =====================================================================================================================================
 
     // CRUD untuk Guru (Hanya admin yang bisa mengakses)
     Route::get('/admin/guru', function () {
@@ -197,10 +190,8 @@ Route::middleware(['auth'])->group(function () {
         return response()->download($filePath, 'template_guru.xlsx');
     })->name('admin.guru.downloadTemplateGuru');
 
-
-
     // =====================================================================================================================================
-// =====================================================================================================================================
+    // =====================================================================================================================================
 
     // Route untuk daftar mata pelajaran
     Route::get('/admin/mapel', function () {
@@ -245,8 +236,8 @@ Route::middleware(['auth'])->group(function () {
     })->name('admin.mapel.delete');
 
     // =====================================================================================================================================
-// ======================      Route untuk Manajemen Semester        ======================================================
-// =====================================================================================================================================
+    // ======================      Route untuk Manajemen Semester          ======================================================
+    // =====================================================================================================================================
 
     // Route untuk daftar semester
     Route::get('/admin/semester', function () {
@@ -298,7 +289,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('admin.semester.activate');
 
     // =====================================================================================================================================
-// =====================================================================================================================================
+    // =====================================================================================================================================
 
 
     // Route untuk daftar kelas (hanya admin yang bisa mengakses)
@@ -345,7 +336,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     // =====================================================================================================================================
-// =====================================================================================================================================
+    // =====================================================================================================================================
 
     // Route untuk daftar Guru dengan Mata Pelajaran
     Route::get('/admin/guru-mapel', function () {
@@ -383,13 +374,9 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.guru-mapel.destroy');
 
-
-
-
-
     // =====================================================================================================================================
-// ======================      Route untuk Manajemen Ujian / Tugas  HAL GURU        ======================================================
-// =====================================================================================================================================
+    // ======================      Route untuk Manajemen Ujian / Tugas  HAL GURU         ======================================================
+    // =====================================================================================================================================
 
 
     // Route untuk Manajemen ujian
@@ -425,16 +412,82 @@ Route::middleware(['auth'])->group(function () {
         }, 'guru');
     })->name('guru.manajemen-ujian.destroy');
 
+
     // =====================================================================================================================================
-// ======================      Route untuk Manajemen Ujian / Tugas  Essay dan pilihan ganda        ======================================================
-// =====================================================================================================================================
+    // ======================      Route untuk Manajemen Kuis HAL GURU      ============================================================================
+    // =====================================================================================================================================
+
+    // Route untuk Manajemen Kuis (TELAH DIPERBAIKI)
+Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(function () {
+    
+    // URL: /guru/quiz - Nama: guru.quiz.index
+    Route::get('/', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            // Path sudah benar di sini
+            return app()->call('App\Http\Controllers\QuizController@index');
+        }, 'guru');
+    })->name('index');
+
+    // URL: /guru/quiz/create - Nama: guru.quiz.create
+    Route::get('/create', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            // Path sudah benar di sini
+            return app()->call('App\Http\Controllers\QuizController@create');
+        }, 'guru');
+    })->name('create');
+    
+    // Route untuk menyimpan kuis
+    Route::post('/', function (Illuminate\Http\Request $request) {
+        return (new RoleMiddleware)->handle(request(), function () use ($request) {
+            // Path sudah benar di sini
+            return app()->call('App\Http\Controllers\QuizController@store', ['request' => $request]);
+        }, 'guru');
+    })->name('store');
+
+    // Route untuk menampilkan halaman edit
+    Route::get('/{quiz}/edit', function (App\Models\Quiz $quiz) {
+        return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
+            // PERBAIKAN DI SINI: Http-Controllers -> Http\Controllers
+            return app()->call('App\Http\Controllers\QuizController@edit', ['quiz' => $quiz]);
+        }, 'guru');
+    })->name('edit');
+
+    // Route untuk memproses update data
+    Route::put('/{quiz}', function (Illuminate\Http\Request $request, App\Models\Quiz $quiz) {
+        return (new RoleMiddleware)->handle(request(), function () use ($request, $quiz) {
+            // PERBAIKAN DI SINI: Http-Controllers -> Http\Controllers
+            return app()->call('App\Http\Controllers\QuizController@update', [
+                'request' => $request,
+                'quiz' => $quiz
+            ]);
+        }, 'guru');
+    })->name('update');
+
+    // Route untuk menghapus data
+    Route::delete('/{quiz}', function (App\Models\Quiz $quiz) {
+        return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
+            // PERBAIKAN DI SINI: Http-Controllers -> Http\Controllers
+            return app()->call('App\Http\Controllers\QuizController@destroy', ['quiz' => $quiz]);
+        }, 'guru');
+    })->name('destroy');
+
+    Route::get('/{quiz}', function (App\Models\Quiz $quiz) {
+        return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
+            return app()->call('App\Http\Controllers\QuizController@show', ['quiz' => $quiz]);
+        }, 'guru');
+    })->name('show');
+});
+
+    // =====================================================================================================================================
+    // ======================      Route untuk Manajemen Ujian / Tugas  Essay dan pilihan ganda          ======================================================
+    // =====================================================================================================================================
 
 
 });
 
 // =====================================================================================================================================
 // ======================      Route untuk Manajemen Ujian / Tugas  HAL SISWA        ====================================================
-// ======================                   Route untuk Login SISWA        ======================================================
+// ======================              Route untuk Login SISWA         ======================================================
 // =====================================================================================================================================
 
 
@@ -444,7 +497,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/admin/update-profile/{id}', [AdminController::class, 'updateProfil'])->name('admin.update_profil');
 });
 
-//==============================    Route SISWA ==========================================================
+//==============================      Route SISWA ==========================================================
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/siswa/ujian', [UjianController::class, 'index'])->name('siswa.ujian.index');
@@ -473,7 +526,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 
-    // ======================      Route untuk materi siswa        ======================================================
+    // ======================      Route untuk materi siswa          ======================================================
 
 
     // Route untuk menampilkan daftar materi bagi siswa
@@ -502,12 +555,12 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 // =====================================================================================================================================
-// ======================      Route untuk Manajemen Ujian / Tugas  HAL GURU        ====================================================
-// ======================                   Route untuk Login Guru        ======================================================
+// ======================      Route untuk Manajemen Ujian / Tugas  HAL GURU         ====================================================
+// ======================              Route untuk Login Guru          ======================================================
 // =====================================================================================================================================
 
 
-//==============================    Route Guru ==========================================================
+//==============================      Route Guru ==========================================================
 Route::group(['middleware' => ['auth']], function () {
     Route::prefix('guru/tugas-siswa')->name('guru.tugas-siswa.')->group(function () {
         Route::get('/create', [TugasSiswaController::class, 'create'])->name('create');
@@ -521,7 +574,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
 
-    // ======================      Route untuk materi guru        ======================================================
+    // ======================      Route untuk materi guru           ======================================================
 // =====================================================================================================================================
 
     Route::prefix('guru/materi')->name('guru.materi.')->group(function () {
@@ -664,25 +717,25 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
         Route::post('/admin/jadwal/store', function () {
             return (new RoleMiddleware)->handle(request(), function () {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@store');
+                return app()->call('App\\Http\Controllers\\AdminJadwalController@store');
             }, 'admin');
         })->name('admin.jadwal.store');
 
         Route::get('/admin/jadwal/edit/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@edit', ['id' => $id]);
+                return app()->call('App\\Http\Controllers\\AdminJadwalController@edit', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.edit');
 
         Route::post('/admin/jadwal/update/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@update', ['id' => $id]);
+                return app()->call('App\\Http\Controllers\\AdminJadwalController@update', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.update');
 
         Route::delete('/admin/jadwal/delete/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
+                return app()->call('App\\Http\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.destroy');
     });
@@ -713,7 +766,7 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
     Route::post('/guru/presensi/{id}/close', function ($id) {
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\\Http\\Controllers\\PresensiController@close', ['id' => $id]);
+            return app()->call('App\\Http\Controllers\\PresensiController@close', ['id' => $id]);
         }, 'guru');
     })->name('guru.presensi.close');
 
@@ -725,7 +778,7 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
     Route::get('/guru/presensi/api/active-sessions', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\\Controllers\\PresensiController@getActiveSessions');
+            return app()->call('App\\Http\Controllers\\PresensiController@getActiveSessions');
         }, 'guru');
     })->name('guru.presensi.api.active-sessions');
 
