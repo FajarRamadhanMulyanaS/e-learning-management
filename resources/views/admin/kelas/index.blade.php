@@ -38,7 +38,7 @@
                                     <button class="btn btn-warning btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editKelasModal{{ $k->id }}">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
-                                    <form action="{{ route('admin.kelas.destroy', $k->id) }}" method="POST" style="display: inline-block;">
+                                    <form action="{{ url('/admin/kelas/delete/' . $k->id) }}" method="POST" style="display: inline-block;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus?')">
@@ -56,9 +56,8 @@
                                             <h5 class="modal-title fw-bold" id="editKelasModalLabel">Edit Kelas</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                        <form action="{{ route('admin.kelas.update', $k->id) }}" method="POST">
+                                        <form action="{{ url('/admin/kelas/update/' . $k->id) }}" method="POST">
                                             @csrf
-                                            @method('PUT')
                                             <div class="modal-body">
                                                 <div class="mb-3">
                                                     <label for="kode_kelas" class="form-label">Kode Kelas</label>

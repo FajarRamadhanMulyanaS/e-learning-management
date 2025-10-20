@@ -38,6 +38,12 @@
 <script src="{{asset('New')}}/js/Chart.roundedBarCharts.js"></script>
 <!-- End custom js for this page-->
 
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <!-- Template Main JS File -->
 <script src="{{asset('admin')}}/js/main.js"></script>
 
