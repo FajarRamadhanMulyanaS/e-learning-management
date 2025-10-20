@@ -41,11 +41,11 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">Guru</label>
-                        <select name="guru_id" class="form-select">
-                            <option value="">- Opsional -</option>
-                            @foreach($gurus as $g)
-                                <option value="{{ $g->id }}">{{ $g->nama_guru }}</option>
+                        <label for="user_id">Pilih Guru</label>
+                        <select name="user_id" class="form-control" required>
+                            <option value="">Pilih Guru</option>
+                            @foreach($guru as $g)
+                                <option value="{{ $g->id }}">{{ $g->username }}</option>
                             @endforeach
                         </select>
                     </div>

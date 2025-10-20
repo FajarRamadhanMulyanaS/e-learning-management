@@ -36,7 +36,7 @@
                                 <td>{{ \Illuminate\Support\Carbon::parse($item->jam_mulai)->format('H:i') }} - {{ \Illuminate\Support\Carbon::parse($item->jam_selesai)->format('H:i') }}</td>
                                 <td>{{ $item->kelas->nama_kelas ?? '-' }}</td>
                                 <td>{{ $item->mapel->nama_mapel ?? '-' }}</td>
-                                <td>{{ $item->guru->nama_guru ?? '-' }}</td>
+                                <td>{{ $item->user->username ?? '-' }}</td>
                                 <td>{{ optional($item->semester)->nama_semester }} {{ optional($item->semester)->tahun_ajaran }}</td>
                                 <td>{{ $item->ruang ?? '-' }}</td>
                                 <td class="d-flex gap-2">
