@@ -10,6 +10,24 @@
         </div>
         <div class="card-body">
             <p class="card-text fs-5">{{ $thread->content }}</p>
+
+            {{-- PERUBAHAN 1: Tampilkan lampiran untuk thread utama --}}
+            @if($thread->attachments->isNotEmpty())
+                <div class="mt-3">
+                    <strong>Lampiran:</strong>
+                    <ul class="list-unstyled">
+                        @foreach($thread->attachments as $attachment)
+                            <li>
+                                <a href="{{ Storage::url($attachment->path) }}" target="_blank">
+                                    <i class="fa-solid fa-paperclip me-1"></i>
+                                    {{ $attachment->filename }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            
             <hr>
             <div class="d-flex justify-content-end text-muted">
                 <small class="me-3">
@@ -43,6 +61,23 @@
             </div>
             <div class="card-body">
                 <p class="mb-0">{{ $comment->content }}</p>
+
+                {{-- PERUBAHAN 2: Tampilkan lampiran untuk setiap komentar --}}
+                @if($comment->attachments->isNotEmpty())
+                    <div class="mt-3">
+                        <strong>Lampiran:</strong>
+                        <ul class="list-unstyled">
+                            @foreach($comment->attachments as $attachment)
+                                <li>
+                                    <a href="{{ Storage::url($attachment->path) }}" target="_blank">
+                                        <i class="fa-solid fa-paperclip me-1"></i>
+                                        {{ $attachment->filename }}
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
             </div>
         </div>
     @empty
@@ -55,10 +90,15 @@
             <h5 class="mb-0">Tinggalkan Komentar</h5>
         </div>
         <div class="card-body">
-            <form action="{{ route('comments.store', $thread->id) }}" method="POST">
+            {{-- PERUBAHAN 3: Tambahkan enctype dan input file pada form komentar --}}
+            <form action="{{ route('comments.store', $thread->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
-                <div class="form-group mb-2">
+                <div class="form-group mb-3">
                     <textarea name="content" class="form-control" rows="4" placeholder="Tulis komentar Anda di sini..." required></textarea>
+                </div>
+                <div class="form-group mb-3">
+                     <label for="comment-attachments" class="form-label">Lampiran (Opsional)</label>
+                    <input type="file" name="attachments[]" id="comment-attachments" class="form-control" multiple>
                 </div>
                 <button type="submit" class="btn btn-primary">
                     <i class="fa-solid fa-paper-plane me-2"></i>Kirim
