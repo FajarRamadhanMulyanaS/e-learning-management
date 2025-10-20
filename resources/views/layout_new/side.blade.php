@@ -9,6 +9,12 @@
             <span class="menu-title">Dashboard</span>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{route('admin.jadwal.index')}}">
+                <i class="fas fa-calendar-alt menu-icon"></i>
+            <span class="menu-title">Jadwal Pelajaran</span>
+            </a>
+        </li>
 
         <li class="nav-item">
             <a class="nav-link" href="{{ route('auth.change-password2') }}">

@@ -28,6 +28,8 @@ use App\Exports\SiswaExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\ThreadController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\AdminJadwalController;
+use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/', function () {
@@ -61,7 +63,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('siswa.index');
 
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // =====================================================================================================================================
 
 
@@ -81,7 +83,7 @@ Route::middleware(['auth'])->group(function () {
     //     }, 'admin');
     // })->name('admin.profil_admin');
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // =====================================================================================================================================
 
 
@@ -141,7 +143,7 @@ Route::middleware(['auth'])->group(function () {
         return response()->download($filePath, 'template_siswa.xlsx');
     })->name('admin.siswa.downloadTemplateSiswa');
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // =====================================================================================================================================
 
     // CRUD untuk Guru (Hanya admin yang bisa mengakses)
@@ -196,7 +198,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // =====================================================================================================================================
 
     // Route untuk daftar mata pelajaran
@@ -241,7 +243,7 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.mapel.delete');
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // ======================      Route untuk Manajemen Semester        ======================================================
 // =====================================================================================================================================
 
@@ -294,12 +296,12 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.semester.activate');
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // =====================================================================================================================================
 
 
-     // Route untuk daftar kelas (hanya admin yang bisa mengakses)
-     Route::get('/admin/kelas', function () {
+    // Route untuk daftar kelas (hanya admin yang bisa mengakses)
+    Route::get('/admin/kelas', function () {
         return (new RoleMiddleware)->handle(request(), function () {
             return app()->call('App\Http\Controllers\KelasController@index');
         }, 'admin');
@@ -341,7 +343,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('admin.kelas.destroy');
 
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // =====================================================================================================================================
 
     // Route untuk daftar Guru dengan Mata Pelajaran
@@ -384,7 +386,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // ======================      Route untuk Manajemen Ujian / Tugas  HAL GURU        ======================================================
 // =====================================================================================================================================
 
@@ -422,7 +424,7 @@ Route::middleware(['auth'])->group(function () {
         }, 'guru');
     })->name('guru.manajemen-ujian.destroy');
 
-// =====================================================================================================================================
+    // =====================================================================================================================================
 // ======================      Route untuk Manajemen Ujian / Tugas  Essay dan pilihan ganda        ======================================================
 // =====================================================================================================================================
 
@@ -470,7 +472,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
 
-// ======================      Route untuk materi siswa        ======================================================
+    // ======================      Route untuk materi siswa        ======================================================
 
 
     // Route untuk menampilkan daftar materi bagi siswa
@@ -495,7 +497,7 @@ Route::group(['middleware' => ['auth']], function () {
     // Route untuk update pengumpulan tugas (PUT)
     Route::put('/siswa/pengumpulan/{id}', [TugasSiswaController::class, 'updateTugasSiswa'])->name('siswa.tugas.updateTugasSiswa');
 
-   Route::delete('/siswa/pengumpulan/{id}', [TugasSiswaController::class, 'destroyTugasSiswa'])->name('siswa.tugas.destroyTugasSiswa');
+    Route::delete('/siswa/pengumpulan/{id}', [TugasSiswaController::class, 'destroyTugasSiswa'])->name('siswa.tugas.destroyTugasSiswa');
 });
 
 // =====================================================================================================================================
@@ -518,7 +520,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
 
-// ======================      Route untuk materi guru        ======================================================
+    // ======================      Route untuk materi guru        ======================================================
 // =====================================================================================================================================
 
     Route::prefix('guru/materi')->name('guru.materi.')->group(function () {
@@ -576,14 +578,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/guru/profil', [ProfileController::class, 'showProfilGuru'])->name('guru.profil.profil_guru');
     // route untuk exports nilai tugas
     Route::get('/guru/tugas/{id}/export-excel', [TugasSiswaController::class, 'exportExcel'])->name('guru.exportExcel');
-// routes/web.php
-Route::get('guru/tugas/{id}/detail', [TugasSiswaController::class, 'showTugas'])->name('guru.tugas-siswa.showguru');
-Route::post('guru/tugas/{id}/koreksi', [TugasSiswaController::class, 'koreksiTugas'])->name('guru.koreksiTugas');
+    // routes/web.php
+    Route::get('guru/tugas/{id}/detail', [TugasSiswaController::class, 'showTugas'])->name('guru.tugas-siswa.showguru');
+    Route::post('guru/tugas/{id}/koreksi', [TugasSiswaController::class, 'koreksiTugas'])->name('guru.koreksiTugas');
 
 
 
 
-Route::put('/guru/profil/{id}', [ProfileController::class, 'updateProfilGuru'])->name('guru.profil.updateProfilGuru');
+    Route::put('/guru/profil/{id}', [ProfileController::class, 'updateProfilGuru'])->name('guru.profil.updateProfilGuru');
 
 });
 
@@ -641,6 +643,46 @@ Route::prefix('guru/video')->name('guru.video.')->middleware('auth')->group(func
 
 
 // Routes untuk Mata Pelajaran
+// ====================== Manajemen Jadwal (Admin) ======================
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/jadwal', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\\Http\\Controllers\\AdminJadwalController@index');
+        }, 'admin');
+    })->name('admin.jadwal.index');
+
+    Route::get('/admin/jadwal/create', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\\Http\\Controllers\\AdminJadwalController@create');
+        }, 'admin');
+    })->name('admin.jadwal.create');
+
+    Route::post('/admin/jadwal/store', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\\Http\\Controllers\\AdminJadwalController@store');
+        }, 'admin');
+    })->name('admin.jadwal.store');
+
+    Route::get('/admin/jadwal/edit/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\\Http\\Controllers\\AdminJadwalController@edit', ['id' => $id]);
+        }, 'admin');
+    })->name('admin.jadwal.edit');
+
+    Route::post('/admin/jadwal/update/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\\Http\\Controllers\\AdminJadwalController@update', ['id' => $id]);
+        }, 'admin');
+    })->name('admin.jadwal.update');
+
+    Route::delete('/admin/jadwal/delete/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\\Http\\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
+        }, 'admin');
+    })->name('admin.jadwal.destroy');
+});
+// ====================== End Manajemen Jadwal (Admin) ======================
+
 Route::resource('courses', CourseController::class);
 
 // Logout Route
