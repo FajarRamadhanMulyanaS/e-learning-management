@@ -18,7 +18,7 @@ class PelajaranController extends Controller
 
         $activeSemester = Semester::active()->first();
 
-        $jadwal = Jadwal::with(['kelas', 'mapel', 'guru'])
+        $jadwal = Jadwal::with(['kelas', 'mapel', 'user'])
             ->when($kelasId, function ($q) use ($kelasId) {
                 $q->where('kelas_id', $kelasId);
             })

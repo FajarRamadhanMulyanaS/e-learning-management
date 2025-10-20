@@ -8,12 +8,13 @@ use App\Models\Mapel;
 use App\Models\Guru;
 use App\Models\Semester;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class AdminJadwalController extends Controller
 {
     public function index()
     {
-        $jadwal = Jadwal::with(['kelas', 'mapel', 'guru', 'semester'])->orderBy('hari')->orderBy('jam_mulai')->paginate(20);
+        $jadwal = Jadwal::with(['kelas', 'mapel', 'user', 'semester'])->orderBy('hari')->orderBy('jam_mulai')->paginate(20);
         return view('admin.jadwal.index', compact('jadwal'));
     }
 
@@ -21,9 +22,9 @@ class AdminJadwalController extends Controller
     {
         $kelas = Kelas::all();
         $mapels = Mapel::all();
-        $gurus = Guru::all();
+        $guru = User::where('role', 'guru')->get();
         $semesters = Semester::all();
-        return view('admin.jadwal.create', compact('kelas', 'mapels', 'gurus', 'semesters'));
+        return view('admin.jadwal.create', compact('kelas', 'mapels', 'guru', 'semesters'));
     }
 
     public function store(Request $request)
@@ -31,7 +32,7 @@ class AdminJadwalController extends Controller
         $validated = $request->validate([
             'kelas_id' => 'required|exists:kelas,id',
             'mapel_id' => 'required|exists:mapels,id',
-            'guru_id' => 'nullable|exists:guru,id',
+            'user_id' => 'nullable|exists:users,id',
             'semester_id' => 'nullable|exists:semesters,id',
             'hari' => 'required|string',
             'jam_mulai' => 'required|date_format:H:i',
@@ -48,9 +49,9 @@ class AdminJadwalController extends Controller
         $jadwal = Jadwal::findOrFail($id);
         $kelas = Kelas::all();
         $mapels = Mapel::all();
-        $gurus = Guru::all();
+        $guru = User::where('role', 'guru')->get();
         $semesters = Semester::all();
-        return view('admin.jadwal.edit', compact('jadwal', 'kelas', 'mapels', 'gurus', 'semesters'));
+        return view('admin.jadwal.edit', compact('jadwal', 'kelas', 'mapels', 'guru', 'semesters'));
     }
 
     public function update(Request $request, $id)
@@ -58,7 +59,7 @@ class AdminJadwalController extends Controller
         $validated = $request->validate([
             'kelas_id' => 'required|exists:kelas,id',
             'mapel_id' => 'required|exists:mapels,id',
-            'guru_id' => 'nullable|exists:guru,id',
+            'user_id' => 'nullable|exists:users,id',
             'semester_id' => 'nullable|exists:semesters,id',
             'hari' => 'required|string',
             'jam_mulai' => 'required|date_format:H:i',

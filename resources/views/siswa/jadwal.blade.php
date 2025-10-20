@@ -59,7 +59,7 @@
                     {{ optional(\Illuminate\Support\Carbon::parse($item->jam_selesai ?? '00:00'))->format('H:i') }}
                   </td>
                   <td>{{ optional($item->mapel)->nama_mapel ?? '-' }}</td>
-                  <td>{{ optional($item->guru)->nama_guru ?? '-' }}</td>
+                  <td>{{ optional($item->user)->username ?? '-' }}</td>
                   <td>{{ $item->ruang ?? '-' }}</td>
                 </tr>
               @empty

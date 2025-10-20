@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('kelas_id');
             $table->unsignedBigInteger('mapel_id');
-            $table->unsignedBigInteger('guru_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('semester_id')->nullable();
             $table->string('hari');
             $table->time('jam_mulai');
@@ -21,7 +21,7 @@ return new class extends Migration {
 
             $table->foreign('kelas_id')->references('id')->on('kelas')->onDelete('cascade');
             $table->foreign('mapel_id')->references('id')->on('mapels')->onDelete('cascade');
-            $table->foreign('guru_id')->references('id')->on('guru')->onDelete('set null');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('semester_id')->references('id')->on('semesters')->onDelete('set null');
         });
     }
