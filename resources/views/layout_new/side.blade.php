@@ -17,6 +17,13 @@
         </li>
 
         <li class="nav-item">
+            <a class="nav-link" href="{{route('admin.presensi.index')}}">
+                <i class="fas fa-clipboard-check menu-icon"></i>
+            <span class="menu-title">Presensi Online</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
             <a class="nav-link" href="{{ route('auth.change-password2') }}">
                 <i class="fa-solid fa-key menu-icon"></i>
             <span class="menu-title">Ganti Password</span>
