@@ -42,13 +42,31 @@
               <thead>
                 <tr>
                   <th scope="col">No</th>
-                  <th scope="col">Kategori</th>
-                  <th scope="col">Jadwal Kelas</th>
-                  <th scope="col">Aksi</th>
+                  <th scope="col">Hari</th>
+                  <th scope="col">Jam</th>
+                  <th scope="col">Mapel</th>
+                  <th scope="col">Guru</th>
+                  <th scope="col">Ruang</th>
                 </tr>
               </thead>
               <tbody>
-
+              @forelse(($jadwal ?? collect()) as $index => $item)
+                <tr>
+                  <td>{{ $index + 1 }}</td>
+                  <td>{{ $item->hari ?? '-' }}</td>
+                  <td>
+                    {{ optional(\Illuminate\Support\Carbon::parse($item->jam_mulai ?? '00:00'))->format('H:i') }} -
+                    {{ optional(\Illuminate\Support\Carbon::parse($item->jam_selesai ?? '00:00'))->format('H:i') }}
+                  </td>
+                  <td>{{ optional($item->mapel)->nama_mapel ?? '-' }}</td>
+                  <td>{{ optional($item->guru)->nama_guru ?? '-' }}</td>
+                  <td>{{ $item->ruang ?? '-' }}</td>
+                </tr>
+              @empty
+                <tr>
+                  <td colspan="6" class="text-center">Belum ada jadwal untuk ditampilkan.</td>
+                </tr>
+              @endforelse
               </tbody>
             </table>
           </div>

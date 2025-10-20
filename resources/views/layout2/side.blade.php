@@ -128,6 +128,12 @@
       </li>
 
       <li class="nav-item">
+        <a class="nav-link" href="{{route('siswa.jadwal')}}">
+          <i class="fas fa-calendar-alt menu-icon"></i>
+          <span class="menu-title">Jadwal Pelajaran</span>
+        </a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="{{ route('auth.change-password') }}">
           <i class="mdi mdi-key-variant menu-icon"></i>
           <span class="menu-title">Ganti Password</span>

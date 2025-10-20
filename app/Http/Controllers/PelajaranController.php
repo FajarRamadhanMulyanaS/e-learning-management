@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Jadwal;
+use App\Models\Semester;
+use Illuminate\Support\Facades\Auth;
 
 class PelajaranController extends Controller
 {
@@ -10,7 +13,23 @@ class PelajaranController extends Controller
 
     public function jadwal()
     {
-        return view('siswa.jadwal');
+        $user = Auth::user();
+        $kelasId = optional($user->kelas)->id;
+
+        $activeSemester = Semester::active()->first();
+
+        $jadwal = Jadwal::with(['kelas', 'mapel', 'guru'])
+            ->when($kelasId, function ($q) use ($kelasId) {
+                $q->where('kelas_id', $kelasId);
+            })
+            ->when($activeSemester, function ($q) use ($activeSemester) {
+                $q->where('semester_id', $activeSemester->id);
+            })
+            ->orderBy('hari')
+            ->orderBy('jam_mulai')
+            ->get();
+
+        return view('siswa.jadwal', compact('jadwal', 'activeSemester'));
     }
     public function indo()
     {
