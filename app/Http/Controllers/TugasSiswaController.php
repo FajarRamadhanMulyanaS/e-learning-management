@@ -202,11 +202,35 @@ class TugasSiswaController extends Controller
     public function indexSiswa(Request $request)
     {
         $kelasId = auth()->user()->kelas_id;
-        $tugas = Tugas::where('kelas_id', $kelasId)->with('mapel')->get();
+        $siswaId = auth()->id();
+        
+        $tugas = Tugas::where('kelas_id', $kelasId)
+                    ->with(['mapel', 'pengumpulanTugas' => function($query) use ($siswaId) {
+                        $query->where('siswa_id', $siswaId);
+                    }])
+                    ->get();
 
-
+        // Tambahkan status untuk setiap tugas
+        $tugas->each(function($tugasItem) {
+            $tugasItem->status = $this->getTugasStatus($tugasItem);
+        });
 
         return view('siswa.tugas.index', compact('tugas'));
+    }
+
+    private function getTugasStatus($tugas)
+    {
+        $now = now();
+        $deadline = $tugas->tanggal_pengumpulan;
+        $isSubmitted = $tugas->pengumpulanTugas->isNotEmpty();
+        
+        if ($isSubmitted) {
+            return 'submitted'; // Sudah disubmit
+        } elseif ($now->gt($deadline)) {
+            return 'overdue'; // Melebihi deadline
+        } else {
+            return 'pending'; // Belum disubmit dan belum deadline
+        }
     }
 
     public function show($id)
