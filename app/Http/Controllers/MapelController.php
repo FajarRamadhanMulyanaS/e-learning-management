@@ -3,21 +3,37 @@
 namespace App\Http\Controllers;
 
 use App\Models\Mapel;
+use App\Models\Semester;
 use Illuminate\Http\Request;
 
 class MapelController extends Controller
 {
     // Menampilkan daftar mapel
-    public function index()
+    public function index(Request $request)
     {
-        $mapels = Mapel::all();
-        return view('admin.mapel.index', compact('mapels'));
+        $query = Mapel::with('semester');
+        
+        // Filter berdasarkan semester jika dipilih
+        if ($request->has('semester_id') && $request->semester_id) {
+            $query->where('semester_id', $request->semester_id);
+        }
+        
+        $mapels = $query->orderBy('nama_mapel')->get();
+        $semesters = Semester::orderBy('tahun_ajaran', 'desc')
+                           ->orderBy('nama_semester', 'asc')
+                           ->get();
+        $selectedSemester = $request->semester_id;
+        
+        return view('admin.mapel.index', compact('mapels', 'semesters', 'selectedSemester'));
     }
 
     // Menampilkan form untuk menambahkan mapel baru
     public function create()
     {
-        return view('admin.mapel.create');
+        $semesters = Semester::orderBy('tahun_ajaran', 'desc')
+                           ->orderBy('nama_semester', 'asc')
+                           ->get();
+        return view('admin.mapel.create', compact('semesters'));
     }
 
     // Menyimpan mapel baru ke database
@@ -26,6 +42,7 @@ class MapelController extends Controller
         $request->validate([
             'kode_mapel' => 'required|unique:mapels',
             'nama_mapel' => 'required',
+            'semester_id' => 'required|exists:semesters,id',
         ]);
 
         Mapel::create($request->all());
@@ -36,7 +53,10 @@ class MapelController extends Controller
     public function edit($id)
     {
         $mapel = Mapel::findOrFail($id);
-        return view('admin.mapel.edit', compact('mapel'));
+        $semesters = Semester::orderBy('tahun_ajaran', 'desc')
+                           ->orderBy('nama_semester', 'asc')
+                           ->get();
+        return view('admin.mapel.edit', compact('mapel', 'semesters'));
     }
 
     // Memperbarui data mapel di database
@@ -45,6 +65,7 @@ class MapelController extends Controller
         $request->validate([
             'kode_mapel' => 'required|unique:mapels,kode_mapel,' . $id,
             'nama_mapel' => 'required',
+            'semester_id' => 'required|exists:semesters,id',
         ]);
 
         $mapel = Mapel::findOrFail($id);

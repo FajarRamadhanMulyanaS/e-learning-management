@@ -241,6 +241,58 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.mapel.delete');
 
+// =====================================================================================================================================
+// ======================      Route untuk Manajemen Semester        ======================================================
+// =====================================================================================================================================
+
+    // Route untuk daftar semester
+    Route::get('/admin/semester', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\Http\Controllers\SemesterController@index');
+        }, 'admin');
+    })->name('admin.semester.index');
+
+    // Route untuk form tambah semester
+    Route::get('/admin/semester/create', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\Http\Controllers\SemesterController@create');
+        }, 'admin');
+    })->name('admin.semester.create');
+
+    // Route untuk menyimpan semester baru
+    Route::post('/admin/semester/store', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\Http\Controllers\SemesterController@store');
+        }, 'admin');
+    })->name('admin.semester.store');
+
+    // Route untuk form edit semester
+    Route::get('/admin/semester/edit/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\Http\Controllers\SemesterController@edit', ['id' => $id]);
+        }, 'admin');
+    })->name('admin.semester.edit');
+
+    // Route untuk update semester
+    Route::post('/admin/semester/update/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\Http\Controllers\SemesterController@update', ['id' => $id]);
+        }, 'admin');
+    })->name('admin.semester.update');
+
+    // Route untuk menghapus semester
+    Route::delete('/admin/semester/delete/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\Http\Controllers\SemesterController@destroy', ['id' => $id]);
+        }, 'admin');
+    })->name('admin.semester.delete');
+
+    // Route untuk mengaktifkan semester
+    Route::post('/admin/semester/activate/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\Http\Controllers\SemesterController@activate', ['id' => $id]);
+        }, 'admin');
+    })->name('admin.semester.activate');
 
 // =====================================================================================================================================
 // =====================================================================================================================================

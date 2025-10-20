@@ -13,6 +13,7 @@ class Mapel extends Model
     protected $fillable = [
         'kode_mapel',
         'nama_mapel',
+        'semester_id',
     ];
 
     public function GuruMapel()
@@ -32,5 +33,11 @@ class Mapel extends Model
     public function ujians()
     {
         return $this->hasMany(Ujian::class, 'mapel_id');
+    }
+
+    // Relasi ke Semester
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
     }
 }
