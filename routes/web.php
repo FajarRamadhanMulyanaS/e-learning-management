@@ -421,39 +421,56 @@ Route::middleware(['auth'])->group(function () {
 
     // Route untuk Manajemen Kuis
 Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(function () {
+    // Route untuk menampilkan halaman penilaian
+
+    Route::get('/submission/{submission}/grade', function (App\Models\QuizSubmission $submission) {
+        return (new RoleMiddleware)->handle(request(), function () use ($submission) {
+            return app()->call('App\\Http\\Controllers\\QuizController@grade', ['submission' => $submission]);
+        }, 'guru');
+    })->name('grade');
+
+    // Route untuk menyimpan nilai
+    Route::post('/submission/{submission}/grade', function (Illuminate\Http\Request $request, App\Models\QuizSubmission $submission) {
+        return (new RoleMiddleware)->handle(request(), function () use ($request, $submission) {
+            return app()->call('App\\Http\\Controllers\\QuizController@storeGrade', [
+                'request' => $request,
+                'submission' => $submission
+            ]);
+        }, 'guru');
+    })->name('storeGrade');
     
     // URL: /guru/quiz - Nama: guru.quiz.index
     Route::get('/', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\QuizController@index');
+            return app()->call('App\\Http\\Controllers\\QuizController@index');
         }, 'guru');
     })->name('index');
 
     // URL: /guru/quiz/create - Nama: guru.quiz.create
     Route::get('/create', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\QuizController@create');
+            return app()->call('App\\Http\\Controllers\\QuizController@create');
         }, 'guru');
     })->name('create');
     
     // Route untuk menyimpan kuis
     Route::post('/', function (Illuminate\Http\Request $request) {
         return (new RoleMiddleware)->handle(request(), function () use ($request) {
-            return app()->call('App\Http\Controllers\QuizController@store', ['request' => $request]);
+            return app()->call('App\\Http\\Controllers\\QuizController@store', ['request' => $request]);
         }, 'guru');
     })->name('store');
 
     // Route untuk menampilkan halaman edit
     Route::get('/{quiz}/edit', function (App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            return app()->call('App\Http\Controllers\QuizController@edit', ['quiz' => $quiz]);
+            return app()->call('App\\Http\\Controllers\\QuizController@edit', ['quiz' => $quiz]);
         }, 'guru');
     })->name('edit');
 
     // Route untuk memproses update data
     Route::put('/{quiz}', function (Illuminate\Http\Request $request, App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($request, $quiz) {
-            return app()->call('App\Http\Controllers\QuizController@update', [
+            return app()->call('App\\Http\\Controllers\\QuizController@update', [
                 'request' => $request,
                 'quiz' => $quiz
             ]);
@@ -463,14 +480,14 @@ Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(functi
     // Route untuk menghapus data
     Route::delete('/{quiz}', function (App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            return app()->call('App\Http\Controllers\QuizController@destroy', ['quiz' => $quiz]);
+            return app()->call('App\\Http\\Controllers\\QuizController@destroy', ['quiz' => $quiz]);
         }, 'guru');
     })->name('destroy');
 
     // Route untuk menampilkan detail kuis
     Route::get('/{quiz}', function (App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            return app()->call('App\Http\Controllers\QuizController@show', ['quiz' => $quiz]);
+            return app()->call('App\\Http\\Controllers\\QuizController@show', ['quiz' => $quiz]);
         }, 'guru');
     })->name('show');
 });

@@ -6,6 +6,7 @@ use App\Models\GuruMapel;
 use App\Models\Quiz; // 1. Pastikan Anda meng-import model Quiz
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\QuizSubmission;
 
 class QuizController extends Controller
 {
@@ -162,14 +163,58 @@ public function store(Request $request)
 
     public function show(Quiz $quiz)
     {
-        // Otorisasi: pastikan guru hanya bisa melihat kuis miliknya
+        // Otorisasi
         if ($quiz->guruMapel->user_id != Auth::id()) {
             abort(403, 'Akses ditolak.');
         }
 
-        // Eager load relasi untuk ditampilkan di view
-        $quiz->load('guruMapel.mapel', 'guruMapel.kelas');
+        // Ambil semua data yang dibutuhkan
+        // PERBAIKAN DI SINI: ganti ->user menjadi ->users
+        $quiz->load('guruMapel.mapel', 'guruMapel.kelas.users');
 
-        return view('Guru.quizz.show', compact('quiz'));
+        // Ambil semua siswa dari kelas yang ditugaskan untuk kuis ini
+        // PERBAIKAN DI SINI: ganti ->user menjadi ->users
+        $students = $quiz->guruMapel->kelas->users;
+
+        // Ambil semua submission untuk kuis ini, di-indeks berdasarkan user_id agar mudah diakses
+        $submissions = \App\Models\QuizSubmission::where('quiz_id', $quiz->id)
+                                                ->get()
+                                                ->keyBy('user_id');
+
+        return view('Guru.quizz.show', compact('quiz', 'students', 'submissions'));
+    }
+
+    public function grade(QuizSubmission $submission)
+    {
+        // Otorisasi: Pastikan guru adalah pemilik kuis dari jawaban ini
+        if ($submission->quiz->guruMapel->user_id != Auth::id()) {
+            abort(403);
+        }
+
+        // Ambil semua data yang dibutuhkan (submission, quiz, student)
+        $submission->load('quiz', 'user');
+
+        return view('Guru.quizz.grade', compact('submission'));
+    }
+
+    public function storeGrade(Request $request, QuizSubmission $submission)
+    {
+        // Otorisasi
+        if ($submission->quiz->guruMapel->user_id != Auth::id()) {
+            abort(403);
+        }
+
+        // Validasi: Pastikan nilai adalah angka antara 0 - 100
+        $request->validate([
+            'nilai' => 'required|numeric|min:0|max:100',
+        ]);
+
+        // Simpan nilai ke database
+        $submission->update([
+            'nilai' => $request->nilai,
+        ]);
+
+        // Redirect kembali ke halaman detail kuis dengan pesan sukses
+        return redirect()->route('guru.quiz.show', $submission->quiz_id)->with('success', 'Nilai untuk siswa ' . $submission->user->username . ' berhasil disimpan.');
     }
 }
