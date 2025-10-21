@@ -32,6 +32,8 @@ use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\SiswaPresensiController;
 use App\Http\Controllers\AdminPresensiController;
 use App\Http\Controllers\QuizController;
+// Import controller siswa yang baru
+use App\Http\Controllers\Siswa\SiswaQuizController;
 
 Route::get('/', function () {
     return redirect()->route('homepage'); // Redirect to login page
@@ -417,13 +419,12 @@ Route::middleware(['auth'])->group(function () {
     // ======================      Route untuk Manajemen Kuis HAL GURU      ============================================================================
     // =====================================================================================================================================
 
-    // Route untuk Manajemen Kuis (TELAH DIPERBAIKI)
+    // Route untuk Manajemen Kuis
 Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(function () {
     
     // URL: /guru/quiz - Nama: guru.quiz.index
     Route::get('/', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            // Path sudah benar di sini
             return app()->call('App\Http\Controllers\QuizController@index');
         }, 'guru');
     })->name('index');
@@ -431,7 +432,6 @@ Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(functi
     // URL: /guru/quiz/create - Nama: guru.quiz.create
     Route::get('/create', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            // Path sudah benar di sini
             return app()->call('App\Http\Controllers\QuizController@create');
         }, 'guru');
     })->name('create');
@@ -439,7 +439,6 @@ Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(functi
     // Route untuk menyimpan kuis
     Route::post('/', function (Illuminate\Http\Request $request) {
         return (new RoleMiddleware)->handle(request(), function () use ($request) {
-            // Path sudah benar di sini
             return app()->call('App\Http\Controllers\QuizController@store', ['request' => $request]);
         }, 'guru');
     })->name('store');
@@ -447,7 +446,6 @@ Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(functi
     // Route untuk menampilkan halaman edit
     Route::get('/{quiz}/edit', function (App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            // PERBAIKAN DI SINI: Http-Controllers -> Http\Controllers
             return app()->call('App\Http\Controllers\QuizController@edit', ['quiz' => $quiz]);
         }, 'guru');
     })->name('edit');
@@ -455,7 +453,6 @@ Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(functi
     // Route untuk memproses update data
     Route::put('/{quiz}', function (Illuminate\Http\Request $request, App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($request, $quiz) {
-            // PERBAIKAN DI SINI: Http-Controllers -> Http\Controllers
             return app()->call('App\Http\Controllers\QuizController@update', [
                 'request' => $request,
                 'quiz' => $quiz
@@ -466,11 +463,11 @@ Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(functi
     // Route untuk menghapus data
     Route::delete('/{quiz}', function (App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            // PERBAIKAN DI SINI: Http-Controllers -> Http\Controllers
             return app()->call('App\Http\Controllers\QuizController@destroy', ['quiz' => $quiz]);
         }, 'guru');
     })->name('destroy');
 
+    // Route untuk menampilkan detail kuis
     Route::get('/{quiz}', function (App\Models\Quiz $quiz) {
         return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
             return app()->call('App\Http\Controllers\QuizController@show', ['quiz' => $quiz]);
@@ -500,6 +497,10 @@ Route::group(['middleware' => ['auth']], function () {
 //==============================      Route SISWA ==========================================================
 
 Route::group(['middleware' => ['auth']], function () {
+
+    Route::get('/siswa/quiz', [SiswaQuizController::class, 'index'])->name('siswa.quiz.index');
+    Route::get('/siswa/quiz/{quiz}', [SiswaQuizController::class, 'show'])->name('siswa.quiz.show');
+    Route::post('/siswa/quiz/{quiz}', [SiswaQuizController::class, 'submit'])->name('siswa.quiz.submit');
     Route::get('/siswa/ujian', [UjianController::class, 'index'])->name('siswa.ujian.index');
     Route::get('/siswa/ujian/{id}', [UjianController::class, 'view'])->name('siswa.ujian.view');
     Route::get('/siswa/ujian/kerjakan/{ujian_id}', [UjianController::class, 'kerjakan'])->name('siswa.ujian.kerjakan');
@@ -729,13 +730,13 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
         Route::post('/admin/jadwal/update/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\Controllers\\AdminJadwalController@update', ['id' => $id]);
+                return app()->call('App\\Http\\Controllers\\AdminJadwalController@update', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.update');
 
         Route::delete('/admin/jadwal/delete/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
+                return app()->call('App\\Http\\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.destroy');
     });
@@ -766,7 +767,7 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
     Route::post('/guru/presensi/{id}/close', function ($id) {
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\\Http\Controllers\\PresensiController@close', ['id' => $id]);
+            return app()->call('App\\Http\\Controllers\\PresensiController@close', ['id' => $id]);
         }, 'guru');
     })->name('guru.presensi.close');
 
@@ -778,7 +779,7 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
     Route::get('/guru/presensi/api/active-sessions', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\Controllers\\PresensiController@getActiveSessions');
+            return app()->call('App\\Http\\Controllers\\PresensiController@getActiveSessions');
         }, 'guru');
     })->name('guru.presensi.api.active-sessions');
 

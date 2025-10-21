@@ -158,6 +158,12 @@
         </a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" href="{{ route('siswa.quiz.index') }}">
+          <i class="mdi mdi-puzzle-check menu-icon"></i>
+          <span class="menu-title">Daftar Kuis</span>
+        </a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" href="{{ route('siswa.materi.index') }}">
             <i class="mdi mdi-book-open-page-variant menu-icon"></i>
           <span class="menu-title">Materi</span>
