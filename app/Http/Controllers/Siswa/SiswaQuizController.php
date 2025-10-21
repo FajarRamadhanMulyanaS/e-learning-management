@@ -30,17 +30,16 @@ class SiswaQuizController extends Controller
     }
     public function show(Quiz $quiz)
     {
-        // Otorisasi: Pastikan siswa hanya bisa mengakses kuis untuk kelasnya
+        // Otorisasi
         if ($quiz->guruMapel->kelas_id != Auth::user()->kelas_id) {
             abort(403, 'Anda tidak memiliki akses ke kuis ini.');
         }
 
-        // Ambil semua data terkait: mapel dan guru
-        $quiz->load('guruMapel.mapel', 'guruMapel.user');
+        // PERBARUI BARIS INI: Tambahkan 'mySubmission' untuk memuat data jawaban & nilai
+        $quiz->load('guruMapel.mapel', 'guruMapel.user', 'mySubmission');
 
         return view('Siswa.quiz.show', compact('quiz'));
     }
-
     public function submit(Request $request, Quiz $quiz)
     {
         // 1. Validasi input: pastikan ada file yang diupload dan sesuai format

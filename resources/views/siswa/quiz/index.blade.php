@@ -22,7 +22,8 @@
                             <th>Judul Kuis</th>
                             <th>Mata Pelajaran</th>
                             <th>Guru</th>
-                            <th class="text-center">Status</th> {{-- 1. Tambah Kolom Status --}}
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Nilai</th> {{-- 1. Tambah Kolom Nilai --}}
                             <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
@@ -34,7 +35,6 @@
                                 <td>{{ $quiz->guruMapel->mapel->nama_mapel }}</td>
                                 <td>{{ $quiz->guruMapel->user->username }}</td>
                                 <td class="text-center">
-                                    {{-- 2. Logika untuk menampilkan status --}}
                                     @if($quiz->mySubmission)
                                         <span class="badge badge-success">Sudah Dikerjakan</span>
                                     @else
@@ -42,19 +42,22 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    {{-- 3. Logika untuk mengubah teks tombol --}}
+                                    {{-- 2. Logika untuk menampilkan nilai --}}
+                                    <strong>{{ $quiz->mySubmission->nilai ?? '-' }}</strong>
+                                </td>
+                                <td class="text-center">
                                     <a href="{{ route('siswa.quiz.show', $quiz->id) }}" class="btn btn-sm btn-primary">
                                         @if($quiz->mySubmission)
-                                            Lihat / Kirim Ulang
+                                            Lihat Detail
                                         @else
-                                            Lihat & Kerjakan
+                                            Kerjakan
                                         @endif
                                     </a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center text-muted">Belum ada kuis yang tersedia untuk kelas Anda.</td>
+                                <td colspan="7" class="text-center text-muted">Belum ada kuis yang tersedia untuk kelas Anda.</td>
                             </tr>
                         @endforelse
                     </tbody>

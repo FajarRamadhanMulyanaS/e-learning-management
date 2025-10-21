@@ -41,7 +41,7 @@
                                 <td>0</td> {{-- Placeholder, akan diisi nanti saat soal sudah dibuat --}}
                                 <td class="text-center">
                                     {{-- Tombol aksi (Detail, Edit, Hapus) --}}
-                                    <a href="{{ route('guru.quiz.show', $quiz->id) }}" class="btn btn-sm btn-info">Nilai</a>
+                                    <a href="{{ route('guru.quiz.show', $quiz->id) }}" class="btn btn-sm btn-info">Detail</a>
                                     <a href="{{ route('guru.quiz.edit', $quiz->id) }}" class="btn btn-sm btn-warning">Edit</a>
                                     <form action="{{ route('guru.quiz.destroy', $quiz->id) }}" method="POST" class="d-inline">
                                         @csrf

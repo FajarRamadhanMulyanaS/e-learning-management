@@ -19,40 +19,40 @@
                 </div>
             </div>
 
-            {{-- Bagian Lampiran dari Guru --}}
-            @if($quiz->attachment_file || $quiz->attachment_link || $quiz->attachment_image)
-            <div class="card shadow-sm mb-4">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Materi Lampiran dari Guru</h5>
-                </div>
-                <div class="card-body">
-                    <ul>
-                        @if($quiz->attachment_file)
-                            <li><strong>File:</strong> <a href="{{ asset('storage/' . $quiz->attachment_file) }}" target="_blank">Unduh/Lihat File</a></li>
-                        @endif
-                        @if($quiz->attachment_link)
-                            <li><strong>Link:</strong> <a href="{{ $quiz->attachment_link }}" target="_blank">{{ $quiz->attachment_link }}</a></li>
-                        @endif
-                    </ul>
-                    @if($quiz->attachment_image)
+            {{-- Bagian Status & Nilai Anda --}}
+            @if($quiz->mySubmission)
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header @if($quiz->mySubmission->nilai !== null) bg-success @else bg-info @endif text-white">
+                        <h4 class="mb-0">Status & Nilai Anda</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5>Status: <span class="badge badge-success">Sudah Mengumpulkan</span></h5>
+                        <p>Jawaban Anda: <a href="{{ asset('storage/' . $quiz->mySubmission->file_path) }}" target="_blank">Lihat File Jawaban</a></p>
                         <hr>
-                        <strong>Gambar:</strong><br>
-                        <img src="{{ asset('storage/' . $quiz->attachment_image) }}" alt="Gambar Lampiran" class="img-fluid img-thumbnail mt-2" style="max-width: 400px;">
-                    @endif
+                        <h5>Nilai:</h5>
+                        @if($quiz->mySubmission->nilai !== null)
+                            <h2 class="display-4 text-success"><strong>{{ $quiz->mySubmission->nilai }}</strong></h2>
+                        @else
+                            <p class="text-muted">Jawaban Anda sedang menunggu penilaian dari guru.</p>
+                        @endif
+                    </div>
                 </div>
-            </div>
             @endif
 
-            {{-- Bagian Pengumpulan Jawaban --}}
+            {{-- Sembunyikan form jika sudah dinilai, atau tampilkan form jika belum pernah submit/belum dinilai --}}
+            @if(!$quiz->mySubmission || $quiz->mySubmission->nilai === null)
             <div class="card shadow-sm">
-                <div class="card-header bg-success text-white">
-                    <h4 class="mb-0">Kumpulkan Jawaban Anda</h4>
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0">{{ $quiz->mySubmission ? 'Kirim Ulang Jawaban' : 'Kumpulkan Jawaban Anda' }}</h4>
                 </div>
                 <div class="card-body">
-                    {{-- Form ini akan kita fungsikan selanjutnya untuk mengirim jawaban --}}
                     <form action="{{ route('siswa.quiz.submit', $quiz->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <p>Silakan kerjakan kuis sesuai petunjuk, lalu upload file jawaban Anda di sini.</p>
+                        @if($quiz->mySubmission)
+                            <p>Anda dapat mengirim ulang file jawaban selama kuis belum dinilai oleh guru. File sebelumnya akan diganti.</p>
+                        @else
+                            <p>Silakan kerjakan kuis sesuai petunjuk, lalu upload file jawaban Anda di sini.</p>
+                        @endif
                         
                         <div class="form-group">
                             <label for="submission_file" class="font-weight-bold">Lampirkan File Jawaban</label>
@@ -60,10 +60,13 @@
                             <small class="form-text text-muted">Format yang diizinkan: PDF, DOC, DOCX, JPG, PNG.</small>
                         </div>
                         
-                        <button type="submit" class="btn btn-primary btn-lg mt-3">Kumpulkan Jawaban</button>
+                        <button type="submit" class="btn btn-primary btn-lg mt-3">
+                            {{ $quiz->mySubmission ? 'Kirim Ulang' : 'Kumpulkan Jawaban' }}
+                        </button>
                     </form>
                 </div>
             </div>
+            @endif
 
             <a href="{{ route('siswa.quiz.index') }}" class="btn btn-secondary mt-3">Kembali ke Daftar Kuis</a>
         </div>
