@@ -1,5 +1,13 @@
-@extends('layout_new.app')
+@extends('layout2.app')
+
 @section('konten')
+<style>
+    /* Mobile Optimization */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+</style>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
