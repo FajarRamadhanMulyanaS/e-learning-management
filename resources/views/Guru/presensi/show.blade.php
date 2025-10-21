@@ -42,8 +42,8 @@
                     {{ $session->tanggal->format('d F Y') }}
                 </div>
                 <div class="col-md-3">
-                    <strong>Jam:</strong><br>
-                    {{ $session->jam_mulai_formatted }} - {{ $session->jam_selesai_formatted }}
+                    <strong>Jam Mulai:</strong><br>
+                    {{ $session->jam_mulai_formatted }}
                 </div>
                 <div class="col-md-3">
                     <strong>Kelas:</strong><br>
@@ -170,12 +170,22 @@
 <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
     // Generate QR Code
-    QRCode.toCanvas(document.getElementById('qrcode'), '{{ $session->qr_code }}', {
-        width: 200,
-        height: 200,
-        color: {
-            dark: '#000000',
-            light: '#FFFFFF'
+    document.addEventListener('DOMContentLoaded', function() {
+        const canvas = document.getElementById('qrcode');
+        if (canvas) {
+            QRCode.toCanvas(canvas, '{{ $session->qr_code }}', {
+                width: 200,
+                height: 200,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function (error) {
+                if (error) {
+                    console.error('Error generating QR code:', error);
+                    canvas.innerHTML = '<p class="text-danger">Error generating QR code</p>';
+                }
+            });
         }
     });
 
@@ -211,10 +221,15 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    alert('QR Code berhasil diperbarui!');
                     location.reload();
                 } else {
                     alert('Error: ' + data.message);
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat regenerate QR Code');
             });
         }
     }

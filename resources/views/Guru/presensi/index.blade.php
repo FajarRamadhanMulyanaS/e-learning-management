@@ -26,7 +26,7 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>No</th>
                             <th>Tanggal</th>
                             <th>Jam</th>
                             <th>Kelas</th>
@@ -42,7 +42,7 @@
                             <tr>
                                 <td>{{ $sessions->firstItem() + $index }}</td>
                                 <td>{{ $session->tanggal->format('d/m/Y') }}</td>
-                                <td>{{ $session->jam_mulai_formatted }} - {{ $session->jam_selesai_formatted }}</td>
+                                <td>{{ $session->jam_mulai_formatted }}</td>
                                 <td>{{ $session->kelas->nama_kelas }}</td>
                                 <td>{{ $session->mapel->nama_mapel }}</td>
                                 <td>

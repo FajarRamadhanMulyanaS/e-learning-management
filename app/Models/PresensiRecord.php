@@ -53,21 +53,27 @@ class PresensiRecord extends Model
 
     // Method untuk menentukan status berdasarkan waktu
     public function determineStatus($waktuAbsen, $jamMulai)
-    {
-        $jamMulaiCarbon = Carbon::parse($jamMulai);
-        $waktuAbsenCarbon = Carbon::parse($waktuAbsen);
+{
+    $jamMulaiCarbon = Carbon::parse($jamMulai);
+    $waktuAbsenCarbon = Carbon::parse($waktuAbsen);
 
-        // Jika absen lebih dari 15 menit dari jam mulai, dianggap terlambat
-        if ($waktuAbsenCarbon->diffInMinutes($jamMulaiCarbon) > 15) {
-            return 'terlambat';
-        }
-
-        return 'hadir';
+    if ($waktuAbsenCarbon->greaterThan($jamMulaiCarbon->addMinutes(5))) {
+        return 'terlambat';
     }
+
+    return 'hadir';
+}
+
 
     // Method untuk melakukan absen
     public function doAbsen($metodeAbsen = 'manual', $keterangan = null)
     {
+        // Load presensi session jika belum di-load
+        if (!$this->relationLoaded('presensiSession')) {
+            $this->load('presensiSession');
+        }
+
+        // Tentukan status berdasarkan jam mulai saja
         $this->status = $this->determineStatus(now(), $this->presensiSession->jam_mulai);
         $this->waktu_absen = now();
         $this->metode_absen = $metodeAbsen;
