@@ -23,23 +23,23 @@ class Kelas extends Model
     {
         return $this->hasMany(Materi::class);
     }
-        public function siswa()
+    public function siswa()
     {
         return $this->hasMany(Siswa::class); // Setiap kelas memiliki banyak siswa
     }
-    // Relasi ke siswa (user)
+    // Relasi ke users melalui tabel siswa
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->hasManyThrough(User::class, Siswa::class, 'kelas_id', 'id', 'id', 'user_id');
     }
     // Relasi ke Ujian
     public function ujians()
-     {
-         return $this->hasMany(Ujian::class, 'kelas_id');
-     }
-     public function videos()
-     {
-         return $this->hasMany(Video::class, 'kelas_id', 'kelas_id');
-     }
+    {
+        return $this->hasMany(Ujian::class, 'kelas_id');
+    }
+    public function videos()
+    {
+        return $this->hasMany(Video::class, 'kelas_id', 'kelas_id');
+    }
 
 }

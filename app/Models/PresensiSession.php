@@ -92,14 +92,14 @@ class PresensiSession extends Model
     // Method untuk generate QR Code
 
     // Method untuk generate QR Code
-public function generateQRCode()
-{
-    $this->qr_code = 'PRESENSI_' . $this->id . '_' . time() . '_' . rand(1000, 9999);
-    $this->qr_expires_at = now()->endOfDay(); // QR berlaku hingga akhir hari ini
-    $this->save();
+    public function generateQRCode()
+    {
+        $this->qr_code = 'PRESENSI_' . $this->id . '_' . time() . '_' . rand(1000, 9999);
+        $this->qr_expires_at = now()->endOfDay(); // QR berlaku hingga akhir hari ini
+        $this->save();
 
-    return $this->qr_code;
-}
+        return $this->qr_code;
+    }
 
     // Method untuk cek apakah QR masih berlaku
     public function isQRValid()
@@ -118,10 +118,8 @@ public function generateQRCode()
     // Method untuk mendapatkan statistik presensi
     public function getPresensiStats()
     {
-        // Hitung total siswa dari kedua relasi
-        $siswaFromSiswaTable = $this->kelas->siswa()->count();
-        $siswaFromUserTable = $this->kelas->users()->where('role', 'siswa')->count();
-        $totalSiswa = max($siswaFromSiswaTable, $siswaFromUserTable);
+        // Hitung total siswa dari tabel siswa
+        $totalSiswa = $this->kelas->siswa()->count();
 
         $hadir = $this->presensiRecords()->where('status', 'hadir')->count();
         $terlambat = $this->presensiRecords()->where('status', 'terlambat')->count();

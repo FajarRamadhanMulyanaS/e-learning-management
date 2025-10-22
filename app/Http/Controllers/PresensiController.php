@@ -147,10 +147,6 @@ class PresensiController extends Controller
         $siswaFromSiswaTable = $session->kelas->siswa()->pluck('user_id');
         $siswaIds = $siswaIds->merge($siswaFromSiswaTable);
 
-        // Cek dari tabel users yang memiliki kelas_id
-        $siswaFromUserTable = $session->kelas->users()->where('role', 'siswa')->pluck('id');
-        $siswaIds = $siswaIds->merge($siswaFromUserTable);
-
         // Hapus duplikat
         $siswaIds = $siswaIds->unique();
 
