@@ -88,7 +88,22 @@
                         <small class="text-danger">{{ $message }}</small>
                     @enderror
                 </div>
+                {{-- Toggle Switch untuk Visibilitas Jawaban --}}
+                <div class="form-group mb-3">
+                    <label>Visibilitas Jawaban Siswa</label>
+                    <div class="d-flex align-items-center" style="gap: 15px;">
+                        <input type="hidden" name="answers_visible_to_others" value="0">
+                        
+                        <label class="toggle-switch">
+                          <input type="checkbox" name="answers_visible_to_others" value="1" {{ old('answers_visible_to_others', $tugas->answers_visible_to_others) ? 'checked' : '' }}>
+                          <span class="slider"></span>
+                        </label>
 
+                        <small class="text-muted">
+                            Aktifkan jika siswa boleh melihat jawaban siswa lain.
+                        </small>
+                    </div>
+                </div>
                 <button type="submit" class="btn btn-primary">Perbarui Tugas</button>
                 <a href="{{ route('guru.tugas-siswa.index') }}" class="btn btn-secondary">Kembali</a>
             </form>

@@ -9,7 +9,7 @@ class Tugas extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['judul', 'deskripsi','file', 'mapel_id', 'kelas_id', 'guru_id','tanggal_pengumpulan'];
+    protected $fillable = ['judul', 'deskripsi','file', 'mapel_id', 'kelas_id', 'guru_id','tanggal_pengumpulan','answers_visible_to_others',];
     protected $casts = [
         'tanggal_pengumpulan' => 'datetime',
     ];

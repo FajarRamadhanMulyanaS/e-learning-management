@@ -563,6 +563,8 @@ Route::group(['middleware' => ['auth']], function () {
     // Route untuk menyimpan tugas yang dikumpulkan
     Route::post('/siswa/tugas/{id}/submit', [TugasSiswaController::class, 'submitTugas'])->name('siswa.tugas.submitTugas');
 
+    Route::get('/siswa/tugas/{id}/edit', [TugasSiswaController::class, 'formEditPengumpulan'])->name('siswa.tugas.edit');
+
     // Route untuk form edit pengumpulan tugas (GET)
     Route::get('/siswa/pengumpulan/{id}/edit', [TugasSiswaController::class, 'formEditPengumpulan'])->name('siswa.tugas.edit');
 

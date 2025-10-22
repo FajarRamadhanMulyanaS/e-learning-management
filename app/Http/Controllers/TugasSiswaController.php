@@ -38,47 +38,49 @@ class TugasSiswaController extends Controller
 
 
     public function store(Request $request)
-    {
-        // Validasi data input termasuk file
-        $request->validate([
-            'judul' => 'required|string|max:255',
-            'deskripsi' => 'required|string',
-            'mapel_id' => 'required|integer',
-            'kelas_id' => 'required|integer',
-            'tanggal_pengumpulan' => 'required|date',
-            'file' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
-        ]);
-
-        try {
-            // Simpan file jika ada
-            $filePath = null;
-            if ($request->hasFile('file')) {
-                try {
-                    $filePath = $request->file('file')->store('tugas_files', 'public');
-                } catch (\Exception $e) {
-                    return redirect()->back()->with('error', 'Gagal mengunggah file: ' . $e->getMessage());
-                }
-            }
-
-            // Pastikan tanggal_pengumpulan diformat dengan benar
-            $tanggalPengumpulan = Carbon::createFromFormat('Y-m-d', $request->tanggal_pengumpulan)->format('Y-m-d');
-
-            // Simpan data tugas
-            Tugas::create([
-                'judul' => $request->judul,
-                'deskripsi' => $request->deskripsi,
-                'mapel_id' => $request->mapel_id,
-                'kelas_id' => $request->kelas_id,
-                'guru_id' => auth()->id(),
-                'tanggal_pengumpulan' => $tanggalPengumpulan,
-                'file' => $filePath,
+        {
+            // Validasi data input termasuk file
+            $request->validate([
+                'judul' => 'required|string|max:255',
+                'deskripsi' => 'required|string',
+                'mapel_id' => 'required|integer',
+                'kelas_id' => 'required|integer',
+                'tanggal_pengumpulan' => 'required|date',
+                'file' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+                'answers_visible_to_others' => 'required|boolean', // <-- TAMBAHKAN INI
             ]);
 
-            return redirect()->route('guru.tugas-siswa.index')->with('success', 'Tugas berhasil dibuat');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menyimpan tugas. Silakan coba lagi.');
+            try {
+                // ... (kode untuk menyimpan file tidak berubah) ...
+                $filePath = null;
+                if ($request->hasFile('file')) {
+                    try {
+                        $filePath = $request->file('file')->store('tugas_files', 'public');
+                    } catch (\Exception $e) {
+                        return redirect()->back()->with('error', 'Gagal mengunggah file: ' . $e->getMessage());
+                    }
+                }
+                
+                // ... (kode tanggal tidak berubah) ...
+                $tanggalPengumpulan = Carbon::createFromFormat('Y-m-d', $request->tanggal_pengumpulan)->format('Y-m-d');
+
+                // Simpan data tugas
+                Tugas::create([
+                    'judul' => $request->judul,
+                    'deskripsi' => $request->deskripsi,
+                    'mapel_id' => $request->mapel_id,
+                    'kelas_id' => $request->kelas_id,
+                    'guru_id' => auth()->id(),
+                    'tanggal_pengumpulan' => $tanggalPengumpulan,
+                    'file' => $filePath,
+                    'answers_visible_to_others' => $request->answers_visible_to_others, // <-- TAMBAHKAN INI
+                ]);
+
+                return redirect()->route('guru.tugas-siswa.index')->with('success', 'Tugas berhasil dibuat');
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', 'Gagal menyimpan tugas. Silakan coba lagi.');
+            }
         }
-    }
 
 
     public function edit($id)
@@ -95,7 +97,7 @@ class TugasSiswaController extends Controller
     }
 
     // =================================================================================================================
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
     {
         $request->validate([
             'judul' => 'required|string|max:255',
@@ -103,7 +105,8 @@ class TugasSiswaController extends Controller
             'mapel_id' => 'required|integer',
             'kelas_id' => 'required|integer',
             'tanggal_pengumpulan' => 'required|date',
-            'file' => 'nullable|file|mimes:pdf,doc,docx|max:2048'
+            'file' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
+            'answers_visible_to_others' => 'required|boolean', // <-- TAMBAHKAN INI
         ]);
 
         $tugas = Tugas::findOrFail($id);
@@ -112,9 +115,11 @@ class TugasSiswaController extends Controller
             // Handle file update if necessary
             $filePath = $tugas->file;
             if ($request->hasFile('file')) {
+                // Hapus file lama jika ada
                 if ($filePath && Storage::disk('public')->exists($filePath)) {
                     Storage::disk('public')->delete($filePath);
                 }
+                // Simpan file baru di disk 'public'
                 $filePath = $request->file('file')->store('tugas_files', 'public');
             }
 
@@ -126,6 +131,7 @@ class TugasSiswaController extends Controller
                 'kelas_id' => $request->kelas_id,
                 'tanggal_pengumpulan' => date_create_from_format('Y-m-d', $request->tanggal_pengumpulan),
                 'file' => $filePath,
+                'answers_visible_to_others' => $request->answers_visible_to_others,
             ]);
 
             return redirect()->route('guru.tugas-siswa.index')->with('success', 'Tugas berhasil diperbarui');
@@ -236,7 +242,18 @@ class TugasSiswaController extends Controller
     public function show($id)
     {
         $tugas = Tugas::with('mapel', 'guru', 'kelas')->findOrFail($id);
-        $pengumpulanTugas = PengumpulanTugas::with('siswa')->where('tugas_id', $id)->get();
+        
+        // Logika Kondisional untuk Menampilkan Jawaban
+        if ($tugas->answers_visible_to_others) {
+            // JIKA AKTIF: Ambil semua data pengumpulan tugas dari semua siswa untuk tugas ini
+            $pengumpulanTugas = PengumpulanTugas::with('siswa')->where('tugas_id', $id)->get();
+        } else {
+            // JIKA TIDAK AKTIF: Ambil HANYA data pengumpulan milik siswa yang sedang login
+            $pengumpulanTugas = PengumpulanTugas::with('siswa')
+                                ->where('tugas_id', $id)
+                                ->where('siswa_id', auth()->id())
+                                ->get();
+        }
 
         return view('siswa.tugas.show', compact('tugas', 'pengumpulanTugas'));
     }
@@ -256,7 +273,7 @@ class TugasSiswaController extends Controller
         ]);
 
         // Simpan file tugas ke penyimpanan
-        $file = $request->file('file_pengumpulan')->store('tugas_pengumpulan');
+        $file = $request->file('file_pengumpulan')->store('tugas_pengumpulan', 'public');
 
         // Simpan data ke database
         PengumpulanTugas::create([
@@ -296,7 +313,7 @@ class TugasSiswaController extends Controller
             }
 
             // Simpan file baru
-            $file = $request->file('file_tugas')->store('tugas_pengumpulan');
+            $file = $request->file('file_tugas')->store('tugas_pengumpulan', 'public');
             $pengumpulan->file_tugas = $file;
         }
 
@@ -316,7 +333,7 @@ class TugasSiswaController extends Controller
 
         // Hapus file tugas jika ada
         if ($pengumpulan->file_tugas) {
-            Storage::delete($pengumpulan->file_tugas);
+            Storage::disk('public')->delete($pengumpulan->file_tugas);
         }
 
         $pengumpulan->delete();

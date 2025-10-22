@@ -74,16 +74,17 @@
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Judul</th>
-                            <th>Mata Pelajaran</th>
-                            <th>Kelas</th>
-                            <th>Pengumpulan Terakhir</th>
-                            <th>File</th>
-                            <th>Lihat Soal</th>
-                            <th>Aksi</th>
-                        </tr>
+                    <tr>
+                        <th>No</th>
+                        <th>Judul</th>
+                        <th>Mata Pelajaran</th>
+                        <th>Kelas</th>
+                        <th>Pengumpulan Terakhir</th>
+                        <th>File</th>
+                        <th>Visibilitas</th> {{-- TAMBAHKAN INI --}}
+                        <th>Lihat Soal</th>
+                        <th>Aksi</th>
+                    </tr>
                     </thead>
                     <tbody>
                         @forelse($tugas as $index => $task)
@@ -100,6 +101,17 @@
                                         </a>
                                     @else
                                         <span class="text-muted">Tidak ada file</span>
+                                    @endif
+                                </td>
+                                <td> 
+                                    @if($task->answers_visible_to_others)
+                                        <span class="badge bg-success p-2">
+                                            <i class="fa-solid fa-eye me-1"></i> Publik
+                                        </span>
+                                    @else
+                                        <span class="badge bg-dark p-2">
+                                            <i class="fa-solid fa-lock me-1"></i> Pribadi
+                                        </span>
                                     @endif
                                 </td>
                                 <td>
@@ -122,7 +134,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="text-center text-muted">Tidak ada tugas yang tersedia.</td>
+                                <td colspan="9" class="text-center text-muted">Tidak ada tugas yang tersedia.</td>
                             </tr>
                         @endforelse
                     </tbody>
