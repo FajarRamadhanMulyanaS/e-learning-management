@@ -42,107 +42,142 @@ class SiswaPresensiController extends Controller
         return view('siswa.presensi.index', compact('activeSessions', 'presensiHistory'));
     }
 
-    public function checkIn(Request $request)
-    {
-        $validated = $request->validate([
-            'session_id' => 'required|exists:presensi_sessions,id',
-            'metode' => 'required|in:qr,manual',
-            'qr_code' => 'nullable|string',
-        ]);
+   public function checkIn(Request $request)
+{
+    $sessionId = $request->input('session_id');
+    $qrCode = $request->input('qr_code');
+    $metode = $request->input('metode');
 
-        $session = PresensiSession::findOrFail($validated['session_id']);
-        $siswaId = Auth::id();
+    if (!$sessionId) {
+        return response()->json(['success' => false, 'error' => 'Session ID tidak ditemukan']);
+    }
 
-        // Validasi QR Code jika metode QR
-        if ($validated['metode'] === 'qr') {
-            if (!$session->qr_code || $session->qr_code !== $validated['qr_code']) {
-                return response()->json(['error' => 'QR Code tidak valid'], 400);
+    $validated = $request->validate([
+        'session_id' => 'required|exists:presensi_sessions,id',
+        'metode' => 'required|in:qr,manual',
+        'qr_code' => 'nullable|string',
+    ]);
+
+    $session = PresensiSession::findOrFail($validated['session_id']);
+    $siswaId = Auth::id();
+
+    /**
+     * ==============================
+     * 🔍 VALIDASI KHUSUS QR CODE
+     * ==============================
+     */
+    if ($validated['metode'] === 'qr') {
+        $qrInput = trim($validated['qr_code']);
+
+        // ✅ Pola QR baru: PRESENSI_{id}_{timestamp}_{kodeacak}
+        if (preg_match('/^PRESENSI_(\d+)_(\d+)_(\d+)$/', $qrInput, $matches)) {
+            $qrSessionId = (int)$matches[1];
+            $qrTimestamp = $matches[2];
+            $qrRandom = $matches[3];
+
+            // Pastikan session ID cocok
+            if ($qrSessionId !== (int)$session->id) {
+                return response()->json(['error' => 'QR Code bukan milik sesi ini'], 400);
             }
 
+            // Pastikan kode QR di DB sama persis
+            if ($session->qr_code !== $qrInput) {
+                return response()->json(['error' => 'QR Code tidak cocok dengan sesi ini'], 400);
+            }
+
+            // Cek masa berlaku QR
             if (!$session->isQRValid()) {
                 return response()->json(['error' => 'QR Code sudah expired'], 400);
             }
-        }
-
-        // Cek apakah siswa sudah absen
-        $existingRecord = PresensiRecord::where('presensi_session_id', $session->id)
-            ->where('siswa_id', $siswaId)
-            ->first();
-
-        if ($existingRecord && $existingRecord->status !== 'tidak_hadir') {
-            return response()->json(['error' => 'Anda sudah melakukan absen'], 400);
-        }
-
-        // Lakukan absen
-        if ($existingRecord) {
-            $existingRecord->doAbsen($validated['metode']);
-            $status = $existingRecord->status;
         } else {
-            $record = PresensiRecord::create([
-                'presensi_session_id' => $session->id,
-                'siswa_id' => $siswaId,
-                'status' => 'tidak_hadir',
-            ]);
-            $record->doAbsen($validated['metode']);
-            $status = $record->status;
+            return response()->json(['error' => 'Format QR Code tidak dikenali'], 400);
         }
+    }
 
-        // Ambil record yang sudah di-update
-        $updatedRecord = PresensiRecord::where('presensi_session_id', $session->id)
-            ->where('siswa_id', $siswaId)
-            ->first();
+    /**
+     * ==============================
+     * ⏰ PROSES ABSEN
+     * ==============================
+     */
+    $existingRecord = PresensiRecord::where('presensi_session_id', $session->id)
+        ->where('siswa_id', $siswaId)
+        ->first();
 
+    if ($existingRecord && $existingRecord->status !== 'tidak_hadir') {
+        return response()->json(['error' => 'Anda sudah melakukan absen'], 400);
+    }
+
+    $now = now();
+    $isLate = $now->gt($session->jam_mulai);
+
+    if ($existingRecord) {
+        $existingRecord->doAbsen($validated['metode']);
+        $existingRecord->status = $isLate ? 'terlambat' : 'hadir';
+        $existingRecord->save();
+        $status = $existingRecord->status;
+    } else {
+        $record = PresensiRecord::create([
+            'presensi_session_id' => $session->id,
+            'siswa_id' => $siswaId,
+            'status' => $isLate ? 'terlambat' : 'hadir',
+            'metode_absen' => $validated['metode'],
+            'waktu_absen' => $now,
+        ]);
+        $status = $record->status;
+    }
+
+    $updatedRecord = PresensiRecord::where('presensi_session_id', $session->id)
+        ->where('siswa_id', $siswaId)
+        ->first();
+
+    return response()->json([
+        'success' => 'Absen berhasil',
+        'status' => $status,
+        'waktu_absen' => $updatedRecord->waktu_absen_formatted,
+        'status_text' => $status === 'hadir' ? 'Hadir' : ($status === 'terlambat' ? 'Terlambat' : 'Tidak Hadir')
+    ]);
+}
+
+
+
+ public function validateQR(Request $request)
+{
+    $request->validate([
+        'qr_code' => 'required|string',
+    ]);
+
+    // Cari session presensi berdasarkan kode QR
+    $session = PresensiSession::where('qr_code', $request->qr_code)
+        ->where(function ($query) {
+            $query->whereNull('qr_expires_at')
+                  ->orWhere('qr_expires_at', '>=', now());
+        })
+        ->first();
+
+    // Jika tidak ditemukan atau sudah kedaluwarsa
+    if (!$session) {
         return response()->json([
-            'success' => 'Absen berhasil',
-            'status' => $status,
-            'waktu_absen' => $updatedRecord->waktu_absen_formatted,
-            'status_text' => $status === 'hadir' ? 'Hadir' : ($status === 'terlambat' ? 'Terlambat' : 'Tidak Hadir')
+            'valid' => false,
+            'message' => 'QR Code tidak valid atau sudah kedaluwarsa.',
         ]);
     }
 
-    public function validateQR(Request $request)
-    {
-        $validated = $request->validate([
-            'qr_code' => 'required|string',
-        ]);
-
-        $session = PresensiSession::where('qr_code', $validated['qr_code'])
-            ->active()
-            ->first();
-
-        if (!$session) {
-            return response()->json(['valid' => false, 'message' => 'QR Code tidak valid']);
-        }
-
-        if (!$session->isQRValid()) {
-            return response()->json(['valid' => false, 'message' => 'QR Code sudah expired']);
-        }
-
-        $siswaId = Auth::id();
-        $user = Auth::user();
-
-        // Cek kelas dari tabel siswa atau user
-        $kelasId = null;
-        if ($user->siswa && $user->siswa->kelas_id) {
-            $kelasId = $user->siswa->kelas_id;
-        } elseif ($user->kelas_id) {
-            $kelasId = $user->kelas_id;
-        }
-
-        if ($session->kelas_id !== $kelasId) {
-            return response()->json(['valid' => false, 'message' => 'QR Code tidak untuk kelas Anda']);
-        }
-
+    // Pastikan session masih aktif (opsional jika kamu punya scope "active()")
+    if (method_exists($session, 'isActive') && !$session->isActive()) {
         return response()->json([
-            'valid' => true,
-            'session' => [
-                'id' => $session->id,
-                'mapel' => $session->mapel->nama_mapel,
-                'guru' => $session->guru->username,
-                'jam_mulai' => $session->jam_mulai_formatted,
-            ]
+            'valid' => false,
+            'message' => 'Sesi presensi ini sudah tidak aktif.',
         ]);
     }
+
+    // Jika valid, kembalikan ID sesi untuk proses absen
+    return response()->json([
+        'valid' => true,
+        'session_id' => $session->id,
+        'message' => 'QR Code valid, lanjutkan presensi.',
+    ]);
+}
+
 
     public function getPresensiStatus($sessionId)
     {

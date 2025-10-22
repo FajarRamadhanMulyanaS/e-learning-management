@@ -12,5 +12,3 @@
 </div>
 
 
-
-@include('layout2.footer') <!-- Include Footer -->

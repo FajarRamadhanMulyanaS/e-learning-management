@@ -100,11 +100,11 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.siswa.index');
 
-    // Route::get('/admin/siswa/create', function () { // Tidak terpakai jika pakai modal
-    //     return (new RoleMiddleware)->handle(request(), function () {
-    //         return app()->call('App\Http\Controllers\AdminController@createSiswa');
-    //     }, 'admin');
-    // })->name('admin.siswa.create');
+    Route::get('/admin/siswa/create', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\Http\Controllers\AdminController@createSiswa');
+        }, 'admin');
+    })->name('admin.siswa.create');
 
     Route::post('/admin/siswa/store', function () {
         return (new RoleMiddleware)->handle(request(), function () {
@@ -680,47 +680,48 @@ Route::group(['middleware' => ['auth']], function () {
 
 });
 
-Route::prefix('siswa')->middleware('auth')->group(function () {
-    Route::get('/pesan', [PesanController::class, 'index'])->name('pesan.index');
-    Route::get('/pesan terkirim', [PesanController::class, 'pesan'])->name('pesan.pengirim');
-    Route::get('/pesan/kirim', [PesanController::class, 'create'])->name('pesan.create');
-    Route::post('/pesan/create', [PesanController::class, 'store'])->name('pesan.store');
-    Route::get('/pesan2/{id}', [PesanController::class, 'showSiswa2'])->name('siswa.pesan.show2');
-    Route::get('/pesan/{id}', [PesanController::class, 'showSiswa'])->name('siswa.pesan.show');
-    // Route untuk form edit pesan (menggunakan modal di view, tidak terpisah)
-    Route::put('pesan/{id}', [PesanController::class, 'update'])->name('pesan.update');
-    // Route untuk menghapus pesan
-    Route::delete('pesan/{id}', [PesanController::class, 'destroy'])->name('pesan.destroy');
-    Route::post('/pesan/balas/{id}', [PesanController::class, 'balas'])->name('pesan.balas');
-    // ====================== Presensi Siswa ======================
-    Route::get('/siswa/presensi', [SiswaPresensiController::class, 'index'])->name('siswa.presensi.index');
-    Route::post('/siswa/presensi/check-in', [SiswaPresensiController::class, 'checkIn'])->name('siswa.presensi.check-in');
-    Route::post('/siswa/presensi/validate-qr', [SiswaPresensiController::class, 'validateQR'])->name('siswa.presensi.validate-qr');
-    Route::get('/siswa/presensi/status/{sessionId}', [SiswaPresensiController::class, 'getPresensiStatus'])->name('siswa.presensi.status');
-    Route::get('/siswa/presensi/history', [SiswaPresensiController::class, 'history'])->name('siswa.presensi.history');
-    Route::get('/siswa/video', [VideoController::class, 'indexSiswa'])->name('siswa.video');
+    Route::prefix('siswa')->middleware('auth')->group(function () {
+        Route::post('/siswa/presensi/validate-qr', [SiswaPresensiController::class, 'validateQR']);
+        Route::get('/pesan', [PesanController::class, 'index'])->name('pesan.index');
+        Route::get('/pesan terkirim', [PesanController::class, 'pesan'])->name('pesan.pengirim');
+        Route::get('/pesan/kirim', [PesanController::class, 'create'])->name('pesan.create');
+        Route::post('/pesan/create', [PesanController::class, 'store'])->name('pesan.store');
+        Route::get('/pesan2/{id}', [PesanController::class, 'showSiswa2'])->name('siswa.pesan.show2');
+        Route::get('/pesan/{id}', [PesanController::class, 'showSiswa'])->name('siswa.pesan.show');
+        // Route untuk form edit pesan (menggunakan modal di view, tidak terpisah)
+        Route::put('pesan/{id}', [PesanController::class, 'update'])->name('pesan.update');
+        // Route untuk menghapus pesan
+        Route::delete('pesan/{id}', [PesanController::class, 'destroy'])->name('pesan.destroy');
+        Route::post('/pesan/balas/{id}', [PesanController::class, 'balas'])->name('pesan.balas');
+        // ====================== Presensi Siswa ======================
+        Route::get('/siswa/presensi', [SiswaPresensiController::class, 'index'])->name('siswa.presensi.index');
+        Route::post('/siswa/presensi/check-in', [SiswaPresensiController::class, 'checkIn'])->name('siswa.presensi.check-in');
+        Route::post('/siswa/presensi/validate-qr', [SiswaPresensiController::class, 'validateQR'])->name('siswa.presensi.validate-qr');
+        Route::get('/siswa/presensi/status/{sessionId}', [SiswaPresensiController::class, 'getPresensiStatus'])->name('siswa.presensi.status');
+        Route::get('/siswa/presensi/history', [SiswaPresensiController::class, 'history'])->name('siswa.presensi.history');
+        Route::get('/siswa/video', [VideoController::class, 'indexSiswa'])->name('siswa.video');
 
-    Route::prefix('guru')->middleware('auth')->group(function () {
-        Route::get('/pesan', [PesanController::class, 'indexGuru'])->name('guru.pesan.index');
-        Route::get('/pesan/kirim', [PesanController::class, 'createGuru'])->name('guru.pesan.create');
-        Route::post('/pesan/kirim', [PesanController::class, 'storeGuru'])->name('guru.pesan.store');
-        Route::post('/pesan/{id}/reply', [PesanController::class, 'reply'])->name('pesan.reply');
-        Route::get('/pesan terkirim', [PesanController::class, 'pesanGuru'])->name('guru.pesan.pengirim');
-        Route::get('/pesan/{id}', [PesanController::class, 'showGuru'])->name('guru.pesan.show');
-        Route::get('/pesan2/{id}', [PesanController::class, 'showGuru2'])->name('guru.pesan.show2');
-    });
-    //============================== route untuk ganti password ===================================================
+        Route::prefix('guru')->middleware('auth')->group(function () {
+            Route::get('/pesan', [PesanController::class, 'indexGuru'])->name('guru.pesan.index');
+            Route::get('/pesan/kirim', [PesanController::class, 'createGuru'])->name('guru.pesan.create');
+            Route::post('/pesan/kirim', [PesanController::class, 'storeGuru'])->name('guru.pesan.store');
+            Route::post('/pesan/{id}/reply', [PesanController::class, 'reply'])->name('pesan.reply');
+            Route::get('/pesan terkirim', [PesanController::class, 'pesanGuru'])->name('guru.pesan.pengirim');
+            Route::get('/pesan/{id}', [PesanController::class, 'showGuru'])->name('guru.pesan.show');
+            Route::get('/pesan2/{id}', [PesanController::class, 'showGuru2'])->name('guru.pesan.show2');
+        });
+        //============================== route untuk ganti password ===================================================
 
     Route::middleware(['auth'])->group(function () {
         Route::get('change-password', [UserController::class, 'showChangePasswordForm'])->name('auth.change-password');
         Route::get('change-password/admin', [UserController::class, 'showChangePasswordForm2'])->name('auth.change-password2');
         Route::post('change-password/admin', [UserController::class, 'updatePasswordAdmin'])->name('change-password.update');
-        Route::post('change-password/guru', [UserController::class, 'updatePasswordGuru'])->name('change-password.update'); // Nama route sama, perhatikan
-        Route::post('change-password/siswa', [UserController::class, 'updatePasswordSiswa'])->name('change-password.update'); // Nama route sama, perhatikan
+        Route::post('change-password/guru', [UserController::class, 'updatePasswordGuru'])->name('change-password.update');
+        Route::post('change-password/siswa', [UserController::class, 'updatePasswordSiswa'])->name('change-password.update');
 
-        Route::resource('threads', ThreadController::class);
-        Route::post('threads/{thread}/comments', [CommentController::class, 'store'])->name('comments.store');
-    });
+            Route::resource('threads', ThreadController::class);
+            Route::post('threads/{thread}/comments', [CommentController::class, 'store'])->name('comments.store');
+        });
 
 
 
@@ -729,7 +730,7 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
         Route::post('/store/local', [VideoController::class, 'storeLocal'])->name('store.local'); // Upload lokal
         Route::post('/store/youtube', [VideoController::class, 'storeYoutube'])->name('store.youtube'); // Upload YouTube
         Route::delete('/{id}', [VideoController::class, 'destroy'])->name('destroy'); // Hapus video
-        Route::get('/video/play/{id}', [VideoController::class, 'play'])->name('video.play'); // Perlu diperbaiki, nama rute duplikat
+        Route::get('/video/play/{id}', [VideoController::class, 'play'])->name('video.play');
     });
 
 
@@ -737,95 +738,89 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
 
 
-    // Routes untuk Mata Pelajaran
-// ====================== Manajemen Jadwal (Admin) ======================
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/admin/jadwal', function () {
-            return (new RoleMiddleware)->handle(request(), function () {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@index');
-            }, 'admin');
-        })->name('admin.jadwal.index');
+        // Routes untuk Mata Pelajaran
+    // ====================== Manajemen Jadwal (Admin) ======================
+        Route::middleware(['auth'])->group(function () {
+            Route::get('/admin/jadwal', function () {
+                return (new RoleMiddleware)->handle(request(), function () {
+                    return app()->call('App\\Http\\Controllers\\AdminJadwalController@index');
+                }, 'admin');
+            })->name('admin.jadwal.index');
 
-        Route::get('/admin/jadwal/create', function () {
-            return (new RoleMiddleware)->handle(request(), function () {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@create');
-            }, 'admin');
-        })->name('admin.jadwal.create');
+            Route::get('/admin/jadwal/create', function () {
+                return (new RoleMiddleware)->handle(request(), function () {
+                    return app()->call('App\\Http\\Controllers\\AdminJadwalController@create');
+                }, 'admin');
+            })->name('admin.jadwal.create');
 
-        Route::post('/admin/jadwal/store', function () {
-            return (new RoleMiddleware)->handle(request(), function () {
-                return app()->call('App\\Http\Controllers\\AdminJadwalController@store');
-            }, 'admin');
-        })->name('admin.jadwal.store');
+            Route::post('/admin/jadwal/store', function () {
+                return (new RoleMiddleware)->handle(request(), function () {
+                    return app()->call('App\\Http\Controllers\\AdminJadwalController@store');
+                }, 'admin');
+            })->name('admin.jadwal.store');
 
         Route::get('/admin/jadwal/edit/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@edit', ['id' => $id]);
+                return app()->call('App\\Http\Controllers\\AdminJadwalController@edit', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.edit');
 
-        // !! PERHATIAN: Rute update jadwal seharusnya POST (jika pakai @method('POST')) atau PUT !!
         Route::post('/admin/jadwal/update/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
                 return app()->call('App\\Http\\Controllers\\AdminJadwalController@update', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.update');
 
-        Route::delete('/admin/jadwal/delete/{id}', function ($id) {
+            Route::delete('/admin/jadwal/delete/{id}', function ($id) {
+                return (new RoleMiddleware)->handle(request(), function () use ($id) {
+                    return app()->call('App\\Http\\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
+                }, 'admin');
+            })->name('admin.jadwal.destroy');
+        });
+        // ====================== Manajemen Presensi (Guru) ======================
+        Route::get('/guru/presensi', function () {
+            return (new RoleMiddleware)->handle(request(), function () {
+                return app()->call('App\\Http\\Controllers\\PresensiController@index');
+            }, 'guru');
+        })->name('guru.presensi.index');
+
+        Route::get('/guru/presensi/create', function () {
+            return (new RoleMiddleware)->handle(request(), function () {
+                return app()->call('App\\Http\\Controllers\\PresensiController@create');
+            }, 'guru');
+        })->name('guru.presensi.create');
+
+        Route::post('/guru/presensi/store', function () {
+            return (new RoleMiddleware)->handle(request(), function () {
+                return app()->call('App\\Http\\Controllers\\PresensiController@store');
+            }, 'guru');
+        })->name('guru.presensi.store');
+
+        Route::get('/guru/presensi/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
-            }, 'admin');
-        })->name('admin.jadwal.destroy');
-    });
-    // ====================== Manajemen Presensi (Guru) ======================
-    Route::get('/guru/presensi', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\\Controllers\\PresensiController@index');
-        }, 'guru');
-    })->name('guru.presensi.index');
+                return app()->call('App\\Http\\Controllers\\PresensiController@show', ['id' => $id]);
+            }, 'guru');
+        })->name('guru.presensi.show');
 
-    Route::get('/guru/presensi/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\\Controllers\\PresensiController@create');
-        }, 'guru');
-    })->name('guru.presensi.create');
+        Route::post('/guru/presensi/{id}/close', function ($id) {
+            return (new RoleMiddleware)->handle(request(), function () use ($id) {
+                return app()->call('App\\Http\\Controllers\\PresensiController@close', ['id' => $id]);
+            }, 'guru');
+        })->name('guru.presensi.close');
 
-    Route::post('/guru/presensi/store', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\\Controllers\\PresensiController@store');
-        }, 'guru');
-    })->name('guru.presensi.store');
+        Route::post('/guru/presensi/{id}/regenerate-qr', function ($id) {
+            return (new RoleMiddleware)->handle(request(), function () use ($id) {
+                return app()->call('App\\Http\\Controllers\\PresensiController@regenerateQR', ['id' => $id]);
+            }, 'guru');
+        })->name('guru.presensi.regenerate-qr');
 
-    Route::get('/guru/presensi/{id}', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\\Http\\Controllers\\PresensiController@show', ['id' => $id]);
-        }, 'guru');
-    })->name('guru.presensi.show');
+        Route::get('/guru/presensi/api/active-sessions', function () {
+            return (new RoleMiddleware)->handle(request(), function () {
+                return app()->call('App\\Http\\Controllers\\PresensiController@getActiveSessions');
+            }, 'guru');
+        })->name('guru.presensi.api.active-sessions');
 
-    Route::post('/guru/presensi/{id}/close', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\\Http\\Controllers\\PresensiController@close', ['id' => $id]);
-        }, 'guru');
-    })->name('guru.presensi.close');
-
-    Route::post('/guru/presensi/{id}/regenerate-qr', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\\Http\\Controllers\\PresensiController@regenerateQR', ['id' => $id]);
-        }, 'guru');
-    })->name('guru.presensi.regenerate-qr');
-
-    Route::get('/guru/presensi/api/active-sessions', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\\Controllers\\PresensiController@getActiveSessions');
-        }, 'guru');
-    })->name('guru.presensi.api.active-sessions');
-
-    // Route::get('/guru/presensi/api/stats/{sessionId}', function ($sessionId) { // Rute ini sepertinya tidak lengkap atau salah penempatan
-    //     return (new RoleMiddleware)->handle(request(), function () use ($sessionId) {
-    //         return app()->call('App\\Http\\Controllers\\PresensiController@getSessionStats', ['sessionId' => $sessionId]);
-    //     }, 'guru');
-    // })->name('guru.presensi.api.stats');
-});
+})->name('guru.presensi.api.stats');
 // ====================== Manajemen Presensi (Admin) ======================
 Route::get('/admin/presensi', function () {
     return (new RoleMiddleware)->handle(request(), function () {
@@ -833,35 +828,35 @@ Route::get('/admin/presensi', function () {
     }, 'admin');
 })->name('admin.presensi.index');
 
-Route::get('/admin/presensi/sessions', function () {
-    return (new RoleMiddleware)->handle(request(), function () {
-        return app()->call('App\\Http\\Controllers\\AdminPresensiController@sessions');
-    }, 'admin');
-})->name('admin.presensi.sessions');
+    Route::get('/admin/presensi/sessions', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\\Http\\Controllers\\AdminPresensiController@sessions');
+        }, 'admin');
+    })->name('admin.presensi.sessions');
 
-Route::get('/admin/presensi/reports', function () {
-    return (new RoleMiddleware)->handle(request(), function () {
-        return app()->call('App\\Http\\Controllers\\AdminPresensiController@reports');
-    }, 'admin');
-})->name('admin.presensi.reports');
+    Route::get('/admin/presensi/reports', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\\Http\\Controllers\\AdminPresensiController@reports');
+        }, 'admin');
+    })->name('admin.presensi.reports');
 
-Route::get('/admin/presensi/kelas/{kelasId}', function ($kelasId) {
-    return (new RoleMiddleware)->handle(request(), function () use ($kelasId) {
-        return app()->call('App\\Http\\Controllers\\AdminPresensiController@kelasReport', ['kelasId' => $kelasId]);
-    }, 'admin');
-})->name('admin.presensi.kelas-report');
+    Route::get('/admin/presensi/kelas/{kelasId}', function ($kelasId) {
+        return (new RoleMiddleware)->handle(request(), function () use ($kelasId) {
+            return app()->call('App\\Http\\Controllers\\AdminPresensiController@kelasReport', ['kelasId' => $kelasId]);
+        }, 'admin');
+    })->name('admin.presensi.kelas-report');
 
-Route::get('/admin/presensi/siswa/{siswaId}', function ($siswaId) {
-    return (new RoleMiddleware)->handle(request(), function () use ($siswaId) {
-        return app()->call('App\\Http\\Controllers\\AdminPresensiController@siswaReport', ['siswaId' => $siswaId]);
-    }, 'admin');
-})->name('admin.presensi.siswa-report');
+    Route::get('/admin/presensi/siswa/{siswaId}', function ($siswaId) {
+        return (new RoleMiddleware)->handle(request(), function () use ($siswaId) {
+            return app()->call('App\\Http\\Controllers\\AdminPresensiController@siswaReport', ['siswaId' => $siswaId]);
+        }, 'admin');
+    })->name('admin.presensi.siswa-report');
 
-Route::post('/admin/presensi/export-excel', function () {
-    return (new RoleMiddleware)->handle(request(), function () {
-        return app()->call('App\\Http\\Controllers\\AdminPresensiController@exportExcel');
-    }, 'admin');
-})->name('admin.presensi.export-excel');
+    Route::post('/admin/presensi/export-excel', function () {
+        return (new RoleMiddleware)->handle(request(), function () {
+            return app()->call('App\\Http\\Controllers\\AdminPresensiController@exportExcel');
+        }, 'admin');
+    })->name('admin.presensi.export-excel');
 
 Route::get('/admin/laporan', function () {
     return (new RoleMiddleware)->handle(request(), function () {
@@ -883,12 +878,12 @@ Route::get('/admin/laporan/kelas/{kelas}/mapel/{mapel}', function ($kelas, $mape
     }, 'admin');
 })->name('admin.laporan.showDetail');
 
-// Logout Route
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    // Logout Route
+    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+    // Route::get('/', function () {
+    //     return view('welcome');
+    // });
 
 
 Route::get('/bhsINDO', [PelajaranController::class, 'indo'])->name('siswa.bhs_indo');
@@ -909,8 +904,6 @@ Route::get('/Jadwal', [PelajaranController::class, 'jadwal'])->name('siswa.jadwa
 
 
 
-
-Auth::routes();
+    Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
