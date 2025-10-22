@@ -41,12 +41,4 @@ class Quiz extends Model
         // hasOne karena satu siswa hanya bisa punya satu submission per kuis
         return $this->hasOne(QuizSubmission::class)->where('user_id', Auth::id());
     }
-
-    /**
-     * Relasi ke semua quiz submissions
-     */
-    public function submissions()
-    {
-        return $this->hasMany(QuizSubmission::class, 'quiz_id');
-    }
 }

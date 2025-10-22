@@ -8,39 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class QuizSubmission extends Model
 {
     use HasFactory;
-
-    protected $table = 'quiz_submissions';
-
-    protected $fillable = [
-        'quiz_id',
-        'user_id',
-        'file_path',
-        'nilai',
-    ];
+    protected $fillable = ['quiz_id', 'user_id', 'file_path', 'nilai'];
 
     /**
-     * Relasi ke tabel Quiz
+     * Mendefinisikan relasi bahwa submission ini milik satu Quiz.
      */
     public function quiz()
     {
-        return $this->belongsTo(Quiz::class, 'quiz_id');
+        return $this->belongsTo(Quiz::class);
     }
 
     /**
-     * Relasi ke tabel User
-     * Karena di tabel ini foreign key-nya user_id, bukan siswa_id
+     * Mendefinisikan relasi bahwa submission ini milik satu User (Siswa).
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-
-    /**
-     * Relasi tidak langsung ke Siswa
-     * Agar bisa diakses dari Siswa::with('quizSubmissions')
-     */
-    public function siswa()
-    {
-        return $this->hasOne(Siswa::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class);
     }
 }

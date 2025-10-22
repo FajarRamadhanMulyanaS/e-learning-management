@@ -840,27 +840,23 @@ Route::post('/admin/presensi/export-excel', function () {
     }, 'admin');
 })->name('admin.presensi.export-excel');
 
-// Daftar Kelas
 Route::get('/admin/laporan', function () {
     return (new RoleMiddleware)->handle(request(), function () {
-        return app()->call([app(LaporanController::class), 'index']);
+        return app()->call('App\Http\Controllers\LaporanController@index');
     }, 'admin');
 })->name('admin.laporan.index');
 
-// Daftar Mapel per Kelas
-Route::get('/admin/laporan/kelas/{kelasId}', function ($kelasId) {
-    return (new RoleMiddleware)->handle(request(), function () use ($kelasId) {
-        return app()->call([app(LaporanController::class), 'showKelas'], ['kelasId' => $kelasId]);
+// Rute showKelas
+Route::get('/admin/laporan/kelas/{kelas}', function ($kelas) {
+    return (new RoleMiddleware)->handle(request(), function () use ($kelas) {
+        return app()->call('App\Http\Controllers\LaporanController@showKelas', ['kelasId' => $kelas]); // <-- BARIS INI DIPERBAIKI
     }, 'admin');
 })->name('admin.laporan.showKelas');
 
-// Detail Laporan (Nilai & Presensi)
-Route::get('/admin/laporan/kelas/{kelasId}/mapel/{mapelId}', function ($kelasId, $mapelId) {
-    return (new RoleMiddleware)->handle(request(), function () use ($kelasId, $mapelId) {
-        return app()->call([app(LaporanController::class), 'showDetail'], [
-            'kelasId' => $kelasId,
-            'mapelId' => $mapelId
-        ]);
+// Rute showDetail
+Route::get('/admin/laporan/kelas/{kelas}/mapel/{mapel}', function ($kelas, $mapel) {
+    return (new RoleMiddleware)->handle(request(), function () use ($kelas, $mapel) {
+        return app()->call('App\Http\Controllers\LaporanController@showDetail', ['kelasId' => $kelas, 'mapelId' => $mapel]); // <-- BARIS INI DIPERBAIKI
     }, 'admin');
 })->name('admin.laporan.showDetail');
 

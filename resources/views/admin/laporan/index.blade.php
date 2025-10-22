@@ -6,9 +6,7 @@
         <div class="row">
             <div class="col-12 col-xl-8 mb-4 mb-xl-0">
                 <h3 class="font-weight-bold">Laporan Siswa</h3>
-                <h6 class="font-weight-normal mb-0">
-                    Langkah 1: Pilih kelas yang ingin Anda lihat laporannya.
-                </h6>
+                <h6 class="font-weight-normal mb-0">Langkah 1: Pilih kelas yang ingin Anda lihat laporannya.</h6>
             </div>
         </div>
     </div>
@@ -21,20 +19,15 @@
                 <h4 class="card-title">Daftar Kelas</h4>
                 <div class="list-group">
                     @forelse ($daftarKelas as $kelas)
-                        <a href="{{ route('admin.laporan.showKelas', ['kelasId' => $kelas->id]) }}" 
-                           class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <a href="{{ route('admin.laporan.showKelas', $kelas->id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             <div>
                                 <h5 class="mb-1">{{ $kelas->nama_kelas }}</h5>
-                                <small>
-                                    {{ $kelas->kode_kelas ?? 'ID: '.$kelas->id }}
-                                </small>
+                                <small>Kode Kelas: {{ $kelas->kode_kelas }}</small>
                             </div>
-                            <span class="badge bg-primary rounded-pill">
-                                {{ $kelas->siswa_count ?? 0 }} Siswa
-                            </span>
+                            <span class="badge bg-primary rounded-pill">{{ $kelas->siswa_count }} Siswa</span>
                         </a>
                     @empty
-                        <div class="alert alert-warning text-center m-2" role="alert">
+                        <div class="alert alert-warning" role="alert">
                             Belum ada data kelas yang bisa ditampilkan.
                         </div>
                     @endforelse

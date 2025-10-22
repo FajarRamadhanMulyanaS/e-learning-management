@@ -2,45 +2,58 @@
 @include('layout_new.side')
 
 <div class="row">
-  <div class="col-md-12 grid-margin">
-    <h3 class="font-weight-bold">Daftar Mapel - Kelas: {{ $kelas->nama_kelas ?? '-' }}</h3>
-  </div>
+    <div class="col-md-12 grid-margin">
+        <div class="row">
+            <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                <h3 class="font-weight-bold">Laporan Kelas: {{ $kelas->nama_kelas }}</h3>
+                <h6 class="font-weight-normal mb-0">Langkah 2: Pilih mata pelajaran untuk melihat detail laporan.</h6>
+            </div>
+             <div class="col-12 col-xl-4">
+                <div class="justify-content-end d-flex">
+                    <a href="{{ route('admin.laporan.index') }}" class="btn btn-secondary">Kembali ke Daftar Kelas</a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
-  <div class="col-md-12 grid-margin stretch-card">
-    <div class="card">
-      <div class="card-body">
-        <h4 class="card-title">Mata Pelajaran di Kelas {{ $kelas->nama_kelas ?? '-' }}</h4>
-
-        <div class="list-group">
-          @forelse ($daftarGuruMapel as $gm) {{-- pastikan nama $gm konsisten --}}
-            {{-- Pastikan relasi mapel dan user ada sebelum mengakses property --}}
-            @php
-              $mapel = $gm->mapel ?? null;
-              $guru  = $gm->user ?? null;
-            @endphp
-
-            <a href="{{ route('admin.laporan.showDetail', ['kelasId' => $kelas->id, 'mapelId' => $mapel->id ?? 0]) }}"
-               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-              <div>
-                <h5 class="mb-1">{{ $mapel->nama_mapel ?? 'Mapel tidak diketahui' }}</h5>
-                <small>Guru: {{ $guru->username ?? $guru->name ?? 'Belum ditentukan' }}</small>
-              </div>
-              <span class="badge bg-primary rounded-pill">
-                Lihat Laporan
-              </span>
-            </a>
-          @empty
-            <div class="alert alert-warning text-center m-2">
-              Tidak ada mata pelajaran untuk kelas ini.
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Daftar Mata Pelajaran</h4>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Mata Pelajaran</th>
+                                <th>Guru Pengampu</th>
+                                <th class="text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{-- !! KODE DIBAWAH INI BERUBAH !! --}}
+                            @forelse ($daftarGuruMapel as $gm)
+                                <tr>
+                                    <td>{{ $gm->mapel->nama_mapel ?? 'Mapel tidak ada' }}</td>
+                                    <td>{{ $gm->user->username ?? 'Guru tidak ada' }}</td>
+                                    <td class="text-center">
+                                        <a href="{{ route('admin.laporan.showDetail', [$kelas->id, $gm->mapel_id]) }}" class="btn btn-primary btn-sm">
+                                            Lihat Laporan
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="text-center">Belum ada mata pelajaran yang diajarkan di kelas ini.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
-          @endforelse
         </div>
-
-      </div>
     </div>
-  </div>
 </div>
 
 @include('layout_new.footer')

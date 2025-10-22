@@ -63,10 +63,4 @@ class Ujian extends Model
 {
     return $this->hasMany(JawabanSiswaEssay::class, 'ujian_id');
 }
-
-    // Relasi ke HasilUjian
-    public function hasilUjian()
-    {
-        return $this->hasMany(HasilUjian::class, 'ujian_id');
-    }
 }

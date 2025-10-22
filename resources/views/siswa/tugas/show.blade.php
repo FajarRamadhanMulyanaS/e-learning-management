@@ -71,7 +71,7 @@
                     <table class="table table-bordered table-striped mt-4">
                         <thead class="bg-light">
                             <tr>
-                                <th>#</th>
+                                <th>No</th>
                                 <th>Nama Siswa</th>
                                 <th>File Tugas</th>
                                 <th>Komentar</th>
