@@ -1,5 +1,30 @@
 @extends('layout_new.app')
 @section('konten')
+<style>
+#qrcode-wrapper {
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+#qrcode-wrapper img {
+    border-radius: 10px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+#qr-timer {
+    font-size: 16px;
+    margin-top: 5px;
+}
+</style>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -63,21 +88,31 @@
         </div>
     </div>
 
-    <!-- QR Code Section -->
-    @if($session->mode === 'qr' && $session->qr_code)
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="mb-0">QR Code Presensi</h5>
-            </div>
-            <div class="card-body text-center">
-                <div id="qrcode"></div>
-                <p class="mt-2 text-muted">
-                    QR Code berlaku hingga: {{ $session->qr_expires_at->format('H:i:s') }}
-                </p>
-                <p class="text-danger" id="qr-timer"></p>
-            </div>
+<!-- QR Code Section -->
+@if($session->mode === 'qr' && $session->qr_code)
+<div class="card mb-4 shadow-sm border-0">
+   
+
+    <div class="card-body d-flex flex-column align-items-center justify-content-center py-4">
+        <div id="qrcode-wrapper" class="p-3 bg-white shadow-sm rounded" style="display: inline-block; transition: all 0.3s ease;">
+            <canvas id="qrcode"></canvas>
+       <button class="btn btn-outline-primary mt-3" id="downloadQR">
+    <i class="fas fa-download"></i> Download QR Code
+</button>
+
+
+    </div>
         </div>
-    @endif
+
+        <p class="mt-3 mb-1 text-muted">
+            <i class="fas fa-clock"></i>
+            Berlaku hingga: <strong>{{ $session->qr_expires_at->format('H:i:s') }}</strong>
+        </p>
+        <p class="text-danger fw-bold" id="qr-timer"></p>
+    </div>
+</div>
+@endif
+
 
     <!-- Statistik Presensi -->
     <div class="card mb-4">
@@ -165,75 +200,102 @@
         </div>
     </div>
 </div>
-
 @if($session->mode === 'qr' && $session->qr_code)
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-<script>
-    // Generate QR Code
-    document.addEventListener('DOMContentLoaded', function() {
-        const canvas = document.getElementById('qrcode');
-        if (canvas) {
-            QRCode.toCanvas(canvas, '{{ $session->qr_code }}', {
-                width: 200,
-                height: 200,
-                color: {
-                    dark: '#000000',
-                    light: '#FFFFFF'
-                }
-            }, function (error) {
-                if (error) {
-                    console.error('Error generating QR code:', error);
-                    canvas.innerHTML = '<p class="text-danger">Error generating QR code</p>';
-                }
-            });
-        }
-    });
+<!-- Pastikan load library QRCode dari CDN yang pasti bekerja -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
-    // QR Timer
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const canvas = document.getElementById('qrcode');
+    const qrData = @json($session->qr_code);
+
+    console.log('QR Data:', qrData);
+
+    if (canvas && qrData) {
+        // Gunakan library qrcodejs (bukan yang versi node)
+        const qrContainer = document.createElement('div');
+        canvas.replaceWith(qrContainer);
+
+        new QRCode(qrContainer, {
+            text: qrData,
+            width: 220,
+            height: 220,
+            colorDark: "#000000",
+            colorLight: "#ffffff",
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        console.log('QR Code berhasil dibuat.');
+    } else {
+        console.warn('Canvas tidak ditemukan atau data QR kosong.');
+    }
+
+    // Timer hitung waktu tersisa
     function updateQRTimer() {
         const expiresAt = new Date('{{ $session->qr_expires_at }}').getTime();
         const now = new Date().getTime();
         const timeLeft = expiresAt - now;
 
+        const timerEl = document.getElementById('qr-timer');
+        if (!timerEl) return;
+
         if (timeLeft > 0) {
-            const minutes = Math.floor(timeLeft / (1000 * 60));
-            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-            document.getElementById('qr-timer').textContent = 
-                `Waktu tersisa: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+            const minutes = Math.floor(timeLeft / 60000);
+            const seconds = Math.floor((timeLeft % 60000) / 1000);
+            timerEl.textContent = `Waktu tersisa: ${minutes}:${seconds.toString().padStart(2, '0')}`;
         } else {
-            document.getElementById('qr-timer').textContent = 'QR Code sudah expired';
+            timerEl.textContent = 'QR Code sudah expired';
+            timerEl.style.color = 'gray';
         }
     }
 
     updateQRTimer();
     setInterval(updateQRTimer, 1000);
+});
 
-    // Regenerate QR
-    function regenerateQR() {
-        if (confirm('Regenerate QR Code? QR Code lama akan tidak berlaku.')) {
-            fetch('{{ route("guru.presensi.regenerate-qr", $session->id) }}', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('QR Code berhasil diperbarui!');
-                    location.reload();
-                } else {
-                    alert('Error: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan saat regenerate QR Code');
-            });
-        }
+// Regenerate QR
+function regenerateQR() {
+    if (confirm('Regenerate QR Code? QR Code lama akan tidak berlaku.')) {
+        fetch('{{ route("guru.presensi.regenerate-qr", $session->id) }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert('QR Code berhasil diperbarui!');
+                location.reload();
+            } else {
+                alert('Gagal: ' + data.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Terjadi kesalahan saat regenerate QR Code');
+        });
     }
+}
+// Tombol download QR Code
+document.getElementById('downloadQR').addEventListener('click', function() {
+    const qrCanvas = document.querySelector('#qrcode-wrapper img') || document.querySelector('#qrcode-wrapper canvas');
+    if (!qrCanvas) {
+        alert('QR Code belum dibuat!');
+        return;
+    }
+
+    const link = document.createElement('a');
+    link.href = qrCanvas.src || qrCanvas.toDataURL('image/png');
+    link.download = 'QR_Presensi_{{ $session->id }}.png';
+    link.click();
+});
+
 </script>
 @endif
+
+
+
 
 @endsection

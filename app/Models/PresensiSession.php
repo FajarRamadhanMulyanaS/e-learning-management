@@ -90,14 +90,16 @@ class PresensiSession extends Model
     }
 
     // Method untuk generate QR Code
-    public function generateQRCode()
-    {
-        $this->qr_code = 'PRESENSI_' . $this->id . '_' . time() . '_' . rand(1000, 9999);
-        $this->qr_expires_at = now()->addMinutes(10); // QR berlaku 10 menit
-        $this->save();
 
-        return $this->qr_code;
-    }
+    // Method untuk generate QR Code
+public function generateQRCode()
+{
+    $this->qr_code = 'PRESENSI_' . $this->id . '_' . time() . '_' . rand(1000, 9999);
+    $this->qr_expires_at = now()->endOfDay(); // QR berlaku hingga akhir hari ini
+    $this->save();
+
+    return $this->qr_code;
+}
 
     // Method untuk cek apakah QR masih berlaku
     public function isQRValid()
