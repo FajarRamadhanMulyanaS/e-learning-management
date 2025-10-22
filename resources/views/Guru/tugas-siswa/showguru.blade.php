@@ -92,6 +92,18 @@
                                         <span class="text-muted">Tidak ada file</span>
                                     @endif
                                 </td>
+                                <div class="mb-4">
+                                    <h5 class="text-primary"><i class="fas fa-eye mr-2"></i> Visibilitas Jawaban</h5>
+                                    @if($tugas->answers_visible_to_others)
+                                        <p class="text-success fw-bold">
+                                            <i class="fas fa-check-circle mr-2"></i> Aktif (Siswa dapat melihat jawaban lain)
+                                        </p>
+                                    @else
+                                        <p class="text-muted fw-bold">
+                                            <i class="fas fa-lock mr-2"></i> Pribadi (Siswa hanya melihat jawaban sendiri)
+                                        </p>
+                                    @endif
+                                </div>
                                 <td>{{ $pengumpulan->komentar ?? '-' }}</td>
                                 <td>{{ $pengumpulan->created_at ? $pengumpulan->created_at->format('d-m-Y H:i') : '-' }}</td>
                                 <td>

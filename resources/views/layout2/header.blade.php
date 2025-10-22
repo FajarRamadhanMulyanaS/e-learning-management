@@ -62,6 +62,7 @@
     <link rel="shortcut icon" href="{{ asset('images') }}/logoku.webp"/>
 
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="{{ asset('css/costom.css') }}">
 </head>
 
 <body>

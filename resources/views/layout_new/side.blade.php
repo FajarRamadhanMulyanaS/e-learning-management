@@ -65,7 +65,12 @@
             <span class="menu-title">Master Kelas</span>
             </a>
         </li>
-
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.laporan.index') }}">
+                <i class="fas fa-chart-bar menu-icon"></i>
+                <span class="menu-title">Laporan Siswa</span>
+            </a>
+        </li>
         <li class="nav-item">
             @auth
                 @if(Auth::user()->role === 'admin')

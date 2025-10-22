@@ -71,7 +71,7 @@
                     <table class="table table-bordered table-striped mt-4">
                         <thead class="bg-light">
                             <tr>
-                                <th>#</th>
+                                <th>No</th>
                                 <th>Nama Siswa</th>
                                 <th>File Tugas</th>
                                 <th>Komentar</th>
@@ -103,15 +103,22 @@
                                             <span>belum dinilai</span>
                                         @endif
                                     </td>
-
                                     <td>
-                                        <!-- Tindakan untuk mengedit atau menghapus jika diperlukan -->
-                                        <a href="{{ route('siswa.tugas.edit', $pengumpulan->id) }}" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i> Edit</a>
-                                        <form action="{{ route('siswa.tugas.destroyTugasSiswa', $pengumpulan->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Hapus</button>
-                                        </form>
+                                        @if($pengumpulan->siswa_id == auth()->id())
+                                            <a href="{{ route('siswa.tugas.edit', $pengumpulan->id) }}" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </a>
+                                            <form action="{{ route('siswa.tugas.destroyTugasSiswa', $pengumpulan->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Anda yakin ingin menghapus kiriman tugas ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </form>
+                                        @else
+                                            {{-- Jika bukan pemilik, jangan tampilkan tombol apa pun (cukup tanda strip) --}}
+                                            <span>-</span>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

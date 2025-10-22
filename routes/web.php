@@ -32,7 +32,7 @@ use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\SiswaPresensiController;
 use App\Http\Controllers\AdminPresensiController;
 use App\Http\Controllers\QuizController;
-// Import controller siswa yang baru
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Siswa\SiswaQuizController;
 
 Route::get('/', function () {
@@ -565,6 +565,8 @@ Route::group(['middleware' => ['auth']], function () {
     // Route untuk menyimpan tugas yang dikumpulkan
     Route::post('/siswa/tugas/{id}/submit', [TugasSiswaController::class, 'submitTugas'])->name('siswa.tugas.submitTugas');
 
+    Route::get('/siswa/tugas/{id}/edit', [TugasSiswaController::class, 'formEditPengumpulan'])->name('siswa.tugas.edit');
+
     // Route untuk form edit pengumpulan tugas (GET)
     Route::get('/siswa/pengumpulan/{id}/edit', [TugasSiswaController::class, 'formEditPengumpulan'])->name('siswa.tugas.edit');
 
@@ -841,6 +843,25 @@ Route::group(['middleware' => ['auth']], function () {
         }, 'admin');
     })->name('admin.presensi.export-excel');
 
+Route::get('/admin/laporan', function () {
+    return (new RoleMiddleware)->handle(request(), function () {
+        return app()->call('App\Http\Controllers\LaporanController@index');
+    }, 'admin');
+})->name('admin.laporan.index');
+
+// Rute showKelas
+Route::get('/admin/laporan/kelas/{kelas}', function ($kelas) {
+    return (new RoleMiddleware)->handle(request(), function () use ($kelas) {
+        return app()->call('App\Http\Controllers\LaporanController@showKelas', ['kelasId' => $kelas]); // <-- BARIS INI DIPERBAIKI
+    }, 'admin');
+})->name('admin.laporan.showKelas');
+
+// Rute showDetail
+Route::get('/admin/laporan/kelas/{kelas}/mapel/{mapel}', function ($kelas, $mapel) {
+    return (new RoleMiddleware)->handle(request(), function () use ($kelas, $mapel) {
+        return app()->call('App\Http\Controllers\LaporanController@showDetail', ['kelasId' => $kelas, 'mapelId' => $mapel]); // <-- BARIS INI DIPERBAIKI
+    }, 'admin');
+})->name('admin.laporan.showDetail');
 
     // Logout Route
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
