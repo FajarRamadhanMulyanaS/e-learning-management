@@ -1,4 +1,4 @@
-@extends('layout_new.app')
+@extends('layout2.app')
 @section('konten')
 <style>
 #qrcode-wrapper {
@@ -23,6 +23,28 @@
 #qr-timer {
     font-size: 16px;
     margin-top: 5px;
+}
+
+/* QR Code dengan background biru */
+#qrcode-wrapper {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    border-radius: 12px;
+    padding: 15px;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+#qrcode-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+#qrcode-wrapper img,
+#qrcode-wrapper canvas {
+    background-color: #ffffff !important;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 </style>
 
@@ -224,6 +246,15 @@ document.addEventListener('DOMContentLoaded', function() {
             colorLight: "#ffffff",
             correctLevel: QRCode.CorrectLevel.H
         });
+        
+        // Tambahkan background biru ke QR code
+        const qrElement = qrContainer.querySelector('img') || qrContainer.querySelector('canvas');
+        if (qrElement) {
+            qrElement.style.backgroundColor = '#ffffff';
+            qrElement.style.padding = '10px';
+            qrElement.style.borderRadius = '8px';
+            qrElement.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+        }
 
         console.log('QR Code berhasil dibuat.');
     } else {
@@ -256,6 +287,19 @@ document.addEventListener('DOMContentLoaded', function() {
 // Regenerate QR
 function regenerateQR() {
     if (confirm('Regenerate QR Code? QR Code lama akan tidak berlaku.')) {
+        // Show loading animation
+        const qrWrapper = document.getElementById('qrcode-wrapper');
+        const originalContent = qrWrapper.innerHTML;
+        
+        qrWrapper.innerHTML = `
+            <div class="d-flex flex-column align-items-center justify-content-center" style="height: 250px;">
+                <div class="spinner-border text-light mb-3" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="text-light mb-0">Regenerating QR Code...</p>
+            </div>
+        `;
+        
         fetch('{{ route("guru.presensi.regenerate-qr", $session->id) }}', {
             method: 'POST',
             headers: {
@@ -266,17 +310,25 @@ function regenerateQR() {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
-                alert('QR Code berhasil diperbarui!');
-                location.reload();
+                // Regenerate QR code dengan background biru
+                regenerateQRCode();
             } else {
+                qrWrapper.innerHTML = originalContent;
                 alert('Gagal: ' + data.message);
             }
         })
         .catch(err => {
             console.error(err);
+            qrWrapper.innerHTML = originalContent;
             alert('Terjadi kesalahan saat regenerate QR Code');
         });
     }
+}
+
+// Function to regenerate QR code with blue background
+function regenerateQRCode() {
+    // Reload page to get updated QR code
+    location.reload();
 }
 // Tombol download QR Code
 document.getElementById('downloadQR').addEventListener('click', function() {
@@ -286,10 +338,81 @@ document.getElementById('downloadQR').addEventListener('click', function() {
         return;
     }
 
+    // Show loading state
+    const downloadBtn = document.getElementById('downloadQR');
+    const originalText = downloadBtn.innerHTML;
+    downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
+    downloadBtn.disabled = true;
+
+    // Create a new canvas with blue background
+    const downloadCanvas = document.createElement('canvas');
+    const ctx = downloadCanvas.getContext('2d');
+    const size = 240; // Slightly larger to accommodate padding
+    downloadCanvas.width = size;
+    downloadCanvas.height = size;
+
+    // Fill with blue background
+    ctx.fillStyle = '#007bff';
+    ctx.fillRect(0, 0, size, size);
+    
+    // Add gradient effect
+    const gradient = ctx.createLinearGradient(0, 0, size, size);
+    gradient.addColorStop(0, '#007bff');
+    gradient.addColorStop(1, '#0056b3');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, size, size);
+
+    // Draw QR code in the center with padding
+    const qrSize = 220;
+    const offset = (size - qrSize) / 2;
+    
+    // Add white background for QR code
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(offset - 5, offset - 5, qrSize + 10, qrSize + 10);
+    
+    if (qrCanvas.tagName === 'IMG') {
+        ctx.drawImage(qrCanvas, offset, offset, qrSize, qrSize);
+    } else {
+        // For canvas elements
+        ctx.drawImage(qrCanvas, offset, offset, qrSize, qrSize);
+    }
+
+    // Download the image
     const link = document.createElement('a');
-    link.href = qrCanvas.src || qrCanvas.toDataURL('image/png');
-    link.download = 'QR_Presensi_{{ $session->id }}.png';
+    link.href = downloadCanvas.toDataURL('image/png');
+    link.download = 'QR_Presensi_{{ $session->id }}_Blue.png';
     link.click();
+    
+    // Show success message
+    setTimeout(() => {
+        // Create a toast notification instead of alert
+        const toast = document.createElement('div');
+        toast.className = 'toast-notification';
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.innerHTML = '<i class="fas fa-check-circle"></i> QR Code dengan background biru berhasil didownload!';
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }, 500);
+
+    // Reset button state
+    setTimeout(() => {
+        downloadBtn.innerHTML = originalText;
+        downloadBtn.disabled = false;
+    }, 1000);
 });
 
 </script>

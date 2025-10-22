@@ -180,15 +180,21 @@
 
 <!-- QR Scanner Modal -->
 <div class="modal fade" id="qrScannerModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Scan QR Code</h5>
+                <h5 class="modal-title"><i class="fas fa-qrcode"></i> Scan QR Code</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body text-center">
-                <div id="qr-reader" class="qr-scanner"></div>
-                <p class="mt-3 text-muted">Arahkan kamera ke QR Code untuk melakukan absen</p>
+                <div id="qr-reader" class="qr-scanner" style="width: 100%; max-width: 400px; margin: 0 auto;"></div>
+                <p class="mt-3 text-muted">
+                    <i class="fas fa-camera"></i> Arahkan kamera ke QR Code untuk melakukan absen
+                </p>
+                <div id="scanner-status" class="mt-2"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
             </div>
         </div>
     </div>
@@ -208,6 +214,23 @@
 
 <!-- 5. HTML5 QR Code Scanner -->
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+<!-- Fallback untuk browser yang tidak mendukung -->
+<script>
+    // Check if HTML5 QR Code is available
+    if (typeof Html5QrcodeScanner === 'undefined') {
+        console.error('❌ HTML5 QR Code Scanner library tidak dimuat');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Show fallback message if library fails to load
+            const scannerButtons = document.querySelectorAll('button[onclick*="openQRScanner"]');
+            scannerButtons.forEach(button => {
+                button.onclick = function() {
+                    alert('QR Scanner tidak tersedia. Silakan gunakan metode manual atau refresh halaman.');
+                };
+            });
+        });
+    }
+</script>
 
 <script>
     let currentSessionId = null;
@@ -251,17 +274,21 @@
     function openQRScanner(sessionId) {
         currentSessionId = sessionId;
         $('#qrScannerModal').modal('show');
-        
-        html5QrcodeScanner = new Html5QrcodeScanner(
-            "qr-reader",
-            { fps: 10, qrbox: { width: 250, height: 250 } },
-            false
-        );
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     }
 
     function onScanSuccess(decodedText, decodedResult) {
         console.log("✅ QR berhasil discan:", decodedText);
+        console.log("📱 Decoded result:", decodedResult);
+        
+        // Stop scanner immediately
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+        }
+        
+        // Close modal
+        $('#qrScannerModal').modal('hide');
+        
+        // Validate QR code
         fetch('/siswa/siswa/presensi/validate-qr', {
             method: 'POST',
             headers: {
@@ -270,26 +297,36 @@
             },
             body: JSON.stringify({ qr_code: decodedText })
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log("📡 Response status:", response.status);
+            return response.json();
+        })
         .then(data => {
             console.log("📦 Response dari server:", data);
             if (data.valid) {
                 performCheckIn(currentSessionId, 'qr', decodedText);
             } else {
-                alert('QR Code tidak valid: ' + data.message);
+                alert('QR Code tidak valid: ' + (data.message || 'QR Code tidak dikenali'));
             }
         })
         .catch(error => {
             console.error('❌ Error validating QR:', error);
-            alert('Error validating QR code');
+            alert('Error validating QR code: ' + error.message);
         });
-
-        html5QrcodeScanner.clear();
-        $('#qrScannerModal').modal('hide');
     }
 
     function onScanFailure(error) {
-        // abaikan error kecil dari scanner
+        // Hanya log error yang penting, abaikan error kecil dari scanner
+        if (error && !error.includes('NotFoundException') && !error.includes('No MultiFormat Readers')) {
+            console.log("⚠️ Scanner error:", error);
+            
+            // Update status if it's a significant error
+            if (error.includes('Permission denied') || error.includes('NotAllowedError')) {
+                document.getElementById('scanner-status').innerHTML = '<span class="text-danger"><i class="fas fa-ban"></i> Akses kamera ditolak. Silakan izinkan akses kamera.</span>';
+            } else if (error.includes('NotFoundError') || error.includes('No camera found')) {
+                document.getElementById('scanner-status').innerHTML = '<span class="text-danger"><i class="fas fa-video-slash"></i> Kamera tidak ditemukan.</span>';
+            }
+        }
     }
 
     function manualCheckIn(sessionId) {
@@ -344,10 +381,45 @@
         });
     }
 
+    // Handle modal events
     $('#qrScannerModal').on('hidden.bs.modal', function () {
         if (html5QrcodeScanner) {
             html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
         }
+    });
+    
+    // Handle modal shown event
+    $('#qrScannerModal').on('shown.bs.modal', function () {
+        // Update status
+        document.getElementById('scanner-status').innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Menginisialisasi kamera...';
+        
+        // Small delay to ensure modal is fully rendered
+        setTimeout(function() {
+            if (html5QrcodeScanner) {
+                html5QrcodeScanner.clear();
+            }
+            
+            try {
+                html5QrcodeScanner = new Html5QrcodeScanner(
+                    "qr-reader",
+                    { 
+                        fps: 10, 
+                        qrbox: { width: 300, height: 300 },
+                        aspectRatio: 1.0
+                    },
+                    false
+                );
+                html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+                
+                // Update status to ready
+                document.getElementById('scanner-status').innerHTML = '<span class="text-success"><i class="fas fa-check-circle"></i> Kamera siap, arahkan ke QR Code</span>';
+            } catch (error) {
+                console.error('❌ Error initializing QR scanner:', error);
+                document.getElementById('scanner-status').innerHTML = '<span class="text-danger"><i class="fas fa-exclamation-triangle"></i> Gagal menginisialisasi kamera</span>';
+                alert('Gagal menginisialisasi kamera. Pastikan browser mendukung akses kamera dan izinkan akses kamera.');
+            }
+        }, 200);
     });
 </script>
 
