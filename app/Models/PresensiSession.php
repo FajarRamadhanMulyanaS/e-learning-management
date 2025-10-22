@@ -110,14 +110,17 @@ class PresensiSession extends Model
     {
         $this->is_active = false;
         $this->is_closed = true;
-        $this->jam_selesai = now();
         $this->save();
     }
 
     // Method untuk mendapatkan statistik presensi
     public function getPresensiStats()
     {
-        $totalSiswa = $this->kelas->siswa()->count();
+        // Hitung total siswa dari kedua relasi
+        $siswaFromSiswaTable = $this->kelas->siswa()->count();
+        $siswaFromUserTable = $this->kelas->users()->where('role', 'siswa')->count();
+        $totalSiswa = max($siswaFromSiswaTable, $siswaFromUserTable);
+
         $hadir = $this->presensiRecords()->where('status', 'hadir')->count();
         $terlambat = $this->presensiRecords()->where('status', 'terlambat')->count();
         $tidakHadir = $totalSiswa - $hadir - $terlambat;
@@ -137,8 +140,4 @@ class PresensiSession extends Model
         return Carbon::parse($this->jam_mulai)->format('H:i');
     }
 
-    public function getJamSelesaiFormattedAttribute()
-    {
-        return $this->jam_selesai ? Carbon::parse($this->jam_selesai)->format('H:i') : '-';
-    }
 }

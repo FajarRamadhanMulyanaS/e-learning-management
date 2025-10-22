@@ -104,12 +104,12 @@ class PresensiController extends Controller
         }
 
         if ($session->mode !== 'qr') {
-            return redirect()->back()->with('error', 'Hanya sesi dengan mode QR yang bisa regenerate QR Code');
+            return response()->json(['success' => false, 'message' => 'Hanya sesi dengan mode QR yang bisa regenerate QR Code']);
         }
 
         $session->generateQRCode();
 
-        return redirect()->back()->with('success', 'QR Code berhasil diperbarui');
+        return response()->json(['success' => true, 'message' => 'QR Code berhasil diperbarui']);
     }
 
     public function getActiveSessions()
@@ -140,7 +140,19 @@ class PresensiController extends Controller
 
     private function createPresensiRecords(PresensiSession $session)
     {
-        $siswaIds = $session->kelas->siswa()->pluck('user_id');
+        // Ambil siswa dari kelas melalui relasi yang benar
+        $siswaIds = collect();
+
+        // Cek dari tabel siswa yang memiliki kelas_id
+        $siswaFromSiswaTable = $session->kelas->siswa()->pluck('user_id');
+        $siswaIds = $siswaIds->merge($siswaFromSiswaTable);
+
+        // Cek dari tabel users yang memiliki kelas_id
+        $siswaFromUserTable = $session->kelas->users()->where('role', 'siswa')->pluck('id');
+        $siswaIds = $siswaIds->merge($siswaFromUserTable);
+
+        // Hapus duplikat
+        $siswaIds = $siswaIds->unique();
 
         foreach ($siswaIds as $siswaId) {
             PresensiRecord::create([

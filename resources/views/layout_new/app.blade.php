@@ -1,14 +1,16 @@
-@include('layout_new.header') <!-- Include Header -->
+
+@include('layout2.header') <!-- Include Header -->
+
 <div class="container-fluid">
     <div class="row">
-        @include('layout_new.side') <!-- Include Sidebar -->
-        
-        
+        @include('layout2.side') <!-- Include Sidebar -->
+
+
             @yield('konten') <!-- Yield untuk Konten Utama -->
-        
+
     </div>
 </div>
 
 
 
-@include('layout_new.footer') <!-- Include Footer -->
+@include('layout2.footer') <!-- Include Footer -->

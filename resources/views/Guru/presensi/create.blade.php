@@ -1,5 +1,8 @@
 @extends('layout_new.app')
+
+
 @section('konten')
+
 
 <div class="container mt-4">
     <h3>Buat Sesi Presensi</h3>
@@ -60,6 +63,7 @@
                         <label class="form-label">Jam Mulai</label>
                         <input type="time" name="jam_mulai" class="form-control" 
                                value="{{ date('H:i') }}" required />
+                        <small class="text-muted">Status terlambat jika absen melewati jam ini</small>
                     </div>
 
                     <div class="col-md-6">
@@ -90,5 +94,6 @@
         </div>
     </div>
 </div>
+
 
 @endsection

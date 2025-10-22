@@ -74,6 +74,11 @@
                             <div class="card presensi-card border-primary">
                                 <div class="card-body">
                                     <h6 class="card-title">{{ $session->mapel->nama_mapel }}</h6>
+                                    @if($session->deskripsi)
+                                        <p class="card-text text-primary">
+                                            <i class="fas fa-info-circle"></i> {{ $session->deskripsi }}
+                                        </p>
+                                    @endif
                                     <p class="card-text">
                                         <small class="text-muted">
                                             <i class="fas fa-user"></i> {{ $session->guru->username }}<br>
@@ -127,7 +132,7 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>No</th>
                             <th>Tanggal</th>
                             <th>Mapel</th>
                             <th>Guru</th>
@@ -200,20 +205,39 @@
     @endforeach
 
     function loadPresensiStatus(sessionId) {
-        fetch(`/siswa/presensi/status/${sessionId}`)
+        fetch(`/siswa/siswa/presensi/status/${sessionId}`)
             .then(response => response.json())
             .then(data => {
                 const statusElement = document.getElementById(`status-${sessionId}`);
+                const card = statusElement.closest('.card-body');
+                const buttonContainer = card.querySelector('.d-flex div');
+
                 if (data.status === 'tidak_hadir') {
                     statusElement.innerHTML = '<span class="text-danger">Belum absen</span>';
                 } else {
-                    statusElement.innerHTML = `<span class="text-success">${data.status_text} - ${data.waktu_absen}</span>`;
+                    // Tentukan badge class berdasarkan status
+                    let badgeClass = 'bg-success';
+                    let textClass = 'text-success';
+                    let statusText = data.status_text || 'Hadir';
+                    
+                    if (data.status === 'terlambat') {
+                        badgeClass = 'bg-warning';
+                        textClass = 'text-warning';
+                    } else if (data.status === 'tidak_hadir') {
+                        badgeClass = 'bg-danger';
+                        textClass = 'text-danger';
+                    }
+                    
+                    statusElement.innerHTML = `<span class="${textClass}">${statusText} - ${data.waktu_absen}</span>`;
+                    // sembunyikan tombol hadir kalau sudah absen
+                    buttonContainer.innerHTML = `<span class="badge ${badgeClass}">${statusText}</span>`;
                 }
             })
             .catch(error => {
                 console.error('Error loading presensi status:', error);
             });
     }
+
 
     function openQRScanner(sessionId) {
         currentSessionId = sessionId;
@@ -231,7 +255,7 @@
 
     function onScanSuccess(decodedText, decodedResult) {
         // Validate QR code
-        fetch('/siswa/presensi/validate-qr', {
+        fetch('/siswa/siswa/presensi/validate-qr', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -269,38 +293,73 @@
         }
     }
 
-    function performCheckIn(sessionId, metode, qrCode = null) {
-        const data = {
-            session_id: sessionId,
-            metode: metode
-        };
-        
-        if (qrCode) {
-            data.qr_code = qrCode;
-        }
-
-        fetch('/siswa/presensi/check-in', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Absen berhasil!');
-                location.reload();
-            } else {
-                alert('Error: ' + data.error);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan saat melakukan absen');
-        });
+function performCheckIn(sessionId, metode, qrCode = null) {
+    const data = {
+        session_id: sessionId,
+        metode: metode
+    };
+    
+    if (qrCode) {
+        data.qr_code = qrCode;
     }
+
+    fetch('/siswa/siswa/presensi/check-in', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // ✅ Ubah tombol jadi status tanpa reload
+            const card = document.querySelector(`#status-${sessionId}`).closest('.card-body');
+            const buttonContainer = card.querySelector('.d-flex div'); // container tombol hadir
+            const statusElement = document.getElementById(`status-${sessionId}`);
+
+            // Tentukan status dan styling berdasarkan response
+            let statusText = data.status_text || 'Hadir';
+            let badgeClass = 'bg-success';
+            let textClass = 'text-success';
+            
+            if (data.status === 'terlambat') {
+                badgeClass = 'bg-warning';
+                textClass = 'text-warning';
+            } else if (data.status === 'tidak_hadir') {
+                badgeClass = 'bg-danger';
+                textClass = 'text-danger';
+            }
+
+            // Hilangkan tombol hadir dan ganti dengan status
+            buttonContainer.innerHTML = `<span class="badge ${badgeClass}">${statusText}</span>`;
+
+            // Update status teks dengan waktu absen
+            const waktuAbsen = data.waktu_absen || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            statusElement.innerHTML = `<span class="${textClass}">${statusText} - ${waktuAbsen}</span>`;
+
+            // Tampilkan pesan sesuai status
+            if (data.status === 'terlambat') {
+                alert('Absen berhasil! Status: Terlambat');
+            } else {
+                alert('Absen berhasil! Status: Hadir');
+            }
+        } else {
+            alert('Error: ' + (data.error || 'Terjadi kesalahan tidak diketahui'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat melakukan absen. Silakan coba lagi.');
+    });
+}
+
 
     // Clean up scanner when modal is hidden
     $('#qrScannerModal').on('hidden.bs.modal', function () {

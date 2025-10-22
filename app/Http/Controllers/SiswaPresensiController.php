@@ -12,7 +12,15 @@ class SiswaPresensiController extends Controller
     public function index()
     {
         $siswaId = Auth::id();
-        $kelasId = Auth::user()->kelas_id;
+        $user = Auth::user();
+
+        // Cek kelas dari tabel siswa atau user
+        $kelasId = null;
+        if ($user->siswa && $user->siswa->kelas_id) {
+            $kelasId = $user->siswa->kelas_id;
+        } elseif ($user->kelas_id) {
+            $kelasId = $user->kelas_id;
+        }
 
         if (!$kelasId) {
             return view('siswa.presensi.index')->with('error', 'Anda belum terdaftar di kelas manapun');
@@ -68,15 +76,28 @@ class SiswaPresensiController extends Controller
         // Lakukan absen
         if ($existingRecord) {
             $existingRecord->doAbsen($validated['metode']);
+            $status = $existingRecord->status;
         } else {
-            PresensiRecord::create([
+            $record = PresensiRecord::create([
                 'presensi_session_id' => $session->id,
                 'siswa_id' => $siswaId,
                 'status' => 'tidak_hadir',
-            ])->doAbsen($validated['metode']);
+            ]);
+            $record->doAbsen($validated['metode']);
+            $status = $record->status;
         }
 
-        return response()->json(['success' => 'Absen berhasil']);
+        // Ambil record yang sudah di-update
+        $updatedRecord = PresensiRecord::where('presensi_session_id', $session->id)
+            ->where('siswa_id', $siswaId)
+            ->first();
+
+        return response()->json([
+            'success' => 'Absen berhasil',
+            'status' => $status,
+            'waktu_absen' => $updatedRecord->waktu_absen_formatted,
+            'status_text' => $status === 'hadir' ? 'Hadir' : ($status === 'terlambat' ? 'Terlambat' : 'Tidak Hadir')
+        ]);
     }
 
     public function validateQR(Request $request)
@@ -98,7 +119,15 @@ class SiswaPresensiController extends Controller
         }
 
         $siswaId = Auth::id();
-        $kelasId = Auth::user()->kelas_id;
+        $user = Auth::user();
+
+        // Cek kelas dari tabel siswa atau user
+        $kelasId = null;
+        if ($user->siswa && $user->siswa->kelas_id) {
+            $kelasId = $user->siswa->kelas_id;
+        } elseif ($user->kelas_id) {
+            $kelasId = $user->kelas_id;
+        }
 
         if ($session->kelas_id !== $kelasId) {
             return response()->json(['valid' => false, 'message' => 'QR Code tidak untuk kelas Anda']);
@@ -124,13 +153,25 @@ class SiswaPresensiController extends Controller
             ->first();
 
         if (!$record) {
-            return response()->json(['status' => 'tidak_hadir', 'waktu_absen' => null]);
+            return response()->json([
+                'status' => 'tidak_hadir',
+                'waktu_absen' => null,
+                'status_text' => 'Tidak Hadir'
+            ]);
         }
+
+        $statusText = match ($record->status) {
+            'hadir' => 'Hadir',
+            'terlambat' => 'Terlambat',
+            'tidak_hadir' => 'Tidak Hadir',
+            default => 'Tidak Hadir'
+        };
 
         return response()->json([
             'status' => $record->status,
             'waktu_absen' => $record->waktu_absen_formatted,
             'metode_absen' => $record->metode_absen,
+            'status_text' => $statusText
         ]);
     }
 
