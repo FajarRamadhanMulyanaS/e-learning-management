@@ -71,11 +71,14 @@
 
                                 <!-- Tombol Aktifkan -->
                                 @if(!$semester->is_active)
-                                    <a href="{{ route('admin.semester.activate', $semester->id) }}" class="btn btn-success btn-sm rounded-pill">
-                                        <i class="fas fa-check"></i> Aktifkan
-                                    </a>
+                                    <form action="{{ route('admin.semester.activate', $semester->id) }}" method="POST" style="display:inline;">
+                                        @csrf
+                                        <button type="submit" class="btn btn-success btn-sm rounded-pill" onclick="return confirm('Aktifkan semester ini?')">
+                                            <i class="fas fa-check"></i> Aktifkan
+                                        </button>
+                                    </form>
                                 @endif
-
+                                
                                 <!-- Form Hapus -->
                                 <form action="{{ route('admin.semester.delete', $semester->id) }}" method="POST" style="display:inline;">
                                     @csrf

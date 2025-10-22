@@ -12,13 +12,21 @@ class PengumpulanTugas extends Model
     protected $table = 'pengumpulan_tugas';
     protected $fillable = ['tugas_id', 'siswa_id', 'file_tugas','nilai', 'komentar'];
 
+    /**
+     * Relasi ke model Tugas
+     */
     public function tugas()
     {
         return $this->belongsTo(Tugas::class);
     }
 
+    /**
+     * Relasi ke model Siswa (YANG BENAR)
+     * Kolom 'siswa_id' di tabel ini merujuk ke 'id' di tabel 'siswa'.
+     */
     public function siswa()
     {
-        return $this->belongsTo(User::class, 'siswa_id');
+        // !! PERBAIKAN DI SINI !! Ganti User::class menjadi Siswa::class
+        return $this->belongsTo(Siswa::class, 'siswa_id');
     }
 }

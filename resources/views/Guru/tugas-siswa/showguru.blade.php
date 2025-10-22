@@ -82,7 +82,8 @@
                         @foreach($pengumpulanTugas as $pengumpulan)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $pengumpulan->siswa->username ?? 'Tidak ada' }}</td>
+                                {{-- BENAR --}}
+                                <td>{{ $pengumpulan->siswa->user->username ?? 'Siswa tidak ditemukan' }}</td>
                                 <td>
                                     @if($pengumpulan->file_tugas)
                                         <a href="{{ asset('storage/' . $pengumpulan->file_tugas) }}" target="_blank" class="btn btn-outline-primary btn-sm">

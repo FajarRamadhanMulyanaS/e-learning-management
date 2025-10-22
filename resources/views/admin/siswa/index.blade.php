@@ -3,6 +3,7 @@
 @section('konten')
 
 <style>
+    /* ... (style Anda tidak berubah) ... */
     .container-fluid {
         background-color: white;
     }
@@ -77,7 +78,6 @@
     .card-header{
         background-color: white;
     }
-
 
 </style>
 
@@ -193,7 +193,8 @@
                                     <label for="kelas_id">Kelas:</label>
                                     <select name="kelas_id" id="kelas_id" class="form-control" required>
                                         <option value="">Pilih Kelas</option>
-                                        @foreach ($kelas as $k)
+                                        {{-- Variabel $kelas ini dikirim dari SiswaController@index --}}
+                                        @foreach ($kelas as $k) 
                                             <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
                                         @endforeach
                                     </select>
@@ -257,6 +258,7 @@
                             </tr>
                         </tfoot>
                         <tbody>
+                            {{-- Variabel $users ini dikirim dari SiswaController@index --}}
                             @foreach ($users as $user)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
@@ -267,14 +269,27 @@
                                         <img src="{{ asset('images/default.png') }}" alt="Default Foto" width="50" height="50">
                                     @endif
                                 </td>
-                                <td>{{ $user->siswa->nis }}</td> <!-- Akses NIS dari relasi siswa -->
-                                <td>{{ $user->siswa->nisn }}</td> <!-- Akses NISN dari relasi siswa -->
+                                <td>{{ $user->siswa->nis ?? 'N/A' }}</td> <!-- Akses NIS dari relasi siswa -->
+                                <td>{{ $user->siswa->nisn ?? 'N/A' }}</td> <!-- Akses NISN dari relasi siswa -->
                                 <td>{{ $user->username }}</td> <!-- Akses username dari tabel users -->
-                                <td>{{ $user->siswa->telepon }}</td> <!-- Akses telepon dari relasi siswa -->
-                                <td>{{ $user->kelas ? $user->kelas->nama_kelas : 'Tidak ada kelas' }}</td> <!-- Cek jika kelas ada -->
-                                <td>{{ $user->siswa->gender }}</td> <!-- Akses gender dari relasi siswa -->
-                                <td>{{ $user->siswa->alamat }}</td> <!-- Akses alamat dari relasi siswa -->
-                                <td>{{ $user->siswa->tgl_lahir }}</td> <!-- Akses tanggal lahir dari relasi siswa -->
+                                <td>{{ $user->siswa->telepon ?? 'N/A' }}</td> <!-- Akses telepon dari relasi siswa -->
+                                
+                                {{-- 
+                                  !! INI PERBAIKAN UTAMA (TABEL) !!
+                                  Menggunakan relasi baru: $user->siswa->kelas->nama_kelas
+                                  $user->kelas sudah tidak ada.
+                                --}}
+                                <td>
+                                    @if ($user->siswa && $user->siswa->kelas)
+                                        {{ $user->siswa->kelas->nama_kelas }}
+                                    @else
+                                        'Tidak ada kelas'
+                                    @endif
+                                </td>
+                                
+                                <td>{{ $user->siswa->gender ?? 'N/A' }}</td> <!-- Akses gender dari relasi siswa -->
+                                <td>{{ $user->siswa->alamat ?? 'N/A' }}</td> <!-- Akses alamat dari relasi siswa -->
+                                <td>{{ $user->siswa->tgl_lahir ?? 'N/A' }}</td> <!-- Akses tanggal lahir dari relasi siswa -->
 
                                     <td>
                                         <!-- Menempatkan semua tombol dalam satu kolom -->
@@ -301,38 +316,55 @@
 
                                                                 <div class="form-group">
                                                                     <label for="nis">NIS:</label>
-                                                                    <input type="text" class="form-control" name="nis" value="{{ $user->siswa->nis }}" required>
+                                                                    <input type="text" class="form-control" name="nis" value="{{ $user->siswa->nis ?? '' }}" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="nisn">NISN:</label>
-                                                                    <input type="text" class="form-control" name="nisn" value="{{ $user->siswa->nisn }}" required>
+                                                                    <input type="text" class="form-control" name="nisn" value="{{ $user->siswa->nisn ?? '' }}" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="username">Nama:</label>
                                                                     <input type="text" class="form-control" name="username" value="{{ $user->username }}" required>
                                                                 </div>
+                                                                
+                                                                {{-- 
+                                                                  !! INI PERBAIKAN UTAMA (MODAL EDIT) !!
+                                                                  Mengganti input teks 'kelas' menjadi dropdown 'kelas_id'
+                                                                  agar konsisten dengan modal 'Tambah Siswa'.
+                                                                --}}
                                                                 <div class="form-group">
-                                                                    <label for="kelas">Kelas:</label>
-                                                                    <input type="text" class="form-control" name="kelas" value="{{ $user->kelas->nama_kelas }}" required>
+                                                                    <label for="kelas_id">Kelas:</label>
+                                                                    {{-- Pastikan $kelas dikirim dari Controller --}}
+                                                                    <select name="kelas_id" id="kelas_id_{{ $user->id }}" class="form-control" required>
+                                                                        <option value="">Pilih Kelas</option>
+                                                                        @if(isset($kelas)) {{-- Tambahkan check ini --}}
+                                                                            @foreach ($kelas as $k)
+                                                                                <option value="{{ $k->id }}" {{ ($user->siswa && $user->siswa->kelas_id == $k->id) ? 'selected' : '' }}>
+                                                                                    {{ $k->nama_kelas }}
+                                                                                </option>
+                                                                            @endforeach
+                                                                        @endif
+                                                                    </select>
                                                                 </div>
+
                                                                 <div class="form-group">
                                                                     <label for="telepon">Telepon:</label>
-                                                                    <input type="text" class="form-control" name="telepon" value="{{ $user->siswa->telepon }}" required>
+                                                                    <input type="text" class="form-control" name="telepon" value="{{ $user->siswa->telepon ?? '' }}" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="gender">Gender:</label>
                                                                     <select name="gender" class="form-control" required>
-                                                                        <option value="Laki-laki" {{ $user->gender == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
-                                                                        <option value="Perempuan" {{ $user->gender == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                                                                        <option value="Laki-laki" {{ ($user->siswa && $user->siswa->gender == 'Laki-laki') ? 'selected' : '' }}>Laki-laki</option>
+                                                                        <option value="Perempuan" {{ ($user->siswa && $user->siswa->gender == 'Perempuan') ? 'selected' : '' }}>Perempuan</option>
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="alamat">Alamat:</label>
-                                                                    <input type="text" class="form-control" name="alamat" value="{{ $user->siswa->alamat }}" required>
+                                                                    <input type="text" class="form-control" name="alamat" value="{{ $user->siswa->alamat ?? '' }}" required>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="tgl_lahir">Tanggal Lahir:</label>
-                                                                    <input type="date" class="form-control" name="tgl_lahir" value="{{ $user->siswa->tgl_lahir }}" required>
+                                                                    <input type="date" class="form-control" name="tgl_lahir" value="{{ $user->siswa->tgl_lahir ?? '' }}" required>
                                                                 </div>
 
                                                                 <!-- Tambahkan input untuk upload foto -->
@@ -372,3 +404,4 @@
 </div>
 
 @endsection
+

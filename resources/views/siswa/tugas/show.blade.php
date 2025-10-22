@@ -84,7 +84,7 @@
                             @foreach($pengumpulanTugas as $pengumpulan)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $pengumpulan->siswa->username ?? 'Tidak ada' }}</td>
+                                    <td>{{ $pengumpulan->siswa->user->username ?? 'Siswa tidak ditemukan' }}</td>
                                     <td>
                                         @if($pengumpulan->file_tugas)
                                             <a href="{{ asset('storage/' . $pengumpulan->file_tugas) }}" target="_blank" class="btn btn-outline-primary btn-sm">
@@ -104,7 +104,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($pengumpulan->siswa_id == auth()->id())
+                                        @if($pengumpulan->siswa_id == $siswaId)
                                             <a href="{{ route('siswa.tugas.edit', $pengumpulan->id) }}" class="btn btn-warning btn-sm">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>

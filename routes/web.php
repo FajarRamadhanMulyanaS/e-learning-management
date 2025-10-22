@@ -34,6 +34,10 @@ use App\Http\Controllers\AdminPresensiController;
 use App\Http\Controllers\QuizController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\Siswa\SiswaQuizController;
+use App\Http\Controllers\SemesterController; // <-- Tambahkan ini
+use App\Http\Controllers\MapelController; // <-- Tambahkan ini
+use App\Http\Controllers\KelasController; // <-- Tambahkan ini
+use App\Http\Controllers\AdminJadwalController; // <-- Tambahkan ini
 
 Route::get('/', function () {
     return redirect()->route('homepage'); // Redirect to login page
@@ -61,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
     // Route Dashboard Siswa
     Route::get('/siswa/index', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\SiswaController@index');
+            return app()->call('App\Http\Controllers\SiswaController@dashboard'); // <-- BENAR
         }, 'siswa');
     })->name('siswa.index');
 
@@ -88,7 +92,7 @@ Route::middleware(['auth'])->group(function () {
         return (new RoleMiddleware)->handle(request(), function () {
             return app()->call('App\Http\Controllers\AdminController@searchSiswa');
         }, 'admin');
-    })->name('admin.siswa.search');
+    })->name('admin.siswa.search'); // (Pastikan method searchSiswa ada di AdminController)
 
     Route::get('/admin/siswa', function () {
         return (new RoleMiddleware)->handle(request(), function () {
@@ -96,11 +100,11 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.siswa.index');
 
-    Route::get('/admin/siswa/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\AdminController@createSiswa');
-        }, 'admin');
-    })->name('admin.siswa.create');
+    // Route::get('/admin/siswa/create', function () { // Tidak terpakai jika pakai modal
+    //     return (new RoleMiddleware)->handle(request(), function () {
+    //         return app()->call('App\Http\Controllers\AdminController@createSiswa');
+    //     }, 'admin');
+    // })->name('admin.siswa.create');
 
     Route::post('/admin/siswa/store', function () {
         return (new RoleMiddleware)->handle(request(), function () {
@@ -108,13 +112,14 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.siswa.store');
 
-    Route::get('/admin/siswa/edit/{id}', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\Http\Controllers\AdminController@editSiswa', ['id' => $id]);
-        }, 'admin');
-    })->name('admin.siswa.editSiswa');
+    // Route::get('/admin/siswa/edit/{id}', function ($id) { // Tidak terpakai jika pakai modal
+    //     return (new RoleMiddleware)->handle(request(), function () use ($id) {
+    //         return app()->call('App\Http\Controllers\AdminController@editSiswa', ['id' => $id]);
+    //     }, 'admin');
+    // })->name('admin.siswa.editSiswa');
 
-    Route::post('/admin/siswa/update/{id}', function ($id) {
+    // !! PERHATIAN: Rute update siswa seharusnya POST (karena @method('POST') di form Anda) atau PUT !!
+    Route::post('/admin/siswa/update/{id}', function ($id) { // Tetap POST karena form Anda pakai @method('POST')
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\AdminController@updateSiswa', ['id' => $id]);
         }, 'admin');
@@ -136,6 +141,9 @@ Route::middleware(['auth'])->group(function () {
     // route untuk Download Excel siswa
     Route::get('/admin/siswa/download-template', function () {
         $filePath = public_path('templates/template_siswa.xlsx'); // pastikan file ada di folder public/templates
+        if (!file_exists($filePath)) {
+             abort(404, 'Template file not found.');
+        }
         return response()->download($filePath, 'template_siswa.xlsx');
     })->name('admin.siswa.downloadTemplateSiswa');
 
@@ -149,11 +157,11 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.guru.index');
 
-    Route::get('/admin/guru/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\AdminController@createGuru');
-        }, 'admin');
-    })->name('admin.guru.create');
+    // Route::get('/admin/guru/create', function () { // Tidak terpakai jika pakai modal
+    //     return (new RoleMiddleware)->handle(request(), function () {
+    //         return app()->call('App\Http\Controllers\AdminController@createGuru');
+    //     }, 'admin');
+    // })->name('admin.guru.create');
 
     Route::post('/admin/guru/store', function () {
         return (new RoleMiddleware)->handle(request(), function () {
@@ -161,12 +169,13 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.guru.storeGuru');
 
-    Route::get('/admin/guru/edit/{id}', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\Http\Controllers\AdminController@editGuru', ['id' => $id]);
-        }, 'admin');
-    })->name('admin.guru.editGuru');
+    // Route::get('/admin/guru/edit/{id}', function ($id) { // Tidak terpakai jika pakai modal
+    //     return (new RoleMiddleware)->handle(request(), function () use ($id) {
+    //         return app()->call('App\Http\Controllers\AdminController@editGuru', ['id' => $id]);
+    //     }, 'admin');
+    // })->name('admin.guru.editGuru');
 
+    // !! PERHATIAN: Rute update guru seharusnya POST (jika pakai @method('POST')) atau PUT !!
     Route::post('/admin/guru/update/{id}', function ($id) {
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\AdminController@updateGuru', ['id' => $id]);
@@ -182,13 +191,16 @@ Route::middleware(['auth'])->group(function () {
     // untuk import excel guru
     Route::post('/admin/guru/import', function () {
         return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\AdminController@importguru');
+            return app()->call('App\Http\Controllers\AdminController@importGuru'); // <-- Perbaiki typo importguru
         }, 'admin');
     })->name('admin.guru.import'); // Route untuk meng-handle upload Excel
 
     // route untuk Download Excel guru
     Route::get('/admin/guru/download-template', function () {
         $filePath = public_path('templates/template_guru.xlsx'); // pastikan file ada di folder public/templates
+         if (!file_exists($filePath)) {
+             abort(404, 'Template file not found.');
+        }
         return response()->download($filePath, 'template_guru.xlsx');
     })->name('admin.guru.downloadTemplateGuru');
 
@@ -202,12 +214,12 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.mapel.index');
 
-    // Route untuk form tambah mata pelajaran
-    Route::get('/admin/mapel/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\MapelController@create');
-        }, 'admin');
-    })->name('admin.mapel.create');
+    // Route untuk form tambah mata pelajaran (jika tidak pakai modal)
+    // Route::get('/admin/mapel/create', function () {
+    //     return (new RoleMiddleware)->handle(request(), function () {
+    //         return app()->call('App\Http\Controllers\MapelController@create');
+    //     }, 'admin');
+    // })->name('admin.mapel.create');
 
     // Route untuk menyimpan mata pelajaran baru
     Route::post('/admin/mapel/store', function () {
@@ -216,14 +228,15 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.mapel.store');
 
-    // Route untuk edit mata pelajaran
-    Route::get('/admin/mapel/edit/{id}', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\Http\Controllers\MapelController@edit', ['id' => $id]);
-        }, 'admin');
-    })->name('admin.mapel.edit');
+    // Route untuk edit mata pelajaran (jika tidak pakai modal)
+    // Route::get('/admin/mapel/edit/{id}', function ($id) {
+    //     return (new RoleMiddleware)->handle(request(), function () use ($id) {
+    //         return app()->call('App\Http\Controllers\MapelController@edit', ['id' => $id]);
+    //     }, 'admin');
+    // })->name('admin.mapel.edit');
 
     // Route untuk update mata pelajaran
+    // !! PERHATIAN: Rute update seharusnya POST (jika pakai @method('POST')) atau PUT !!
     Route::post('/admin/mapel/update/{id}', function ($id) {
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\MapelController@update', ['id' => $id]);
@@ -248,12 +261,12 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.semester.index');
 
-    // Route untuk form tambah semester
-    Route::get('/admin/semester/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\SemesterController@create');
-        }, 'admin');
-    })->name('admin.semester.create');
+    // Route untuk form tambah semester (jika tidak pakai modal)
+    // Route::get('/admin/semester/create', function () {
+    //     return (new RoleMiddleware)->handle(request(), function () {
+    //         return app()->call('App\Http\Controllers\SemesterController@create');
+    //     }, 'admin');
+    // })->name('admin.semester.create');
 
     // Route untuk menyimpan semester baru
     Route::post('/admin/semester/store', function () {
@@ -262,14 +275,15 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.semester.store');
 
-    // Route untuk form edit semester
-    Route::get('/admin/semester/edit/{id}', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\Http\Controllers\SemesterController@edit', ['id' => $id]);
-        }, 'admin');
-    })->name('admin.semester.edit');
+    // Route untuk form edit semester (jika tidak pakai modal)
+    // Route::get('/admin/semester/edit/{id}', function ($id) {
+    //     return (new RoleMiddleware)->handle(request(), function () use ($id) {
+    //         return app()->call('App\Http\Controllers\SemesterController@edit', ['id' => $id]);
+    //     }, 'admin');
+    // })->name('admin.semester.edit');
 
     // Route untuk update semester
+    // !! PERHATIAN: Rute update seharusnya POST (jika pakai @method('POST')) atau PUT !!
     Route::post('/admin/semester/update/{id}', function ($id) {
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\SemesterController@update', ['id' => $id]);
@@ -301,12 +315,12 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.kelas.index');
 
-    // Route untuk form tambah kelas
-    Route::get('/admin/kelas/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\KelasController@create');
-        }, 'admin');
-    })->name('admin.kelas.create');
+    // Route untuk form tambah kelas (jika tidak pakai modal)
+    // Route::get('/admin/kelas/create', function () {
+    //     return (new RoleMiddleware)->handle(request(), function () {
+    //         return app()->call('App\Http\Controllers\KelasController@create');
+    //     }, 'admin');
+    // })->name('admin.kelas.create');
 
     // Route untuk menyimpan kelas baru
     Route::post('/admin/kelas/store', function () {
@@ -315,14 +329,15 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.kelas.store');
 
-    // Route untuk form edit kelas
-    Route::get('/admin/kelas/edit/{id}', function ($id) {
-        return (new RoleMiddleware)->handle(request(), function () use ($id) {
-            return app()->call('App\Http\Controllers\KelasController@edit', ['id' => $id]);
-        }, 'admin');
-    })->name('admin.kelas.edit');
+    // Route untuk form edit kelas (jika tidak pakai modal)
+    // Route::get('/admin/kelas/edit/{id}', function ($id) {
+    //     return (new RoleMiddleware)->handle(request(), function () use ($id) {
+    //         return app()->call('App\Http\Controllers\KelasController@edit', ['id' => $id]);
+    //     }, 'admin');
+    // })->name('admin.kelas.edit');
 
     // Route untuk update kelas
+    // !! PERHATIAN: Rute update seharusnya POST (jika pakai @method('POST')) atau PUT !!
     Route::post('/admin/kelas/update/{id}', function ($id) {
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\KelasController@update', ['id' => $id]);
@@ -330,11 +345,11 @@ Route::middleware(['auth'])->group(function () {
     })->name('admin.kelas.update');
 
     // Route untuk menghapus kelas
-    Route::delete('/admin/kelas/delete/{id}', function ($id) {
+    Route::delete('/admin/kelas/delete/{id}', function ($id) { // <-- Ganti destroy jadi delete agar konsisten
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\KelasController@destroy', ['id' => $id]);
         }, 'admin');
-    })->name('admin.kelas.destroy');
+    })->name('admin.kelas.destroy'); // Nama route sudah benar
 
 
     // =====================================================================================================================================
@@ -347,12 +362,12 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.guru-mapel.index');
 
-    // Route untuk form tambah Guru ke Mata Pelajaran
-    Route::get('/admin/guru-mapel/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\Http\Controllers\GuruMapelController@create');
-        }, 'admin');
-    })->name('admin.guru-mapel.create');
+    // Route untuk form tambah Guru ke Mata Pelajaran (jika tidak pakai modal)
+    // Route::get('/admin/guru-mapel/create', function () {
+    //     return (new RoleMiddleware)->handle(request(), function () {
+    //         return app()->call('App\Http\Controllers\GuruMapelController@create');
+    //     }, 'admin');
+    // })->name('admin.guru-mapel.create');
 
     // Route untuk menyimpan Guru ke Mata Pelajaran baru
     Route::post('/admin/guru-mapel/store', function () {
@@ -363,7 +378,8 @@ Route::middleware(['auth'])->group(function () {
 
 
     // Route untuk update Guru ke Mata Pelajaran
-    Route::post('/admin/guru-mapel/update/{id}', function ($id) {
+    // !! PERBAIKAN DI SINI !! Ganti POST menjadi PUT atau PATCH
+    Route::put('/admin/guru-mapel/update/{id}', function ($id) { // <-- GANTI POST jadi PUT
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\GuruMapelController@update', ['id' => $id]);
         }, 'admin');
@@ -402,6 +418,7 @@ Route::middleware(['auth'])->group(function () {
         }, 'guru');  // Sesuaikan dengan peran siswa
     })->name('guru.manajemen-ujian.detailsoal');
 
+    // !! PERHATIAN: Rute update ujian seharusnya POST (jika pakai @method('POST')) atau PUT !!
     Route::post('/guru/manajemen_ujian/update/{id}', function ($id) {
         return (new RoleMiddleware)->handle(request(), function () use ($id) {
             return app()->call('App\Http\Controllers\ManajemenTugasController@update', ['id' => $id]);
@@ -420,77 +437,77 @@ Route::middleware(['auth'])->group(function () {
     // =====================================================================================================================================
 
     // Route untuk Manajemen Kuis
-Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(function () {
-    // Route untuk menampilkan halaman penilaian
+    Route::prefix('guru/quiz')->name('guru.quiz.')->middleware('auth')->group(function () {
+        // Route untuk menampilkan halaman penilaian
 
-    Route::get('/submission/{submission}/grade', function (App\Models\QuizSubmission $submission) {
-        return (new RoleMiddleware)->handle(request(), function () use ($submission) {
-            return app()->call('App\\Http\\Controllers\\QuizController@grade', ['submission' => $submission]);
-        }, 'guru');
-    })->name('grade');
+        Route::get('/submission/{submission}/grade', function (App\Models\QuizSubmission $submission) {
+            return (new RoleMiddleware)->handle(request(), function () use ($submission) {
+                return app()->call('App\\Http\\Controllers\\QuizController@grade', ['submission' => $submission]);
+            }, 'guru');
+        })->name('grade');
 
-    // Route untuk menyimpan nilai
-    Route::post('/submission/{submission}/grade', function (Illuminate\Http\Request $request, App\Models\QuizSubmission $submission) {
-        return (new RoleMiddleware)->handle(request(), function () use ($request, $submission) {
-            return app()->call('App\\Http\\Controllers\\QuizController@storeGrade', [
-                'request' => $request,
-                'submission' => $submission
-            ]);
-        }, 'guru');
-    })->name('storeGrade');
-    
-    // URL: /guru/quiz - Nama: guru.quiz.index
-    Route::get('/', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\\Controllers\\QuizController@index');
-        }, 'guru');
-    })->name('index');
+        // Route untuk menyimpan nilai
+        Route::post('/submission/{submission}/grade', function (Illuminate\Http\Request $request, App\Models\QuizSubmission $submission) {
+            return (new RoleMiddleware)->handle(request(), function () use ($request, $submission) {
+                return app()->call('App\\Http\\Controllers\\QuizController@storeGrade', [
+                    'request' => $request,
+                    'submission' => $submission
+                ]);
+            }, 'guru');
+        })->name('storeGrade');
 
-    // URL: /guru/quiz/create - Nama: guru.quiz.create
-    Route::get('/create', function () {
-        return (new RoleMiddleware)->handle(request(), function () {
-            return app()->call('App\\Http\\Controllers\\QuizController@create');
-        }, 'guru');
-    })->name('create');
-    
-    // Route untuk menyimpan kuis
-    Route::post('/', function (Illuminate\Http\Request $request) {
-        return (new RoleMiddleware)->handle(request(), function () use ($request) {
-            return app()->call('App\\Http\\Controllers\\QuizController@store', ['request' => $request]);
-        }, 'guru');
-    })->name('store');
+        // URL: /guru/quiz - Nama: guru.quiz.index
+        Route::get('/', function () {
+            return (new RoleMiddleware)->handle(request(), function () {
+                return app()->call('App\\Http\\Controllers\\QuizController@index');
+            }, 'guru');
+        })->name('index');
 
-    // Route untuk menampilkan halaman edit
-    Route::get('/{quiz}/edit', function (App\Models\Quiz $quiz) {
-        return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            return app()->call('App\\Http\\Controllers\\QuizController@edit', ['quiz' => $quiz]);
-        }, 'guru');
-    })->name('edit');
+        // URL: /guru/quiz/create - Nama: guru.quiz.create
+        Route::get('/create', function () {
+            return (new RoleMiddleware)->handle(request(), function () {
+                return app()->call('App\\Http\\Controllers\\QuizController@create');
+            }, 'guru');
+        })->name('create');
 
-    // Route untuk memproses update data
-    Route::put('/{quiz}', function (Illuminate\Http\Request $request, App\Models\Quiz $quiz) {
-        return (new RoleMiddleware)->handle(request(), function () use ($request, $quiz) {
-            return app()->call('App\\Http\\Controllers\\QuizController@update', [
-                'request' => $request,
-                'quiz' => $quiz
-            ]);
-        }, 'guru');
-    })->name('update');
+        // Route untuk menyimpan kuis
+        Route::post('/', function (Illuminate\Http\Request $request) {
+            return (new RoleMiddleware)->handle(request(), function () use ($request) {
+                return app()->call('App\\Http\\Controllers\\QuizController@store', ['request' => $request]);
+            }, 'guru');
+        })->name('store');
 
-    // Route untuk menghapus data
-    Route::delete('/{quiz}', function (App\Models\Quiz $quiz) {
-        return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            return app()->call('App\\Http\\Controllers\\QuizController@destroy', ['quiz' => $quiz]);
-        }, 'guru');
-    })->name('destroy');
+        // Route untuk menampilkan halaman edit
+        Route::get('/{quiz}/edit', function (App\Models\Quiz $quiz) {
+            return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
+                return app()->call('App\\Http\\Controllers\\QuizController@edit', ['quiz' => $quiz]);
+            }, 'guru');
+        })->name('edit');
 
-    // Route untuk menampilkan detail kuis
-    Route::get('/{quiz}', function (App\Models\Quiz $quiz) {
-        return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-            return app()->call('App\\Http\\Controllers\\QuizController@show', ['quiz' => $quiz]);
-        }, 'guru');
-    })->name('show');
-});
+        // Route untuk memproses update data
+        Route::put('/{quiz}', function (Illuminate\Http\Request $request, App\Models\Quiz $quiz) {
+            return (new RoleMiddleware)->handle(request(), function () use ($request, $quiz) {
+                return app()->call('App\\Http\\Controllers\\QuizController@update', [
+                    'request' => $request,
+                    'quiz' => $quiz
+                ]);
+            }, 'guru');
+        })->name('update');
+
+        // Route untuk menghapus data
+        Route::delete('/{quiz}', function (App\Models\Quiz $quiz) {
+            return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
+                return app()->call('App\\Http\\Controllers\\QuizController@destroy', ['quiz' => $quiz]);
+            }, 'guru');
+        })->name('destroy');
+
+        // Route untuk menampilkan detail kuis
+        Route::get('/{quiz}', function (App\Models\Quiz $quiz) {
+            return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
+                return app()->call('App\\Http\\Controllers\\QuizController@show', ['quiz' => $quiz]);
+            }, 'guru');
+        })->name('show');
+    });
 
     // =====================================================================================================================================
     // ======================      Route untuk Manajemen Ujian / Tugas  Essay dan pilihan ganda          ======================================================
@@ -527,14 +544,14 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/siswa/ujian/{id}/nilai/pilgan', [UjianController::class, 'hasilUjian'])->name('siswa.ujian.nilai.pilgan');
 
     Route::get('/siswa/ujian/{id}/essay', [UjianController::class, 'mulaiEssay'])->name('siswa.ujian.mulai.essay');
-    Route::get('/ujian/essay/{id}', [UjianController::class, 'tampilEssay'])->name('siswa.ujian.mulai.essay');
+    Route::get('/ujian/essay/{id}', [UjianController::class, 'tampilEssay'])->name('siswa.ujian.mulai.essay'); // Perhatikan duplikasi nama rute ini
     Route::post('/ujian/essay/{id}', [UjianController::class, 'submitEssay'])->name('siswa.ujian.submitEssay');
     Route::get('/ujian/nilai-essay/{id}', [UjianController::class, 'showNilaiEssay'])->name('siswa.ujian.nilai.essay');
 
 
 
 
-    Route::get('/User Profil', [ProfileController::class, 'profil'])->name('siswa.profil_siswa');
+    Route::get('/User Profil', [ProfileController::class, 'profil'])->name('siswa.profil_siswa'); // Sebaiknya gunakan URL yang lebih deskriptif
 
 
 
@@ -563,7 +580,7 @@ Route::group(['middleware' => ['auth']], function () {
     // Route untuk menyimpan tugas yang dikumpulkan
     Route::post('/siswa/tugas/{id}/submit', [TugasSiswaController::class, 'submitTugas'])->name('siswa.tugas.submitTugas');
 
-    Route::get('/siswa/tugas/{id}/edit', [TugasSiswaController::class, 'formEditPengumpulan'])->name('siswa.tugas.edit');
+    Route::get('/siswa/tugas/{id}/edit', [TugasSiswaController::class, 'formEditPengumpulan'])->name('siswa.tugas.edit'); // Sepertinya ini duplikat dengan route di bawah
 
     // Route untuk form edit pengumpulan tugas (GET)
     Route::get('/siswa/pengumpulan/{id}/edit', [TugasSiswaController::class, 'formEditPengumpulan'])->name('siswa.tugas.edit');
@@ -698,8 +715,8 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
         Route::get('change-password', [UserController::class, 'showChangePasswordForm'])->name('auth.change-password');
         Route::get('change-password/admin', [UserController::class, 'showChangePasswordForm2'])->name('auth.change-password2');
         Route::post('change-password/admin', [UserController::class, 'updatePasswordAdmin'])->name('change-password.update');
-        Route::post('change-password/guru', [UserController::class, 'updatePasswordGuru'])->name('change-password.update');
-        Route::post('change-password/siswa', [UserController::class, 'updatePasswordSiswa'])->name('change-password.update');
+        Route::post('change-password/guru', [UserController::class, 'updatePasswordGuru'])->name('change-password.update'); // Nama route sama, perhatikan
+        Route::post('change-password/siswa', [UserController::class, 'updatePasswordSiswa'])->name('change-password.update'); // Nama route sama, perhatikan
 
         Route::resource('threads', ThreadController::class);
         Route::post('threads/{thread}/comments', [CommentController::class, 'store'])->name('comments.store');
@@ -712,7 +729,7 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
         Route::post('/store/local', [VideoController::class, 'storeLocal'])->name('store.local'); // Upload lokal
         Route::post('/store/youtube', [VideoController::class, 'storeYoutube'])->name('store.youtube'); // Upload YouTube
         Route::delete('/{id}', [VideoController::class, 'destroy'])->name('destroy'); // Hapus video
-        Route::get('/video/play/{id}', [VideoController::class, 'play'])->name('video.play');
+        Route::get('/video/play/{id}', [VideoController::class, 'play'])->name('video.play'); // Perlu diperbaiki, nama rute duplikat
     });
 
 
@@ -743,10 +760,11 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
 
         Route::get('/admin/jadwal/edit/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\Controllers\\AdminJadwalController@edit', ['id' => $id]);
+                return app()->call('App\\Http\\Controllers\\AdminJadwalController@edit', ['id' => $id]);
             }, 'admin');
         })->name('admin.jadwal.edit');
 
+        // !! PERHATIAN: Rute update jadwal seharusnya POST (jika pakai @method('POST')) atau PUT !!
         Route::post('/admin/jadwal/update/{id}', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
                 return app()->call('App\\Http\\Controllers\\AdminJadwalController@update', ['id' => $id]);
@@ -802,7 +820,12 @@ Route::prefix('siswa')->middleware('auth')->group(function () {
         }, 'guru');
     })->name('guru.presensi.api.active-sessions');
 
-})->name('guru.presensi.api.stats');
+    // Route::get('/guru/presensi/api/stats/{sessionId}', function ($sessionId) { // Rute ini sepertinya tidak lengkap atau salah penempatan
+    //     return (new RoleMiddleware)->handle(request(), function () use ($sessionId) {
+    //         return app()->call('App\\Http\\Controllers\\PresensiController@getSessionStats', ['sessionId' => $sessionId]);
+    //     }, 'guru');
+    // })->name('guru.presensi.api.stats');
+});
 // ====================== Manajemen Presensi (Admin) ======================
 Route::get('/admin/presensi', function () {
     return (new RoleMiddleware)->handle(request(), function () {
@@ -886,6 +909,8 @@ Route::get('/Jadwal', [PelajaranController::class, 'jadwal'])->name('siswa.jadwa
 
 
 
+
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+

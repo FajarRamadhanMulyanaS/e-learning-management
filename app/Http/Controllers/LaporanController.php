@@ -6,10 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Kelas;
 use App\Models\Mapel;
 use App\Models\GuruMapel;
-use App\Models\PresensiSession;
 use App\Models\Tugas;
 use App\Models\Ujian;
 use App\Models\Quiz;
+use App\Models\Siswa; // Pastikan Siswa di-import
 
 class LaporanController extends Controller
 {
@@ -18,87 +18,79 @@ class LaporanController extends Controller
      */
     public function index()
     {
+        // Query ini sekarang 100% akurat karena 'siswa.kelas_id' sudah benar
         $daftarKelas = Kelas::withCount('siswa')->orderBy('nama_kelas')->get();
-
         return view('admin.laporan.index', compact('daftarKelas'));
     }
 
     /**
      * Menampilkan detail satu kelas (daftar mata pelajaran).
-     * * !! PERUBAHAN DI SINI !!
-     * Mengubah (Kelas $kelas) menjadi ($kelasId) agar sesuai
-     * dengan cara pemanggilan route di web.php
      */
-    public function showKelas($kelasId) // <-- BERUBAH: Tidak lagi type-hint Model
+    public function showKelas($kelasId)
     {
-        $kelas = Kelas::findOrFail($kelasId); // <-- TAMBAHAN: Cari manual
-
+        $kelas = Kelas::findOrFail($kelasId);
         $daftarGuruMapel = GuruMapel::where('kelas_id', $kelas->id)
                                     ->with('mapel', 'user') // 'user' adalah relasi ke Guru
                                     ->get();
-
         return view('admin.laporan.show_kelas', compact('kelas', 'daftarGuruMapel'));
     }
 
     /**
-     * Menampilkan laporan akhir (nilai & presensi).
-     * * !! PERUBAHAN DI SINI !!
-     * Mengubah (Kelas $kelas, $mapelId) menjadi ($kelasId, $mapelId)
+     * Menampilkan laporan akhir (nilai).
+     * Ini adalah versi FINAL yang bersih.
      */
-    public function showDetail($kelasId, $mapelId) // <-- BERUBAH: Tidak lagi type-hint Model
+    public function showDetail($kelasId, $mapelId)
     {
-        $kelas = Kelas::findOrFail($kelasId); // <-- TAMBAHAN: Cari manual
-        $mapel = Mapel::findOrFail($mapelId); // <-- TAMBAHAN: Cari manual
+        $kelas = Kelas::findOrFail($kelasId);
+        $mapel = Mapel::findOrFail($mapelId);
 
-        // 1. Dapatkan ID semua aktivitas yang terkait dengan mapel & kelas ini
-        $sessionIds = PresensiSession::where('kelas_id', $kelas->id)->where('mapel_id', $mapel->id)->pluck('id');
+        // 1. Dapatkan ID semua aktivitas (Tidak berubah, ini sudah benar)
         $tugasIds = Tugas::where('mapel_id', $mapel->id)->where('kelas_id', $kelas->id)->pluck('id');
         $ujianIds = Ujian::where('mapel_id', $mapel->id)->where('kelas_id', $kelas->id)->pluck('id');
-        
         $guruMapelIds = GuruMapel::where('mapel_id', $mapel->id)->where('kelas_id', $kelas->id)->pluck('id');
         $quizIds = Quiz::whereIn('guru_mapel_id', $guruMapelIds)->pluck('id');
 
-        // 2. Ambil semua siswa di kelas, lalu Eager Load semua data relevan
+        // 2. Ambil semua siswa di kelas, lalu Eager Load data
+        //    (Query sekarang sederhana, karena 'siswa.kelas_id' sudah benar)
+        //    !! PERUBAHAN BESAR ADA DI BLOK 'with' INI !!
         $daftarSiswa = $kelas->siswa()->with([
-            'user' => function($query) use ($sessionIds, $tugasIds, $ujianIds, $quizIds) {
-                $query->with([
-                    'presensiRecords' => fn($q) => $q->whereIn('presensi_session_id', $sessionIds),
-                    'pengumpulanTugas' => fn($q) => $q->whereIn('tugas_id', $tugasIds),
-                    'hasilUjian' => fn($q) => $q->whereIn('ujian_id', $ujianIds),
-                    'quizSubmissions' => fn($q) => $q->whereIn('quiz_id', $quizIds)
-                ]);
-            }
-        ])->get();
+            
+            // SEMUA relasi nilai sekarang diambil langsung dari $siswa
+            'pengumpulanTugas' => fn($q) => $q->whereIn('tugas_id', $tugasIds),
+            'hasilUjian'       => fn($q) => $q->whereIn('ujian_id', $ujianIds),
+            'quizSubmissions'  => fn($q) => $q->whereIn('quiz_id', $quizIds),
+            
+            // Kita masih butuh relasi 'user' untuk mengambil 'username'
+            'user'
+        ])
+        ->whereHas('user') // Hanya ambil siswa yang punya akun user
+        ->get();
 
         // 3. Proses data untuk ditampilkan di view
+        //    !! PERUBAHAN BESAR ADA DI KALKULASI INI !!
         foreach ($daftarSiswa as $siswa) {
-            if ($siswa->user) {
-                // Proses Presensi
-                $presensi = $siswa->user->presensiRecords;
-                $siswa->totalHadir = $presensi->where('status', 'hadir')->count();
-                $siswa->totalIzin = $presensi->where('status', 'izin')->count();
-                $siswa->totalSakit = $presensi->where('status', 'sakit')->count(); 
-                $siswa->totalAlpa = $presensi->where('status', 'alpa')->count(); 
-                $siswa->totalTerlambat = $presensi->where('status', 'terlambat')->count();
-
-                // Proses Nilai (Rata-rata)
-                $tugasNilai = $siswa->user->pengumpulanTugas->avg('nilai');
-                
-                $ujianNilai = $siswa->user->hasilUjian->avg(function ($hasil) {
-                    return ($hasil->nilai_pilgan ?? 0) + ($hasil->total_nilai_essay ?? 0);
-                });
-                
-                $quizNilai = $siswa->user->quizSubmissions->avg('nilai');
-                
-                $allNilai = collect([$tugasNilai, $ujianNilai, $quizNilai])->filter(fn($val) => !is_null($val));
-                
-                $siswa->avgTugas = round($tugasNilai, 2);
-                $siswa->avgUjian = round($ujianNilai, 2);
-                $siswa->avgQuiz = round($quizNilai, 2);
-                $siswa->avgTotal = $allNilai->count() > 0 ? round($allNilai->avg(), 2) : 0;
-            }
+            
+            // --- Proses Nilai (Rata-rata) ---
+            
+            // Diambil dari relasi $siswa (BUKAN $siswa->user)
+            $tugasNilai = $siswa->pengumpulanTugas->avg('nilai');
+            
+            // Diambil dari relasi $siswa (BUKAN $siswa->user)
+            // Menggunakan kolom 'total_nilai' dari 'hasil_ujian'
+            $ujianNilai = $siswa->hasilUjian->avg('total_nilai'); 
+            
+            // Diambil dari relasi $siswa (BUKAN $siswa->user)
+            $quizNilai = $siswa->quizSubmissions->avg('nilai');
+            
+            $allNilai = collect([$tugasNilai, $ujianNilai, $quizNilai])->filter(fn($val) => !is_null($val));
+            
+            $siswa->avgTugas = round($tugasNilai, 2);
+            $siswa->avgUjian = round($ujianNilai, 2);
+            $siswa->avgQuiz = round($quizNilai, 2);
+            $siswa->avgTotal = $allNilai->count() > 0 ? round($allNilai->avg(), 2) : 0;
         }
 
         return view('admin.laporan.show_detail', compact('kelas', 'mapel', 'daftarSiswa'));
     }
 }
+
