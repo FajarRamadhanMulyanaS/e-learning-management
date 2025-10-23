@@ -1,5 +1,5 @@
 {{-- File: show.blade.php --}}
-@extends('layout2.app')
+@extends('layout_siswa.app')
 
 @section('konten')
 <div class="container my-4">

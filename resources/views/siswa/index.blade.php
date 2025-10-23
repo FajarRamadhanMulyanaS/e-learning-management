@@ -1,4 +1,4 @@
-@extends('layout2.app')
+@extends('layout_siswa.app')
 @section('konten')
 <style>
     body, h2, h1 {
