@@ -14,18 +14,22 @@ class ProfileController extends Controller
 
     public function profil()
     {
-        // Ambil data siswa berdasarkan user yang sedang login
         $user = Auth::user();
-
-        // Pastikan hanya siswa yang bisa mengakses halaman ini
+    
+        // Pastikan hanya siswa yang bisa akses
         if ($user->role != 'siswa') {
             abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
-
+    
+        // Ambil data siswa berdasarkan relasi user
         $siswa = $user->siswa;
-        $kelas = $user->kelas;
+    
+        // Ambil kelas dari relasi siswa
+        $kelas = $siswa ? $siswa->kelas : null;
+    
         return view('siswa.profil.profil_siswa', compact('user', 'siswa', 'kelas'));
     }
+    
 
 
 
