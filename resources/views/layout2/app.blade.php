@@ -1,4 +1,3 @@
-
 @include('layout2.header') <!-- Include Header -->
 
 <div class="container-fluid">
@@ -12,3 +11,5 @@
 </div>
 
 
+
+@include('layout2.footer') <!-- Include Footer -->
