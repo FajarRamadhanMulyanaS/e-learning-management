@@ -336,50 +336,57 @@
     }
 
     function performCheckIn(sessionId, metode, qrCode = null) {
-        const data = { session_id: sessionId, metode: metode };
-        if (qrCode) data.qr_code = qrCode;
+    const data = { session_id: sessionId, metode: metode };
+    if (qrCode) data.qr_code = qrCode;
 
-        fetch('/siswa/siswa/presensi/check-in', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const card = document.querySelector(`#status-${sessionId}`).closest('.card-body');
-                const buttonContainer = card.querySelector('.d-flex div');
-                const statusElement = document.getElementById(`status-${sessionId}`);
+    fetch('/siswa/siswa/presensi/check-in', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const card = document.querySelector(`#status-${sessionId}`).closest('.card-body');
+            const buttonContainer = card.querySelector('.d-flex div');
+            const statusElement = document.getElementById(`status-${sessionId}`);
 
-                let statusText = data.status_text || 'Hadir';
-                let badgeClass = 'bg-success';
-                let textClass = 'text-success';
-                
-                if (data.status === 'terlambat') {
-                    badgeClass = 'bg-warning';
-                    textClass = 'text-warning';
-                } else if (data.status === 'tidak_hadir') {
-                    badgeClass = 'bg-danger';
-                    textClass = 'text-danger';
-                }
-
-                buttonContainer.innerHTML = `<span class="badge ${badgeClass}">${statusText}</span>`;
-                const waktuAbsen = data.waktu_absen || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                statusElement.innerHTML = `<span class="${textClass}">${statusText} - ${waktuAbsen}</span>`;
-
-                alert('Absen berhasil! Status: ' + statusText);
-            } else {
-                alert('Error: ' + (data.error || 'Terjadi kesalahan tidak diketahui'));
+            let statusText = data.status_text || 'Hadir';
+            let badgeClass = 'bg-success';
+            let textClass = 'text-success';
+            
+            if (data.status === 'terlambat') {
+                badgeClass = 'bg-warning';
+                textClass = 'text-warning';
+            } else if (data.status === 'tidak_hadir') {
+                badgeClass = 'bg-danger';
+                textClass = 'text-danger';
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Terjadi kesalahan saat melakukan absen. Silakan coba lagi.');
-        });
-    }
+
+            buttonContainer.innerHTML = `<span class="badge ${badgeClass}">${statusText}</span>`;
+            const waktuAbsen = data.waktu_absen || new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            statusElement.innerHTML = `<span class="${textClass}">${statusText} - ${waktuAbsen}</span>`;
+
+            alert('✅ Absen berhasil! Status: ' + statusText);
+
+            // 🔄 Tambahkan ini: refresh halaman setelah 1.5 detik
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+
+        } else {
+            alert('Error: ' + (data.error || 'Terjadi kesalahan tidak diketahui'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat melakukan absen. Silakan coba lagi.');
+    });
+}
+
 
     // Handle modal events
     $('#qrScannerModal').on('hidden.bs.modal', function () {
