@@ -11,20 +11,24 @@ use App\Models\HasilUjian;
 class KoreksiEssayController extends Controller
 {
     // Menampilkan halaman koreksi
+// Menampilkan halaman koreksi
     public function showKoreksi($ujian_id, $siswa_id)
-{
-    $ujian = Ujian::with([
-        'user.kelas', // Memuat data user dan kelas siswa dari tabel users
-        'essay',
-        'jawabanEssay' => function ($query) use ($siswa_id) {
-            $query->where('siswa_id', $siswa_id);
-        }
-    ])->findOrFail($ujian_id);
+    {
+        // 1. Ambil data siswa DENGAN RELASI YANG BENAR
+        $siswa = \App\Models\Siswa::with('user', 'kelas')->findOrFail($siswa_id);
 
-    return view('guru.manajemen-ujian.koreksi.koreksi_essay', compact('ujian'));
-}
+        // 2. Ambil data ujian
+        $ujian = Ujian::with([
+            // 'user.kelas', // HAPUS RELASI YANG SALAH INI
+            'essay',
+            'jawabanEssay' => function ($query) use ($siswa_id) {
+                $query->where('siswa_id', $siswa_id);
+            }
+        ])->findOrFail($ujian_id);
 
-
+        // 3. Kirim $ujian DAN $siswa ke view
+        return view('guru.manajemen-ujian.koreksi.koreksi_essay', compact('ujian', 'siswa'));
+    }
 
 
 

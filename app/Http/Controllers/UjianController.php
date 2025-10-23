@@ -263,9 +263,9 @@ class UjianController extends Controller
         $kelas_id = DB::table('ujian')->where('id', $ujian_id)->value('kelas_id');
 
         $siswaSudahUjian = DB::table('siswa')
-            ->join('users', 'siswa.user_id', '=', 'user_id')
-            ->join('kelas', 'users.kelas_id', '=', 'kelas.id') // Join ke tabel kelas
-            ->leftJoin('jawaban_siswa_pilgan', function ($join) use ($ujian_id) {
+            ->join('users', 'siswa.user_id', '=', 'users.id') // <-- Diperbaiki
+            ->join('kelas', 'siswa.kelas_id', '=', 'kelas.id') // <-- SUDAH DIPERBAIKI
+            ->leftJoin('jawaban_siswa_pilgan', function ($join) use ($ujian_id) {   
                 $join->on('siswa.id', '=', 'jawaban_siswa_pilgan.siswa_id')
                     ->where('jawaban_siswa_pilgan.ujian_id', $ujian_id);
             })
@@ -298,7 +298,7 @@ class UjianController extends Controller
         $ujian = Ujian::with('soal')->findOrFail($ujian_id);
 
         // Ambil data siswa beserta user dan kelas
-        $siswa = Siswa::with('user.kelas')->findOrFail($siswa_id);
+        $siswa = Siswa::with('user', 'kelas')->findOrFail($siswa_id);
 
         // Ambil jawaban pilihan ganda siswa berdasarkan ujian dan siswa
         $jawabanSiswa = JawabanSiswaPilgan::where('ujian_id', $ujian_id)
@@ -403,8 +403,8 @@ class UjianController extends Controller
 
         // Ambil data siswa yang sudah mengikuti ujian
         $siswaSudahUjian = DB::table('siswa')
-            ->join('users', 'siswa.user_id', '=', 'user_id')
-            ->join('kelas', 'users.kelas_id', '=', 'kelas.id')
+            ->join('users', 'siswa.user_id', '=', 'users.id') // <-- Diperbaiki
+            ->join('kelas', 'siswa.kelas_id', '=', 'kelas.id') // <-- SUDAH DIPERBAIKI
             ->leftJoin('jawaban_siswa_pilgan', function ($join) use ($ujian_id) {
                 $join->on('siswa.id', '=', 'jawaban_siswa_pilgan.siswa_id')
                     ->where('jawaban_siswa_pilgan.ujian_id', $ujian_id);

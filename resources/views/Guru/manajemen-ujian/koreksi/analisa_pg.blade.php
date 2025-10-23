@@ -29,7 +29,7 @@
                 </tr>
                 <tr>
                     <th>Kelas</th>
-                    <td>{{ optional($siswa->user->kelas)->nama_kelas ?? 'Tidak ada data kelas' }}</td>
+                    <td>{{ optional($siswa->kelas)->nama_kelas ?? 'Tidak ada data kelas' }}</td>
                 </tr>
             </table>
 
