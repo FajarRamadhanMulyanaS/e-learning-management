@@ -1,11 +1,8 @@
 </div>
 <!-- partial:partials/_footer.html -->
 <footer class="footer">
-    <div class="d-sm-flex justify-content-center justify-content-sm-between">
-      <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © E-Learning</span>
-
-    </div>
-    <span class="text-muted d-block text-center text-sm-left d-sm-inline-block mt-2">Distributed By: <a href="https://www.themewagon.com/" target="_blank">Anugrah</a></span>
+   
+    <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © E-Learning</span>
   </footer>
 
  <!-- partial -->
