@@ -68,24 +68,6 @@ class AdminPresensiController extends Controller
 
 
 
-public function export($format)
-{
-    $records = PresensiRecord::with(['presensiSession.kelas', 'presensiSession.mapel', 'presensiSession.guru', 'siswa'])
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    if ($format === 'excel') {
-        $filename = 'Laporan_Presensi_' . now()->format('Y-m-d') . '.xlsx';
-        return Excel::download(new \App\Exports\PresensiExport($records), $filename);
-    }
-
-    if ($format === 'pdf') {
-        $pdf = Pdf::loadView('admin.presensi.export-pdf', compact('records'));
-        return $pdf->download('Laporan_Presensi_' . now()->format('Y-m-d') . '.pdf');
-    }
-
-    abort(404, 'Format tidak dikenal');
-}
 public function closeSession($id)
 {
     $session = \App\Models\PresensiSession::find($id);
@@ -95,7 +77,29 @@ public function closeSession($id)
     }
 
     $session->closeSession(); // Panggil method dari model
-    return response()->json(['message' => 'Sesi berhasil ditutup']);
+  return redirect()
+    ->route('admin.presensi.sessions')
+    ->with('success', 'Sesi berhasil ditutup');
+
+}
+
+
+
+public function exportDetail($id, $format)
+{
+    $session = \App\Models\PresensiSession::with(['guru', 'mapel', 'kelas', 'presensiRecords.siswa'])->findOrFail($id);
+
+    if ($format === 'excel') {
+        return Excel::download(new \App\Exports\PresensiDetailExport($session), 'Presensi_' . $session->kelas->nama_kelas . '.xlsx');
+    }
+
+    if ($format === 'pdf') {
+        $pdf = Pdf::loadView('admin.presensi.export-detail-pdf', compact('session'))
+                  ->setPaper('a4', 'portrait');
+        return $pdf->download('Presensi_' . $session->kelas->nama_kelas . '.pdf');
+    }
+
+    return back()->with('error', 'Format tidak dikenal');
 }
 
 

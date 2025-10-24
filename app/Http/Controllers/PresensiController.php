@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+
 class PresensiController extends Controller
 {
     public function index()
@@ -124,6 +125,14 @@ class PresensiController extends Controller
 
         return response()->json($sessions);
     }
+public function detail($id)
+{
+    // ambil data sesi dan relasi presensi siswa
+    $session = PresensiSession::with(['kelas', 'guru', 'mapel', 'presensiRecords.siswa'])
+                ->findOrFail($id);
+
+    return view('admin.presensi.detail', compact('session'));
+}
 
     public function getSessionStats($id)
     {
