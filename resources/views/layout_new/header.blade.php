@@ -72,15 +72,33 @@
 
                     <li class="nav-item nav-profile dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" id="profileDropdown">
-                            <img src="{{ asset('New') }}/images/faces/face28.jpg" alt="profile" />
+                            @if(Auth::check() && Auth::user()->foto)
+                                <img src="{{ asset(Auth::user()->foto) }}" alt="profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                            @else
+                                <img src="{{ asset('images/default.png') }}" alt="profile" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;" />
+                            @endif
                         </a>
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown"
                             aria-labelledby="profileDropdown">
-                            <a class="dropdown-item d-flex align-items-center"
-                                href="{{ route('siswa.profil_siswa') }}">
-                                <i class="mdi mdi-account-outline"></i>
-                                <span>My Profile</span>
-                            </a>
+                            @if(Auth::check() && Auth::user()->role == 'admin')
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ route('admin.profil_admin', Auth::user()->id) }}">
+                                    <i class="mdi mdi-account-outline"></i>
+                                    <span>My Profile</span>
+                                </a>
+                            @elseif(Auth::check() && Auth::user()->role == 'guru')
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ route('guru.profil.profil_guru', Auth::user()->id) }}">
+                                    <i class="mdi mdi-account-outline"></i>
+                                    <span>My Profile</span>
+                                </a>
+                            @elseif(Auth::check() && Auth::user()->role == 'siswa')
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ route('siswa.profil_siswa') }}">
+                                    <i class="mdi mdi-account-outline"></i>
+                                    <span>My Profile</span>
+                                </a>
+                            @endif
                             <a class="dropdown-item">
                                 <i class="ti-settings text-primary"></i>
                                 Settings

@@ -210,6 +210,35 @@ class AdminController extends Controller
         return view('admin.siswa.index', compact('users', 'kelas'));
     }
 
+    /**
+     * Menampilkan form tambah siswa
+     */
+    public function createSiswa()
+    {
+        $kelas = Kelas::orderBy('nama_kelas')->get();
+        return view('admin.siswa.create', compact('kelas'));
+    }
+
+    /**
+     * Mencari siswa berdasarkan keyword
+     */
+    public function searchSiswa(Request $request)
+    {
+        $keyword = $request->get('keyword');
+        $kelas = Kelas::orderBy('nama_kelas')->get();
+        
+        $users = User::where('role', 'siswa')
+                    ->with(['siswa', 'siswa.kelas'])
+                    ->whereHas('siswa', function($query) use ($keyword) {
+                        $query->where('nis', 'like', "%{$keyword}%")
+                              ->orWhere('nisn', 'like', "%{$keyword}%");
+                    })
+                    ->orWhere('username', 'like', "%{$keyword}%")
+                    ->get();
+        
+        return view('admin.siswa.index', compact('users', 'kelas', 'keyword'));
+    }
+
 
     /**
      * Menyimpan data siswa baru ke database.
@@ -369,6 +398,127 @@ class AdminController extends Controller
             DB::rollBack();
             Log::error('Error saat admin menghapus siswa: ' . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Gagal menghapus siswa.']);
+        }
+    }
+
+    /**
+     * Menampilkan profil admin
+     */
+    public function profil($id)
+    {
+        $admin = User::where('role', 'admin')->findOrFail($id);
+        return view('admin.profil.profil_admin', compact('admin'));
+    }
+
+    /**
+     * Menampilkan form edit profil admin
+     */
+    public function editProfil($id)
+    {
+        $admin = User::where('role', 'admin')->findOrFail($id);
+        return view('admin.profil.edit_profil', compact('admin'));
+    }
+
+    /**
+     * Memperbarui profil admin
+     */
+    public function updateProfil(Request $request, $id)
+    {
+        $admin = User::where('role', 'admin')->findOrFail($id);
+
+        // Validasi input
+        $request->validate([
+            'username' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($admin->id)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($admin->id)],
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            // Update data admin
+            $admin->username = $request->username;
+            $admin->email = $request->email;
+
+            // Handle foto upload
+            if ($request->hasFile('foto')) {
+                // Hapus foto lama jika ada dan bukan default
+                if ($admin->foto && $admin->foto != 'images/default.png' && file_exists(public_path($admin->foto))) {
+                    unlink(public_path($admin->foto));
+                }
+                
+                $file = $request->file('foto');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/admin_photos'), $filename);
+                $admin->foto = 'images/admin_photos/' . $filename;
+            }
+
+            $admin->save();
+
+            DB::commit();
+            return redirect()->route('admin.profil_admin', $admin->id)->with('success', 'Profil berhasil diperbarui.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saat admin update profil: ' . $e->getMessage());
+            
+            if (str_contains($e->getMessage(), 'Duplicate entry')) {
+                if (str_contains($e->getMessage(), 'users_username_unique')) {
+                    return redirect()->back()->withErrors(['username' => 'Username sudah terdaftar untuk pengguna lain.'])->withInput();
+                }
+                if (str_contains($e->getMessage(), 'users_email_unique')) {
+                    return redirect()->back()->withErrors(['email' => 'Email sudah terdaftar untuk pengguna lain.'])->withInput();
+                }
+            }
+            
+            return redirect()->back()->withErrors(['error' => 'Gagal memperbarui profil. Terjadi kesalahan.'])->withInput();
+        }
+    }
+
+    /**
+     * Download template untuk import siswa
+     */
+    public function downloadTemplate()
+    {
+        $filePath = public_path('templates/template_siswa.xlsx');
+        if (!file_exists($filePath)) {
+            abort(404, 'Template file not found.');
+        }
+        return response()->download($filePath, 'template_siswa.xlsx');
+    }
+
+    /**
+     * Import data siswa dari Excel
+     */
+    public function importSiswa(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            Excel::import(new SiswaImport, $request->file('file'));
+            return redirect()->route('admin.siswa.index')->with('success', 'Data siswa berhasil diimport.');
+        } catch (\Exception $e) {
+            Log::error('Error saat import siswa: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Gagal mengimport data siswa. Periksa format file.'])->withInput();
+        }
+    }
+
+    /**
+     * Import data guru dari Excel
+     */
+    public function importGuru(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        try {
+            Excel::import(new GuruImport, $request->file('file'));
+            return redirect()->route('admin.guru.index')->with('success', 'Data guru berhasil diimport.');
+        } catch (\Exception $e) {
+            Log::error('Error saat import guru: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Gagal mengimport data guru. Periksa format file.'])->withInput();
         }
     }
 }

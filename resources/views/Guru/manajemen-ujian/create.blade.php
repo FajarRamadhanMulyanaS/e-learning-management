@@ -3,9 +3,14 @@
 @section('konten')
 <div class="container my-5">
     <div class="card shadow">
-        <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="fas fa-plus-circle"></i> Tambah Ujian</h4>
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i> Tambah Ujian</h4>
+            <!-- Tombol Kembali -->
+            <a href="{{ route('guru.manajemen-ujian.index') }}" class="btn btn-light text-primary fw-semibold">
+                <i class="fas fa-arrow-left me-1"></i> Kembali
+            </a>
         </div>
+
         <div class="card-body">
             <form action="{{ route('guru.manajemen-ujian.store') }}" method="POST">
                 @csrf
@@ -51,13 +56,15 @@
                 </div>
 
                 <!-- Bobot Pilihan Ganda dan Essay -->
-                <div class="form-group mb-3">
-                    <label for="bobot_pilihan_ganda" class="form-label"><strong>Bobot Pilihan Ganda (%)</strong></label>
-                    <input type="number" class="form-control" id="bobot_pilihan_ganda" name="bobot_pilihan_ganda" value="50" required>
-                </div>
-                <div class="form-group mb-3">
-                    <label for="bobot_essay" class="form-label"><strong>Bobot Essay (%)</strong></label>
-                    <input type="number" class="form-control" id="bobot_essay" name="bobot_essay" value="50" required>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="bobot_pilihan_ganda" class="form-label"><strong>Bobot Pilihan Ganda (%)</strong></label>
+                        <input type="number" class="form-control" id="bobot_pilihan_ganda" name="bobot_pilihan_ganda" value="50" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="bobot_essay" class="form-label"><strong>Bobot Essay (%)</strong></label>
+                        <input type="number" class="form-control" id="bobot_essay" name="bobot_essay" value="50" required>
+                    </div>
                 </div>
 
                 <!-- Status Terbit -->
@@ -69,9 +76,14 @@
                     </select>
                 </div>
 
-                <!-- Tombol Simpan -->
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Simpan</button>
+                <!-- Tombol Aksi -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{{ route('guru.manajemen-ujian.index') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </a>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
                 </div>
             </form>
         </div>

@@ -10,7 +10,9 @@
             </div>
              <div class="col-12 col-xl-4">
                 <div class="justify-content-end d-flex">
-                    <a href="{{ route('admin.laporan.index') }}" class="btn btn-secondary">Kembali ke Daftar Kelas</a>
+                    <button onclick="window.history.back()" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Kembali
+                    </button>
                 </div>
             </div>
         </div>
