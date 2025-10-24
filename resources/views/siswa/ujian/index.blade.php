@@ -1,4 +1,4 @@
-@extends('layout2.app')
+@extends('layout_siswa.app')
 
 @section('konten')
 <title>Ujian</title>

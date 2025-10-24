@@ -1,4 +1,4 @@
-@extends('layout2.app')
+@extends('layout_siswa.app')
 
 @section('konten')
 <style>
@@ -60,7 +60,8 @@
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-building me-2 text-primary"></i><strong>Kelas:</strong></span>
-                    <span>{{ $kelas->nama_kelas }}</span>
+                    <span>{{ $kelas->nama_kelas ?? 'Belum ditentukan' }}</span>
+
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-gender-ambiguous me-2 text-primary"></i><strong>Gender:</strong></span>
