@@ -864,6 +864,20 @@ Route::get('/admin/laporan', function () {
     }, 'admin');
 })->name('admin.laporan.index');
 
+// EXPORT LAPORAN PRESENSI
+Route::get('/admin/presensi/export/{format}', function ($format) {
+    return (new RoleMiddleware)->handle(request(), function () use ($format) {
+        return app()->call('App\\Http\\Controllers\\AdminPresensiController@export', ['format' => $format]);
+    }, 'admin');
+})->name('admin.presensi.export');
+
+// Tutup sesi presensi (Admin)
+Route::post('/admin/presensi/close/{id}', function ($id) {
+    return (new RoleMiddleware)->handle(request(), function () use ($id) {
+        return app()->call('App\\Http\\Controllers\\AdminPresensiController@closeSession', ['id' => $id]);
+    }, 'admin');
+})->name('admin.presensi.close');
+
 // Rute showKelas
 Route::get('/admin/laporan/kelas/{kelas}', function ($kelas) {
     return (new RoleMiddleware)->handle(request(), function () use ($kelas) {

@@ -10,7 +10,8 @@ use App\Models\User;
 use App\Models\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+    use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 class AdminPresensiController extends Controller
 {
     public function index()
@@ -64,6 +65,39 @@ class AdminPresensiController extends Controller
 
         return view('admin.presensi.sessions', compact('sessions', 'kelas', 'gurus'));
     }
+
+
+
+public function export($format)
+{
+    $records = PresensiRecord::with(['presensiSession.kelas', 'presensiSession.mapel', 'presensiSession.guru', 'siswa'])
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    if ($format === 'excel') {
+        $filename = 'Laporan_Presensi_' . now()->format('Y-m-d') . '.xlsx';
+        return Excel::download(new \App\Exports\PresensiExport($records), $filename);
+    }
+
+    if ($format === 'pdf') {
+        $pdf = Pdf::loadView('admin.presensi.export-pdf', compact('records'));
+        return $pdf->download('Laporan_Presensi_' . now()->format('Y-m-d') . '.pdf');
+    }
+
+    abort(404, 'Format tidak dikenal');
+}
+public function closeSession($id)
+{
+    $session = \App\Models\PresensiSession::find($id);
+
+    if (!$session) {
+        return response()->json(['message' => 'Sesi tidak ditemukan'], 404);
+    }
+
+    $session->closeSession(); // Panggil method dari model
+    return response()->json(['message' => 'Sesi berhasil ditutup']);
+}
+
 
     public function reports(Request $request)
     {
