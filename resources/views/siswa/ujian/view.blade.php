@@ -15,7 +15,7 @@
     <!-- Ujian Info Section -->
     <div class="card shadow mb-4">
         <div class="card-header bg-light">
-            <h5>Daftar Ujian Oleh <span class="text-info">{{ $ujian->guru->user->username ?? 'Guru Tidak Ditemukan' }}</span></h5>
+            <h5>Daftar Ujian Oleh <span class="text-info">{{ $ujian->user->username ?? 'Guru Tidak Ditemukan' }}</span></h5>
         </div>
         <div class="table-responsive">
             <table class="table table-hover table-striped table-bordered">

@@ -33,12 +33,18 @@ class Quiz extends Model
     }
 
     /**
-     * 2. TAMBAHKAN METHOD RELASI INI
-     * Relasi ke tabel quiz_submissions, HANYA untuk siswa yang sedang login.
+     * Relasi ke semua submission quiz ini
      */
-    public function mySubmission()
+    public function submissions()
     {
-        // hasOne karena satu siswa hanya bisa punya satu submission per kuis
-        return $this->hasOne(QuizSubmission::class)->where('user_id', Auth::id());
+        return $this->hasMany(QuizSubmission::class, 'quiz_id', 'id');
+    }
+
+    /**
+     * Relasi ke submission quiz untuk siswa tertentu
+     */
+    public function submissionForSiswa($siswaId)
+    {
+        return $this->hasOne(QuizSubmission::class, 'quiz_id', 'id')->where('siswa_id', $siswaId);
     }
 }

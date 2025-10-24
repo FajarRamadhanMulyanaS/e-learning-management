@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class QuizSubmission extends Model
 {
     use HasFactory;
-    protected $fillable = ['quiz_id', 'user_id', 'file_path', 'nilai'];
+    protected $fillable = ['quiz_id', 'siswa_id', 'file_path', 'nilai'];
 
     /**
      * Mendefinisikan relasi bahwa submission ini milik satu Quiz.
@@ -19,10 +19,18 @@ class QuizSubmission extends Model
     }
 
     /**
-     * Mendefinisikan relasi bahwa submission ini milik satu User (Siswa).
+     * Mendefinisikan relasi bahwa submission ini milik satu Siswa.
+     */
+    public function siswa()
+    {
+        return $this->belongsTo(Siswa::class);
+    }
+
+    /**
+     * Mendefinisikan relasi bahwa submission ini milik satu User (melalui Siswa).
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOneThrough(User::class, Siswa::class, 'id', 'id', 'siswa_id', 'user_id');
     }
 }

@@ -21,12 +21,11 @@ class UjianController extends Controller
     public function index()
     {
         // Ambil ID kelas dari siswa yang sedang login
-        $kelasId = Auth::user()->kelas_id;
+        $kelasId = Auth::user()->siswa->kelas_id;
 
         // Ambil ujian yang sesuai dengan kelas siswa
         $ujians = Ujian::where('kelas_id', $kelasId)
-            ->with(['mapel', 'guru.user'])
-            ->withCount('guru')
+            ->with(['mapel', 'user'])
             ->get();
 
         return view('siswa.ujian.index', compact('ujians'));
@@ -35,7 +34,7 @@ class UjianController extends Controller
     public function view($id)
     {
         // Mengambil detail ujian berdasarkan ID
-        $ujian = Ujian::with(['guru.user', 'mapel']) // Menambahkan mapel juga
+        $ujian = Ujian::with(['user', 'mapel']) // Menambahkan mapel juga
             ->find($id);
 
         if (!$ujian) {
@@ -50,8 +49,8 @@ class UjianController extends Controller
 
     public function kerjakan($id)
     {
-        // Mengambil detail ujian berdasarkan ID dengan relasi guru dan mapel
-        $ujian = Ujian::with(['guru.user', 'mapel'])->findOrFail($id);
+        // Mengambil detail ujian berdasarkan ID dengan relasi user dan mapel
+        $ujian = Ujian::with(['user', 'mapel'])->findOrFail($id);
 
         // Mengambil data siswa yang sedang login
         $siswa = Auth::user()->siswa;

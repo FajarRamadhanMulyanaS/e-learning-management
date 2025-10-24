@@ -12,7 +12,7 @@ class SiswaQuizController extends Controller
 {
     public function index()
     {
-        $kelasId = Auth::user()->kelas_id;
+        $kelasId = Auth::user()->siswa->kelas_id;
 
         if (!$kelasId) {
             return view('Siswa.quiz.index', ['quizzes' => collect()]);
@@ -21,22 +21,29 @@ class SiswaQuizController extends Controller
         $quizzes = Quiz::whereHas('guruMapel', function ($query) use ($kelasId) {
             $query->where('kelas_id', $kelasId);
         })
-        // PERBARUI BARIS DI BAWAH INI: Tambahkan 'mySubmission'
-        ->with(['guruMapel.mapel', 'guruMapel.user', 'mySubmission'])
+        ->with(['guruMapel.mapel', 'guruMapel.user'])
         ->latest()
         ->get();
+
+        // Load submissions untuk setiap quiz secara terpisah
+        foreach ($quizzes as $quiz) {
+            $quiz->mySubmission = $quiz->submissions()->where('siswa_id', Auth::user()->siswa->id)->first();
+        }
 
         return view('Siswa.quiz.index', compact('quizzes'));
     }
     public function show(Quiz $quiz)
     {
         // Otorisasi
-        if ($quiz->guruMapel->kelas_id != Auth::user()->kelas_id) {
+        if ($quiz->guruMapel->kelas_id != Auth::user()->siswa->kelas_id) {
             abort(403, 'Anda tidak memiliki akses ke kuis ini.');
         }
 
-        // PERBARUI BARIS INI: Tambahkan 'mySubmission' untuk memuat data jawaban & nilai
-        $quiz->load('guruMapel.mapel', 'guruMapel.user', 'mySubmission');
+        // Load relasi yang diperlukan
+        $quiz->load('guruMapel.mapel', 'guruMapel.user');
+        
+        // Load submission untuk user yang sedang login
+        $quiz->mySubmission = $quiz->submissions()->where('siswa_id', Auth::user()->siswa->id)->first();
 
         return view('Siswa.quiz.show', compact('quiz'));
     }
@@ -48,7 +55,7 @@ class SiswaQuizController extends Controller
         ]);
 
         // 2. Otorisasi: pastikan siswa hanya bisa submit ke kuis untuk kelasnya
-        if ($quiz->guruMapel->kelas_id != Auth::user()->kelas_id) {
+        if ($quiz->guruMapel->kelas_id != Auth::user()->siswa->kelas_id) {
             abort(403, 'Anda tidak memiliki akses ke kuis ini.');
         }
 
@@ -60,7 +67,7 @@ class SiswaQuizController extends Controller
         QuizSubmission::updateOrCreate(
             [
                 'quiz_id' => $quiz->id,
-                'user_id' => Auth::id(),
+                'siswa_id' => Auth::user()->siswa->id,
             ],
             [
                 'file_path' => $filePath,

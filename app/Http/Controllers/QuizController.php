@@ -211,7 +211,7 @@ class QuizController extends Controller
             abort(403);
         }
 
-        // Ambil data (Sudah benar, tapi mungkin perlu load siswa, bukan user)
+        // Ambil data dengan relasi yang benar
         $submission->load('quiz', 'siswa.user'); // Load siswa dan user-nya
 
         return view('Guru.quizz.grade', compact('submission')); // Sesuaikan path view
@@ -234,8 +234,10 @@ class QuizController extends Controller
             'nilai' => $request->nilai,
         ]);
 
-        // Ambil nama siswa dari relasi yang benar
-        $namaSiswa = $submission->siswa->user->username ?? 'Siswa'; // Akses username via siswa->user
+        // Ambil nama siswa dari relasi yang benar dengan null check
+        $namaSiswa = $submission->siswa && $submission->siswa->user 
+            ? $submission->siswa->user->username 
+            : 'Siswa'; // Akses username via siswa->user dengan null check
 
         // Redirect (Sudah benar)
         return redirect()->route('guru.quiz.show', $submission->quiz_id)->with('success', 'Nilai untuk ' . $namaSiswa . ' berhasil disimpan.');

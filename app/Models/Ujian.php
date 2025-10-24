@@ -39,11 +39,6 @@ class Ujian extends Model
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');
     }
-    // Relasi ke model User (Guru)
-    public function guru()
-    {
-        return $this->belongsTo(Guru::class, 'user_id'); // guru_id adalah foreign key yang merujuk ke tabel users
-    }
     // Relasi dengan soal pilihan ganda
     public function pilihanGanda()
     {

@@ -83,7 +83,24 @@ class Siswa extends Model
         return $this->hasMany(JawabanSiswaEssay::class, 'siswa_id');
     }
 
-    // Hapus method hasCompletedPilihanGanda dan hasCompletedEssay jika tidak terpakai
-    // ...
+    /**
+     * Cek apakah siswa sudah menyelesaikan pilihan ganda untuk ujian tertentu
+     */
+    public function hasCompletedPilihanGanda($ujianId)
+    {
+        return $this->jawabanPilgan()
+            ->where('ujian_id', $ujianId)
+            ->exists();
+    }
+
+    /**
+     * Cek apakah siswa sudah menyelesaikan essay untuk ujian tertentu
+     */
+    public function hasCompletedEssay($ujianId)
+    {
+        return $this->jawabanEssay()
+            ->where('ujian_id', $ujianId)
+            ->exists();
+    }
 }
 

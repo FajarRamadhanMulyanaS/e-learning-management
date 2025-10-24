@@ -57,10 +57,37 @@
             </div>
 
             <!-- Tombol Menuju Halaman Pengumpulan Tugas -->
-            <div class="mt-4 text-center">
-                <a href="{{ route('siswa.tugas.submit', $tugas->id) }}" class="btn btn-success">
-                    <i class="fas fa-upload mr-2"></i> Pengumpulan Tugas
-                </a>
+<div class="mt-4 text-center">
+
+                {{-- Cek apakah siswa sudah mengumpulkan atau belum --}}
+                @if(!$pengumpulanSiswa)
+                    
+                    {{-- Jika BELUM, cek deadline --}}
+                    @php
+                        // Buat variabel deadline di akhir hari
+                        $deadline = \Carbon\Carbon::parse($tugas->tanggal_pengumpulan)->endOfDay();
+                    @endphp
+
+                    @if(now()->lte($deadline))
+                        {{-- Jika BELUM submit DAN deadline AMAN, tampilkan tombol --}}
+                        <a href="{{ route('siswa.tugas.submit', $tugas->id) }}" class="btn btn-success">
+                            <i class="fas fa-upload mr-2"></i> Kumpulkan Tugas
+                        </a>
+                    @else
+                        {{-- Jika BELUM submit TAPI deadline LEWAT, tampilkan tombol nonaktif --}}
+                        <button class="btn btn-danger" disabled>
+                            <i class="fas fa-times-circle mr-2"></i> Waktu Pengumpulan Habis
+                        </button>
+                    @endif
+
+                @else
+                    {{-- Jika SUDAH mengumpulkan, tampilkan tombol nonaktif --}}
+                    <button class="btn btn-secondary" disabled>
+                        <i class="fas fa-check-circle mr-2"></i> Anda Sudah Mengumpulkan
+                    </button>
+                    <p class="text-muted mt-2">Gunakan tombol "Edit" di tabel di bawah jika ingin mengubah.</p>
+                @endif
+
             </div>
 
             <!-- Tabel Pengumpulan Tugas -->

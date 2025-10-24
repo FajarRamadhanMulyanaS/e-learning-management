@@ -30,7 +30,7 @@
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
                             <td>{{ $ujian->mapel ? $ujian->mapel->nama_mapel : 'Tidak ada mapel' }}</td>
-                            <td>{{ $ujian->guru ? $ujian->guru->user->username : 'Tidak ada guru' }}</td>
+                            <td>{{ $ujian->user ? $ujian->user->username : 'Tidak ada guru' }}</td>
                             <td class="text-center">{{ $ujian->guru_count }}</td> <!-- Jumlah Ujian -->
                             <td class="text-center">
                                 @if (isset($ujian->id))

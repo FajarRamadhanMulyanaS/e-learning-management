@@ -14,7 +14,7 @@ class ManajemenTugasController extends Controller
     public function index()
     {
         // Ambil ID guru yang sedang login
-        $guruId = Auth::user()->guru->id;
+        $guruId = Auth::user()->id;
 
         // Ambil data ujian/tugas hanya untuk guru yang sedang login
         $ujianTugas = Ujian::where('user_id', $guruId)
@@ -68,7 +68,7 @@ class ManajemenTugasController extends Controller
         ]);
 
         // Simpan data ujian dengan user_id
-        $validated['user_id'] = auth()->user()->guru->id; // Mengisi user_id dengan ID guru yang sedang login
+        $validated['user_id'] = auth()->user()->id; // Mengisi user_id dengan ID user guru yang sedang login
 
         // Simpan data ujian
         Ujian::create($validated);

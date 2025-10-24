@@ -29,7 +29,7 @@
                 </tr>
                 <tr>
                     <th>Pengajar</th>
-                    <td>: {{ $ujian->guru->user->username ?? 'Tidak Ada' }}</td>
+                    <td>: {{ $ujian->user->username ?? 'Tidak Ada' }}</td>
                 </tr>
                 <tr>
                     <th>Batas Waktu Ujian</th>
