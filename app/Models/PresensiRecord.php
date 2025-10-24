@@ -40,6 +40,7 @@ class PresensiRecord extends Model
     {
         return $query->where('status', 'hadir');
     }
+    
 
     public function scopeTerlambat($query)
     {
