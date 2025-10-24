@@ -10,7 +10,8 @@ use App\Models\User;
 use App\Models\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+    use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 class AdminPresensiController extends Controller
 {
     public function index()
@@ -64,6 +65,85 @@ class AdminPresensiController extends Controller
 
         return view('admin.presensi.sessions', compact('sessions', 'kelas', 'gurus'));
     }
+
+
+
+public function closeSession($id)
+{
+    $session = \App\Models\PresensiSession::find($id);
+
+    if (!$session) {
+        return response()->json(['message' => 'Sesi tidak ditemukan'], 404);
+    }
+
+    $session->closeSession(); // Panggil method dari model
+  return redirect()
+    ->route('admin.presensi.sessions')
+    ->with('success', 'Sesi berhasil ditutup');
+
+}
+
+
+
+public function exportDetail($id, $format)
+{
+    $session = \App\Models\PresensiSession::with(['guru', 'mapel', 'kelas', 'presensiRecords.siswa'])->findOrFail($id);
+
+    if ($format === 'excel') {
+        return Excel::download(new \App\Exports\PresensiDetailExport($session), 'Presensi_' . $session->kelas->nama_kelas . '.xlsx');
+    }
+
+    if ($format === 'pdf') {
+        $pdf = Pdf::loadView('admin.presensi.export-detail-pdf', compact('session'))
+                  ->setPaper('a4', 'portrait');
+        return $pdf->download('Presensi_' . $session->kelas->nama_kelas . '.pdf');
+    }
+
+    return back()->with('error', 'Format tidak dikenal');
+}
+
+public function getActiveSessions()
+{
+    try {
+        $today = now()->format('Y-m-d');
+
+        // Ambil sesi yang tanggal hari ini DAN masih aktif serta belum ditutup
+        $sessions = PresensiSession::with(['guru', 'mapel', 'kelas'])
+            ->whereDate('tanggal', $today)
+            ->where('is_active', true)
+            ->where('is_closed', false)
+            ->get()
+            ->map(function ($session) {
+                return [
+                    'id' => $session->id,
+                    'kelas' => $session->kelas,
+                    'mapel' => $session->mapel,
+                    'guru' => $session->guru,
+                    'jam_mulai_formatted' => \Carbon\Carbon::parse($session->jam_mulai)->format('H:i'),
+                    'mode' => $session->mode,
+                ];
+            });
+
+        return response()->json($sessions);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
+public function showSession($id)
+{
+    $session = \App\Models\PresensiSession::with(['guru', 'mapel', 'kelas', 'presensiRecords.siswa'])->find($id);
+
+    if (!$session) {
+        abort(404, 'Sesi tidak ditemukan');
+    }
+
+    return view('admin.presensi.detail', compact('session'));
+}
+
+
 
     public function reports(Request $request)
     {

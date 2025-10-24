@@ -864,12 +864,29 @@ Route::get('/admin/laporan', function () {
     }, 'admin');
 })->name('admin.laporan.index');
 
+Route::get('/admin/presensi/active-sessions', [App\Http\Controllers\AdminPresensiController::class, 'getActiveSessions']);
+
+Route::get('/admin/presensi/sessions/{id}', [App\Http\Controllers\AdminPresensiController::class, 'showSession'])
+    ->name('admin.presensi.session.show');
+
+// Tutup sesi presensi (Admin)
+Route::post('/admin/presensi/close/{id}', function ($id) {
+    return (new RoleMiddleware)->handle(request(), function () use ($id) {
+        return app()->call('App\\Http\\Controllers\\AdminPresensiController@closeSession', ['id' => $id]);
+    }, 'admin');
+})->name('admin.presensi.close');
+Route::get('/admin/presensi/detail/{id}', [PresensiController::class, 'detail'])->name('admin.presensi.detail');
+
 // Rute showKelas
 Route::get('/admin/laporan/kelas/{kelas}', function ($kelas) {
     return (new RoleMiddleware)->handle(request(), function () use ($kelas) {
         return app()->call('App\Http\Controllers\LaporanController@showKelas', ['kelasId' => $kelas]); // <-- BARIS INI DIPERBAIKI
     }, 'admin');
 })->name('admin.laporan.showKelas');
+
+Route::get('/admin/presensi/{id}/export/{format}', [App\Http\Controllers\AdminPresensiController::class, 'exportDetail'])
+    ->name('admin.presensi.detail.export');
+
 
 // Rute showDetail
 Route::get('/admin/laporan/kelas/{kelas}/mapel/{mapel}', function ($kelas, $mapel) {
