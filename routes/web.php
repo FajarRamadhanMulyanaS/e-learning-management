@@ -864,7 +864,10 @@ Route::get('/admin/laporan', function () {
     }, 'admin');
 })->name('admin.laporan.index');
 
+Route::get('/admin/presensi/active-sessions', [App\Http\Controllers\AdminPresensiController::class, 'getActiveSessions']);
 
+Route::get('/admin/presensi/sessions/{id}', [App\Http\Controllers\AdminPresensiController::class, 'showSession'])
+    ->name('admin.presensi.session.show');
 
 // Tutup sesi presensi (Admin)
 Route::post('/admin/presensi/close/{id}', function ($id) {

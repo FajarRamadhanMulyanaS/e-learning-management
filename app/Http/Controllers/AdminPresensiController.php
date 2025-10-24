@@ -102,6 +102,48 @@ public function exportDetail($id, $format)
     return back()->with('error', 'Format tidak dikenal');
 }
 
+public function getActiveSessions()
+{
+    try {
+        $today = now()->format('Y-m-d');
+
+        // Ambil sesi yang tanggal hari ini DAN masih aktif serta belum ditutup
+        $sessions = PresensiSession::with(['guru', 'mapel', 'kelas'])
+            ->whereDate('tanggal', $today)
+            ->where('is_active', true)
+            ->where('is_closed', false)
+            ->get()
+            ->map(function ($session) {
+                return [
+                    'id' => $session->id,
+                    'kelas' => $session->kelas,
+                    'mapel' => $session->mapel,
+                    'guru' => $session->guru,
+                    'jam_mulai_formatted' => \Carbon\Carbon::parse($session->jam_mulai)->format('H:i'),
+                    'mode' => $session->mode,
+                ];
+            });
+
+        return response()->json($sessions);
+
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
+
+public function showSession($id)
+{
+    $session = \App\Models\PresensiSession::with(['guru', 'mapel', 'kelas', 'presensiRecords.siswa'])->find($id);
+
+    if (!$session) {
+        abort(404, 'Sesi tidak ditemukan');
+    }
+
+    return view('admin.presensi.detail', compact('session'));
+}
+
+
 
     public function reports(Request $request)
     {

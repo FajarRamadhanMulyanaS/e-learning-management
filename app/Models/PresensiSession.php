@@ -52,6 +52,7 @@ class PresensiSession extends Model
     {
         return $this->belongsTo(User::class, 'guru_id');
     }
+    
 
     // Relasi ke Semester
     public function semester()
