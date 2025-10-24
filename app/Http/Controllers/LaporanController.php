@@ -9,7 +9,12 @@ use App\Models\GuruMapel;
 use App\Models\Tugas;
 use App\Models\Ujian;
 use App\Models\Quiz;
-use App\Models\Siswa; // Pastikan Siswa di-import
+use App\Models\Siswa;
+
+// ===== TAMBAHAN BARU =====
+use Maatwebsite\Excel\Facades\Excel; // 1. Tambahkan fasad Excel
+use App\Exports\LaporanNilaiExport;    // 2. Tambahkan class Export baru (akan kita buat)
+// ==========================
 
 class LaporanController extends Controller
 {
@@ -18,7 +23,7 @@ class LaporanController extends Controller
      */
     public function index()
     {
-        // Query ini sekarang 100% akurat karena 'siswa.kelas_id' sudah benar
+        // Tidak ada perubahan
         $daftarKelas = Kelas::withCount('siswa')->orderBy('nama_kelas')->get();
         return view('admin.laporan.index', compact('daftarKelas'));
     }
@@ -28,6 +33,7 @@ class LaporanController extends Controller
      */
     public function showKelas($kelasId)
     {
+        // Tidak ada perubahan
         $kelas = Kelas::findOrFail($kelasId);
         $daftarGuruMapel = GuruMapel::where('kelas_id', $kelas->id)
                                     ->with('mapel', 'user') // 'user' adalah relasi ke Guru
@@ -35,51 +41,40 @@ class LaporanController extends Controller
         return view('admin.laporan.show_kelas', compact('kelas', 'daftarGuruMapel'));
     }
 
+
+    // ========================================================================
+    // =====            PERUBAHAN BESAR DIMULAI DARI SINI           =====
+    // ========================================================================
+
     /**
-     * Menampilkan laporan akhir (nilai).
-     * Ini adalah versi FINAL yang bersih.
+     * Private function untuk mengambil dan memproses data laporan.
+     * Ini adalah inti logika yang dipindahkan dari showDetail.
      */
-    public function showDetail($kelasId, $mapelId)
+    private function getLaporanData($kelasId, $mapelId)
     {
         $kelas = Kelas::findOrFail($kelasId);
         $mapel = Mapel::findOrFail($mapelId);
 
-        // 1. Dapatkan ID semua aktivitas (Tidak berubah, ini sudah benar)
+        // 1. Dapatkan ID semua aktivitas
         $tugasIds = Tugas::where('mapel_id', $mapel->id)->where('kelas_id', $kelas->id)->pluck('id');
         $ujianIds = Ujian::where('mapel_id', $mapel->id)->where('kelas_id', $kelas->id)->pluck('id');
         $guruMapelIds = GuruMapel::where('mapel_id', $mapel->id)->where('kelas_id', $kelas->id)->pluck('id');
         $quizIds = Quiz::whereIn('guru_mapel_id', $guruMapelIds)->pluck('id');
 
         // 2. Ambil semua siswa di kelas, lalu Eager Load data
-        //    (Query sekarang sederhana, karena 'siswa.kelas_id' sudah benar)
-        //    !! PERUBAHAN BESAR ADA DI BLOK 'with' INI !!
         $daftarSiswa = $kelas->siswa()->with([
-            
-            // SEMUA relasi nilai sekarang diambil langsung dari $siswa
             'pengumpulanTugas' => fn($q) => $q->whereIn('tugas_id', $tugasIds),
             'hasilUjian'       => fn($q) => $q->whereIn('ujian_id', $ujianIds),
             'quizSubmissions'  => fn($q) => $q->whereIn('quiz_id', $quizIds),
-            
-            // Kita masih butuh relasi 'user' untuk mengambil 'username'
             'user'
         ])
-        ->whereHas('user') // Hanya ambil siswa yang punya akun user
+        ->whereHas('user')
         ->get();
 
         // 3. Proses data untuk ditampilkan di view
-        //    !! PERUBAHAN BESAR ADA DI KALKULASI INI !!
         foreach ($daftarSiswa as $siswa) {
-            
-            // --- Proses Nilai (Rata-rata) ---
-            
-            // Diambil dari relasi $siswa (BUKAN $siswa->user)
             $tugasNilai = $siswa->pengumpulanTugas->avg('nilai');
-            
-            // Diambil dari relasi $siswa (BUKAN $siswa->user)
-            // Menggunakan kolom 'total_nilai' dari 'hasil_ujian'
             $ujianNilai = $siswa->hasilUjian->avg('total_nilai'); 
-            
-            // Diambil dari relasi $siswa (BUKAN $siswa->user)
             $quizNilai = $siswa->quizSubmissions->avg('nilai');
             
             $allNilai = collect([$tugasNilai, $ujianNilai, $quizNilai])->filter(fn($val) => !is_null($val));
@@ -90,7 +85,47 @@ class LaporanController extends Controller
             $siswa->avgTotal = $allNilai->count() > 0 ? round($allNilai->avg(), 2) : 0;
         }
 
-        return view('admin.laporan.show_detail', compact('kelas', 'mapel', 'daftarSiswa'));
+        // 4. Kembalikan data dalam bentuk array
+        return compact('kelas', 'mapel', 'daftarSiswa');
+    }
+
+    /**
+     * Menampilkan laporan akhir (nilai) ke halaman web.
+     * (Sekarang memanggil helper)
+     */
+    public function showDetail($kelasId, $mapelId)
+    {
+        // Panggil helper untuk mendapatkan data
+        $data = $this->getLaporanData($kelasId, $mapelId);
+        
+        // Kirim data ke view
+        return view('admin.laporan.show_detail', $data);
+    }
+
+    /**
+     * !! METHOD BARU UNTUK EXPORT EXCEL !!
+     *
+     * Menangani download laporan dalam format Excel.
+     */
+    public function exportExcel($kelasId, $mapelId)
+    {
+        // 1. Panggil helper yang sama untuk mendapatkan data yang identik
+        $data = $this->getLaporanData($kelasId, $mapelId);
+
+        // 2. Siapkan nama file
+        $namaFile = 'laporan-nilai-' . 
+                    \Str::slug($data['kelas']->nama_kelas) . '-' . 
+                    \Str::slug($data['mapel']->nama_mapel) . '-' . 
+                    now()->format('d-m-Y') . '.xlsx';
+
+        // 3. Panggil class Export (yang akan kita buat) dan download
+        return Excel::download(
+            new LaporanNilaiExport(
+                $data['daftarSiswa'], 
+                $data['kelas'], 
+                $data['mapel']
+            ), 
+            $namaFile
+        );
     }
 }
-

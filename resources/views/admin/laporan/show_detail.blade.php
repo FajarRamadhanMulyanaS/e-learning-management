@@ -10,15 +10,13 @@
             </div>
             <div class="col-12 col-xl-4">
                 <div class="justify-content-end d-flex gap-2">
-                    <!-- Tombol Kembali -->
                     <button onclick="window.history.back()" class="btn btn-outline-secondary">
                         <i class="fas fa-arrow-left"></i> Kembali
                     </button>
 
-                    <!-- Tombol Cetak -->
-                    <button class="btn btn-success" onclick="window.print()">
-                        <i class="fas fa-print"></i> Cetak Laporan
-                    </button>
+                    <a href="{{ route('admin.laporan.exportExcel', ['kelas' => $kelas->id, 'mapel' => $mapel->id]) }}" class="btn btn-info text-white">
+                        <i class="fas fa-file-excel"></i> Export Excel
+                    </a>
                 </div>
             </div>
         </div>
@@ -77,4 +75,3 @@
 </div>
 
 @include('layout_new.footer')
-    

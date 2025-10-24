@@ -878,6 +878,13 @@ Route::get('/admin/laporan/kelas/{kelas}/mapel/{mapel}', function ($kelas, $mape
     }, 'admin');
 })->name('admin.laporan.showDetail');
 
+Route::get('/admin/laporan/export/{kelas}/mapel/{mapel}', function ($kelas, $mapel) {
+    return (new RoleMiddleware)->handle(request(), function () use ($kelas, $mapel) {
+        // Panggil method exportExcel baru di Controller
+        return app()->call('App\Http\Controllers\LaporanController@exportExcel', ['kelasId' => $kelas, 'mapelId' => $mapel]);
+    }, 'admin');
+})->name('admin.laporan.exportExcel'); // Nama route baru
+
     // Logout Route
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
