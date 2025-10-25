@@ -69,16 +69,20 @@
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-            <div class="text-center navbar-brand-wrapper d-flex align-items-left justify-content-center">
+            <div class="navbar-brand-wrapper d-flex align-items-center justify-content-center">
                 <a class="navbar-brand brand-logo" href="index.html">
-                    <img src="https://disdikbud.banyuasinkab.go.id/wp-content/uploads/sites/269/2022/11/Logo-Tut-Wuri-Handayani-PNG-Warna.png"
-                        alt="logo" />
+                    <img src="{{ asset('landing/img/logolkp.png') }}" 
+                        alt="Logo LKP Wiyatamandala" 
+                        class="logo-icon" 
+                        style="height: 50px; width: auto;">
                 </a>
                 <a class="navbar-brand brand-logo-mini" href="index.html">
-                    <img src="https://disdikbud.banyuasinkab.go.id/wp-content/uploads/sites/269/2022/11/Logo-Tut-Wuri-Handayani-PNG-Warna.png" alt="logo" />
+                    <img src="{{ asset('landing/img/logolkp.png') }}" 
+                        alt="Logo Mini LKP Wiyatamandala" 
+                        class="logo-icon" 
+                        style="height: 40px; width: auto;">
                 </a>
             </div>
-
             <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
                 <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
                     <span class="icon-menu"></span>
