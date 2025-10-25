@@ -820,6 +820,15 @@ Route::group(['middleware' => ['auth']], function () {
             }, 'guru');
         })->name('guru.presensi.api.active-sessions');
 
+        Route::middleware(['auth'])->group(function () {
+    Route::post('/guru/presensi/update-status/{id}', function ($id) {
+        return (new RoleMiddleware)->handle(request(), function () use ($id) {
+            return app()->call('App\Http\Controllers\PresensiController@updateStatus', ['id' => $id]);
+        }, 'guru');
+    })->name('guru.presensi.update-status');
+});
+
+
 })->name('guru.presensi.api.stats');
 // ====================== Manajemen Presensi (Admin) ======================
 Route::get('/admin/presensi', function () {

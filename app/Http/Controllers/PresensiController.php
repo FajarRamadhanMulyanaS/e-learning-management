@@ -143,6 +143,23 @@ public function detail($id)
 
         return response()->json($stats);
     }
+public function updateStatus(Request $request, $id)
+{
+    $record = PresensiRecord::findOrFail($id);
+
+    $validStatuses = ['hadir', 'sakit', 'izin', 'tidak_hadir'];
+
+    if (!in_array($request->status, $validStatuses)) {
+        return response()->json(['success' => false, 'message' => 'Status tidak valid.']);
+    }
+
+    $record->status = $request->status;
+    $record->save();
+
+    return response()->json(['success' => true]);
+}
+
+
 
     private function createPresensiRecords(PresensiSession $session)
     {
