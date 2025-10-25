@@ -6,7 +6,6 @@
     .table-responsive {
         overflow-x: auto;
     }
-
 </style>
 
 <div class="container mt-4">
@@ -31,7 +30,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
+                <table class="table table-striped table-hover align-middle">
                     <thead>
                         <tr>
                             <th>No</th>
@@ -39,9 +38,8 @@
                             <th>Jam</th>
                             <th>Kelas</th>
                             <th>Mapel</th>
-                            <th>Mode</th>
-                            <th>Status</th>
-                            <th>Presensi</th>
+                            <th>Status Sesi</th>
+                            <th>Rekap Presensi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -54,17 +52,12 @@
                                 <td>{{ $session->kelas->nama_kelas }}</td>
                                 <td>{{ $session->mapel->nama_mapel }}</td>
                                 <td>
-                                    <span class="badge {{ $session->mode === 'qr' ? 'badge-info' : 'badge-warning' }}">
-                                        {{ strtoupper($session->mode) }}
-                                    </span>
-                                </td>
-                                <td>
                                     @if($session->is_active && !$session->is_closed)
-                                        <span class="badge badge-success">Aktif</span>
+                                        <span class="badge bg-success">Aktif</span>
                                     @elseif($session->is_closed)
-                                        <span class="badge badge-secondary">Ditutup</span>
+                                        <span class="badge bg-secondary">Ditutup</span>
                                     @else
-                                        <span class="badge badge-danger">Nonaktif</span>
+                                        <span class="badge bg-danger">Nonaktif</span>
                                     @endif
                                 </td>
                                 <td>
@@ -78,10 +71,12 @@
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
+                                        <!-- Tombol lihat detail dan ubah status siswa -->
                                         <a href="{{ route('guru.presensi.show', $session->id) }}" 
-                                           class="btn btn-sm btn-info" title="Lihat Detail">
-                                            <i class="fas fa-eye"></i>
+                                           class="btn btn-sm btn-info" title="Lihat & Ubah Status Siswa">
+                                            <i class="fas fa-user-check"></i>
                                         </a>
+
                                         @if($session->is_active && !$session->is_closed)
                                             <form action="{{ route('guru.presensi.close', $session->id) }}" 
                                                   method="POST" class="d-inline"
@@ -97,7 +92,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center">Belum ada sesi presensi</td>
+                                <td colspan="8" class="text-center">Belum ada sesi presensi</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -110,5 +105,4 @@
         </div>
     </div>
 </div>
-
 @endsection

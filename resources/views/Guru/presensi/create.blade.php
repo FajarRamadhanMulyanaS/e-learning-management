@@ -1,8 +1,6 @@
 @extends('layout2.app')
 
-
 @section('konten')
-
 
 <div class="container mt-4">
     <h3>Buat Sesi Presensi</h3>
@@ -66,14 +64,8 @@
                         <small class="text-muted">Status terlambat jika absen melewati jam ini</small>
                     </div>
 
-                    <div class="col-md-6">
-                        <label class="form-label">Mode Presensi</label>
-                        <select name="mode" class="form-select" required>
-                            <option value="">- Pilih Mode -</option>
-                            <option value="qr">QR Code</option>
-                            <option value="manual">Manual</option>
-                        </select>
-                    </div>
+                    {{-- Mode presensi dihapus, default: QR --}}
+                    <input type="hidden" name="mode" value="qr">
 
                     <div class="col-12">
                         <label class="form-label">Deskripsi (Opsional)</label>
@@ -94,6 +86,5 @@
         </div>
     </div>
 </div>
-
 
 @endsection
