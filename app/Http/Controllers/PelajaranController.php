@@ -14,7 +14,9 @@ class PelajaranController extends Controller
     public function jadwal()
     {
         $user = Auth::user();
-        $kelasId = optional($user->kelas)->id;
+
+        // --- INI ADALAH BARIS YANG DIPERBAIKI ---
+        $kelasId = optional($user->siswa)->kelas_id;
 
         $activeSemester = Semester::active()->first();
 
@@ -80,4 +82,3 @@ class PelajaranController extends Controller
         return view('siswa.pelajaran.bhs_jawa');
     }
 }
-
