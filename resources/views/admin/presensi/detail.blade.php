@@ -20,11 +20,7 @@
                 <li class="list-group-item"><strong>Mata Pelajaran:</strong> {{ $session->mapel->nama_mapel ?? '-' }}</li>
                 <li class="list-group-item"><strong>Kelas:</strong> {{ $session->kelas->nama_kelas ?? '-' }}</li>
                 <li class="list-group-item"><strong>Jam Mulai:</strong> {{ \Carbon\Carbon::parse($session->jam_mulai)->format('H:i') }}</li>
-                <li class="list-group-item"><strong>Mode:</strong>
-                    <span class="badge {{ $session->mode == 'qr' ? 'bg-info' : 'bg-warning' }}">
-                        {{ strtoupper($session->mode) }}
-                    </span>
-                </li>
+               
             </ul>
 
             {{-- Deskripsi Sesi (Kode ini sudah benar) --}}
