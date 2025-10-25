@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
-
+  use App\Models\Jadwal;
+use Carbon\Carbon;
 class SiswaController extends Controller
 {
     /**
@@ -19,17 +20,30 @@ class SiswaController extends Controller
      * ======================================================================
      * Menampilkan halaman dashboard untuk siswa yang sedang login.
      */
-    public function dashboard()
-    {
-        // Ambil data siswa yang sedang login (termasuk relasi user dan kelas jika perlu)
-        $siswa = Siswa::with(['user', 'kelas'])
-                      ->where('user_id', auth()->id())
-                      ->firstOrFail(); // Gunakan firstOrFail() agar error jika data siswa tidak ada
 
-        // Ganti 'siswa.index' dengan nama file view dashboard siswa Anda yang sebenarnya
-        // (Misalnya 'siswa.dashboard' atau 'siswa.home')
-        return view('siswa.index', compact('siswa'));
-    }
+
+public function dashboard()
+{
+    // Ambil data siswa yang sedang login
+    $siswa = Siswa::with(['user', 'kelas'])
+                  ->where('user_id', auth()->id())
+                  ->firstOrFail();
+
+    // Ambil semua jadwal untuk kelas siswa
+    $jadwal = Jadwal::with(['mapel', 'user'])
+                    ->where('kelas_id', $siswa->kelas_id)
+                    ->get();
+
+    // Tentukan hari ini dalam Bahasa Indonesia
+    $hariIni = Carbon::now()->locale('id')->dayName;
+    $hariIni = ucfirst($hariIni); // Contoh: "Rabu"
+
+    // Filter jadwal hanya untuk hari ini
+    $jadwalHariIni = $jadwal->where('hari', $hariIni);
+
+    // Kirim ke view
+    return view('siswa.index', compact('siswa', 'jadwal', 'jadwalHariIni', 'hariIni'));
+}
 
     /**
      * ======================================================================
@@ -50,6 +64,7 @@ class SiswaController extends Controller
         // Kirim data ke view Admin
         return view('admin.siswa.index', compact('users', 'kelas'));
     }
+    
 
     /**
      * Menyimpan data siswa baru ke database.
