@@ -101,24 +101,27 @@ public function getStatusTextAttribute()
     return match ($this->status) {
         'hadir' => 'Hadir',
         'terlambat' => 'Terlambat',
-        'tidak_hadir' => 'Tidak Hadir',
+        'tidak_hadir' => 'Tidak Hadir', // Teks di tabel tetap 'Tidak Hadir'
         'sakit' => 'Sakit',
         'izin' => 'Izin',
         default => 'Tidak Hadir'
     };
 }
 
+// [--- PERBAIKAN KONSISTENSI TAMPILAN ---]
 // Accessor untuk badge class berdasarkan status
 public function getStatusBadgeClassAttribute()
 {
+    // Menggunakan class BS5 (bg-*) agar konsisten dengan JavaScript
     return match ($this->status) {
-        'hadir' => 'badge-success',
-        'terlambat' => 'badge-warning',
-        'tidak_hadir' => 'badge-danger',
-        'sakit' => 'badge-info',
-        'izin' => 'badge-primary',
-        default => 'badge-secondary'
+        'hadir' => 'bg-success',
+        'terlambat' => 'bg-warning',
+        'tidak_hadir' => 'bg-danger',  // Ini adalah Alpa
+        'sakit' => 'bg-warning', // Sesuai JS, disamakan dengan terlambat
+        'izin' => 'bg-info',    // Sesuai JS
+        default => 'bg-secondary'
     };
 }
+// [--- AKHIR PERBAIKAN ---]
 
 }

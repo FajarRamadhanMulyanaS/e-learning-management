@@ -78,7 +78,6 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        <!-- Info Sesi -->
         <div class="card mb-4">
             <div class="card-header">
                 <h5 class="mb-0">Informasi Sesi</h5>
@@ -111,7 +110,6 @@
             </div>
         </div>
 
-        <!-- QR Code Section -->
         @if ($session->mode === 'qr' && $session->qr_code)
             <div class="card mb-4 shadow-sm border-0">
 
@@ -137,42 +135,64 @@
     </div>
     @endif
 
-
-    <!-- Statistik Presensi -->
+    {{-- ========================================================== --}}
+    {{-- ========== BLOK STATISTIK PRESENSI DIPERBARUI ========== --}}
+    {{-- ========================================================== --}}
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">Statistik Presensi</h5>
         </div>
         <div class="card-body">
             <div class="row text-center">
-                <div class="col-md-3">
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
                     <div class="card bg-success text-white">
                         <div class="card-body">
-                            <h4>{{ $stats['hadir'] }}</h4>
+                            <h4 id="stats-hadir">{{ $stats['hadir'] ?? 0 }}</h4>
                             <p class="mb-0">Hadir</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
                     <div class="card bg-warning text-white">
                         <div class="card-body">
-                            <h4>{{ $stats['terlambat'] }}</h4>
+                            <h4 id="stats-terlambat">{{ $stats['terlambat'] ?? 0 }}</h4>
                             <p class="mb-0">Terlambat</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
-                    <div class="card bg-danger text-white">
+                
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card bg-warning text-dark">
                         <div class="card-body">
-                            <h4>{{ $stats['tidak_hadir'] }}</h4>
-                            <p class="mb-0">Tidak Hadir</p>
+                            <h4 id="stats-sakit">{{ $stats['sakit'] ?? 0 }}</h4>
+                            <p class="mb-0">Sakit</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-3">
+
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
                     <div class="card bg-info text-white">
                         <div class="card-body">
-                            <h4>{{ $stats['persentase_hadir'] }}%</h4>
+                            <h4 id="stats-izin">{{ $stats['izin'] ?? 0 }}</h4>
+                            <p class="mb-0">Izin</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card bg-danger text-white">
+                        <div class="card-body">
+                            {{-- [PERBAIKAN] Menggunakan $stats['alpa'] dari model --}}
+                            <h4 id="stats-alpa">{{ $stats['alpa'] ?? 0 }}</h4>
+                            <p class="mb-0">Alpa</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-2 col-md-4 col-6 mb-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h4 id="stats-persentase">{{ $stats['persentase_hadir'] ?? 0 }}%</h4>
                             <p class="mb-0">Kehadiran</p>
                         </div>
                     </div>
@@ -180,9 +200,12 @@
             </div>
         </div>
     </div>
+    {{-- ========================================================== --}}
+    {{--               AKHIR BLOK STATISTIK DIPERBARUI                --}}
+    {{-- ========================================================== --}}
 
-    <!-- Daftar Siswa -->
-<div class="card">
+
+    <div class="card">
     <div class="card-header">
         <h5 class="mb-0">Daftar Siswa</h5>
     </div>
@@ -195,7 +218,7 @@
                         <th>Nama Siswa</th>
                         <th>Status</th>
                         <th>Waktu Absen</th>
-                        <th>Status</th>
+                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -204,6 +227,7 @@
                             <td>{{ $index + 1 }}</td>
                             <td>{{ $record->siswa->username }}</td>
                             <td>
+                                {{-- Ini mengambil class badge dari Model PresensiRecord --}}
                                 <span class="badge {{ $record->status_badge_class }}">
                                     {{ $record->status_text }}
                                 </span>
@@ -238,8 +262,12 @@
 }
 </style>
 
+{{-- =============================================== --}}
+{{-- ========== BLOK SCRIPT (SUDAH FINAL) ========== --}}
+{{-- =============================================== --}}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // Peta untuk warna lingkaran aksi
     const statusColors = {
         hadir: 'green',
         sakit: 'orange',
@@ -247,19 +275,79 @@ document.addEventListener('DOMContentLoaded', () => {
         tidak_hadir: 'red'
     };
 
+    // Peta untuk teks di kolom status tabel
     const statusTexts = {
         hadir: 'Hadir',
         sakit: 'Sakit',
         izin: 'Izin',
-        tidak_hadir: 'Tidak Hadir'
+        tidak_hadir: 'Tidak Hadir' // Teks di tabel
     };
 
+    // Peta untuk kelas badge Bootstrap di tabel
+    const statusBadgeClasses = {
+        hadir: 'bg-success',
+        sakit: 'bg-warning',
+        izin: 'bg-info',
+        tidak_hadir: 'bg-danger', // 'Tidak Hadir' di tabel -> badge merah
+        terlambat: 'bg-warning' 
+    };
+
+    // Fungsi untuk update statistik di card atas
+    function updateStats() {
+        let hadirCount = 0;
+        let sakitCount = 0;
+        let izinCount = 0;
+        let alpaCount = 0;
+        
+        // Ambil 'terlambat' dari DOM, karena tidak diatur manual
+        const terlambatCount = parseInt(document.getElementById('stats-terlambat').textContent) || 0;
+
+        const rows = document.querySelectorAll('tbody tr');
+        const totalSiswa = rows.length;
+
+        rows.forEach(row => {
+            const badge = row.querySelector('td:nth-child(3) .badge');
+            if (!badge) return;
+            
+            const statusText = badge.textContent.trim();
+
+            // Memecah perhitungan berdasarkan teks di badge
+            if (statusText === 'Hadir') {
+                hadirCount++;
+            } else if (statusText === 'Sakit') {
+                sakitCount++;
+            } else if (statusText === 'Izin') {
+                izinCount++;
+            } else if (statusText === 'Tidak Hadir') { // Teks "Tidak Hadir" di tabel dihitung sebagai Alpa
+                alpaCount++;
+            }
+            // Status 'Terlambat' sudah dihitung di awal
+        });
+
+        // Hitung ulang persentase
+        const totalHadirDanTerlambat = hadirCount + terlambatCount;
+        const persentase = (totalSiswa > 0) ? Math.round((totalHadirDanTerlambat / totalSiswa) * 100) : 0;
+
+        // Update angka di DOM
+        document.getElementById('stats-hadir').textContent = hadirCount;
+        document.getElementById('stats-sakit').textContent = sakitCount;
+        document.getElementById('stats-izin').textContent = izinCount;
+        document.getElementById('stats-alpa').textContent = alpaCount;
+        document.getElementById('stats-persentase').textContent = persentase + '%';
+    }
+
+
+    // Event listener untuk lingkaran aksi
     document.querySelectorAll('.status-circle').forEach(circle => {
         circle.addEventListener('click', function() {
             const id = this.dataset.id;
             const status = this.dataset.status;
             const parent = this.closest('.status-buttons');
             const row = this.closest('tr');
+
+            if (this.classList.contains('active')) {
+                return; 
+            }
 
             fetch(`/guru/presensi/update-status/${id}`, {
                 method: 'POST',
@@ -269,29 +357,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ status })
             })
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                return res.json();
+            })
             .then(data => {
                 if (data.success) {
-                    // Reset semua lingkaran
+                    // 1. Reset lingkaran
                     parent.querySelectorAll('.status-circle').forEach(el => {
                         el.classList.remove('active');
                         el.style.backgroundColor = 'transparent';
                     });
 
-                    // Lingkaran yang diklik jadi aktif
+                    // 2. Aktifkan lingkaran
                     this.classList.add('active');
                     this.style.backgroundColor = statusColors[status];
 
-                    // Update badge teks di kolom Status
+                    // 3. Update badge status di tabel
                     const badge = row.querySelector('td:nth-child(3) .badge');
-                    badge.textContent = statusTexts[status];
+                    
+                    badge.textContent = statusTexts[status]; 
+                    badge.className = 'badge'; 
+                    badge.classList.add(statusBadgeClasses[status]);
+
+                    // 4. Panggil fungsi update statistik
+                    updateStats();
 
                     showToast('Status berhasil diperbarui!');
                 } else {
                     alert(data.message || 'Gagal memperbarui status!');
                 }
             })
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan. Cek konsol (F12) untuk detail. Pastikan rute dan controller sudah benar.');
+            });
         });
     });
 });
@@ -311,16 +413,31 @@ function showToast(msg) {
         z-index: 9999;
         animation: fadeInOut 3s ease;
     `;
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = `
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translateY(-20px); }
+            10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+    `;
+    document.head.appendChild(styleSheet);
+    
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 3000);
 }
 </script>
+{{-- =============================================== --}}
+{{--        AKHIR BLOK SCRIPT DIPERBARUI         --}}
+{{-- =============================================== --}}
+
 
     @if ($session->mode === 'qr' && $session->qr_code)
-        <!-- Pastikan load library QRCode dari CDN yang pasti bekerja -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
         <script>
+            // ... (Kode JavaScript untuk QR Code, Regenerate, dan Download) ...
+            // ... (Tidak ada perubahan di sini) ...
             document.addEventListener('DOMContentLoaded', function() {
                 const canvas = document.getElementById('qrcode');
                 const qrData = @json($session->qr_code);
@@ -328,7 +445,6 @@ function showToast(msg) {
                 console.log('QR Data:', qrData);
 
                 if (canvas && qrData) {
-                    // Gunakan library qrcodejs (bukan yang versi node)
                     const qrContainer = document.createElement('div');
                     canvas.replaceWith(qrContainer);
 
@@ -341,7 +457,6 @@ function showToast(msg) {
                         correctLevel: QRCode.CorrectLevel.H
                     });
 
-                    // Tambahkan background biru ke QR code
                     const qrElement = qrContainer.querySelector('img') || qrContainer.querySelector('canvas');
                     if (qrElement) {
                         qrElement.style.backgroundColor = '#ffffff';
@@ -355,7 +470,6 @@ function showToast(msg) {
                     console.warn('Canvas tidak ditemukan atau data QR kosong.');
                 }
 
-                // Timer hitung waktu tersisa
                 function updateQRTimer() {
                     const expiresAt = new Date('{{ $session->qr_expires_at }}').getTime();
                     const now = new Date().getTime();
@@ -378,10 +492,8 @@ function showToast(msg) {
                 setInterval(updateQRTimer, 1000);
             });
 
-            // Regenerate QR
             function regenerateQR() {
                 if (confirm('Regenerate QR Code? QR Code lama akan tidak berlaku.')) {
-                    // Show loading animation
                     const qrWrapper = document.getElementById('qrcode-wrapper');
                     const originalContent = qrWrapper.innerHTML;
 
@@ -404,7 +516,6 @@ function showToast(msg) {
                         .then(res => res.json())
                         .then(data => {
                             if (data.success) {
-                                // Regenerate QR code dengan background biru
                                 regenerateQRCode();
                             } else {
                                 qrWrapper.innerHTML = originalContent;
@@ -419,12 +530,9 @@ function showToast(msg) {
                 }
             }
 
-            // Function to regenerate QR code with blue background
             function regenerateQRCode() {
-                // Reload page to get updated QR code
                 location.reload();
             }
-            // Tombol download QR Code
             document.getElementById('downloadQR').addEventListener('click', function() {
                 const qrCanvas = document.querySelector('#qrcode-wrapper img') || document.querySelector(
                     '#qrcode-wrapper canvas');
@@ -433,54 +541,44 @@ function showToast(msg) {
                     return;
                 }
 
-                // Show loading state
                 const downloadBtn = document.getElementById('downloadQR');
                 const originalText = downloadBtn.innerHTML;
                 downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing Download...';
                 downloadBtn.disabled = true;
 
-                // Create a new canvas with blue background
                 const downloadCanvas = document.createElement('canvas');
                 const ctx = downloadCanvas.getContext('2d');
-                const size = 240; // Slightly larger to accommodate padding
+                const size = 240;
                 downloadCanvas.width = size;
                 downloadCanvas.height = size;
 
-                // Fill with blue background
                 ctx.fillStyle = '#007bff';
                 ctx.fillRect(0, 0, size, size);
 
-                // Add gradient effect
                 const gradient = ctx.createLinearGradient(0, 0, size, size);
                 gradient.addColorStop(0, '#007bff');
                 gradient.addColorStop(1, '#0056b3');
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, size, size);
 
-                // Draw QR code in the center with padding
                 const qrSize = 220;
                 const offset = (size - qrSize) / 2;
 
-                // Add white background for QR code
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(offset - 5, offset - 5, qrSize + 10, qrSize + 10);
 
                 if (qrCanvas.tagName === 'IMG') {
                     ctx.drawImage(qrCanvas, offset, offset, qrSize, qrSize);
                 } else {
-                    // For canvas elements
                     ctx.drawImage(qrCanvas, offset, offset, qrSize, qrSize);
                 }
 
-                // Download the image
                 const link = document.createElement('a');
                 link.href = downloadCanvas.toDataURL('image/png');
                 link.download = 'QR_Presensi_{{ $session->id }}_Blue.png';
                 link.click();
 
-                // Show success message
                 setTimeout(() => {
-                    // Create a toast notification instead of alert
                     const toast = document.createElement('div');
                     toast.className = 'toast-notification';
                     toast.style.cssText = `
@@ -504,7 +602,6 @@ function showToast(msg) {
                     }, 3000);
                 }, 500);
 
-                // Reset button state
                 setTimeout(() => {
                     downloadBtn.innerHTML = originalText;
                     downloadBtn.disabled = false;

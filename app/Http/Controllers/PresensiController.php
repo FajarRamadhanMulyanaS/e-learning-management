@@ -11,7 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
-
+use Carbon\Carbon; // <-- [PERBAIKAN] Tambahkan ini
 
 class PresensiController extends Controller
 {
@@ -143,22 +143,57 @@ public function detail($id)
 
         return response()->json($stats);
     }
+
+// --- [PERBAIKAN] METODE updateStatus DIGANTI SEPENUHNYA ---
 public function updateStatus(Request $request, $id)
 {
-    $record = PresensiRecord::findOrFail($id);
+    // 1. Validasi input
+    $request->validate([
+        'status' => 'required|in:hadir,izin,sakit,tidak_hadir',
+    ]);
 
-    $validStatuses = ['hadir', 'sakit', 'izin', 'tidak_hadir'];
+    // 2. Cari record presensi
+    $record = PresensiRecord::find($id);
 
-    if (!in_array($request->status, $validStatuses)) {
-        return response()->json(['success' => false, 'message' => 'Status tidak valid.']);
+    if (!$record) {
+        return response()->json([
+            'success' => false, 
+            'message' => 'Data presensi tidak ditemukan.'
+        ], 404);
+    }
+    
+    // 3. Pastikan guru yang mengedit adalah guru sesi tersebut (opsional tapi aman)
+    // if ($record->session->guru_id !== Auth::id()) {
+    //     return response()->json(['success' => false, 'message' => 'Akses ditolak.'], 403);
+    // }
+
+    $newStatus = $request->input('status');
+    
+    // 4. Update status
+    $record->status = $newStatus;
+
+    // 5. Logika tambahan untuk konsistensi data
+    if ($newStatus == 'hadir') {
+        // Jika diubah jadi 'hadir' & sebelumnya belum absen, catat waktunya
+        if (is_null($record->waktu_absen)) {
+            $record->waktu_absen = Carbon::now();
+        }
+        $record->metode_absen = 'manual'; // Tandai sebagai update manual oleh guru
+    
+    } else {
+        // Jika diubah jadi 'izin', 'sakit', atau 'tidak_hadir',
+        // kosongkan waktu absen agar data konsisten
+        $record->waktu_absen = null;
+        $record->metode_absen = 'manual'; // Tandai juga sebagai manual
     }
 
-    $record->status = $request->status;
+    // 6. Simpan perubahan
     $record->save();
 
+    // 7. Kirim respons sukses
     return response()->json(['success' => true]);
 }
-
+// --- [AKHIR PERBAIKAN] ---
 
 
     private function createPresensiRecords(PresensiSession $session)

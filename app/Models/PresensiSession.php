@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB; // <-- [PERBAIKAN] Tambahkan ini
 
 class PresensiSession extends Model
 {
@@ -116,24 +117,38 @@ class PresensiSession extends Model
         $this->save();
     }
 
+    // [--- PERBAIKAN UTAMA ---]
     // Method untuk mendapatkan statistik presensi
     public function getPresensiStats()
     {
         // Hitung total siswa dari tabel siswa
         $totalSiswa = $this->kelas->siswa()->count();
 
-        $hadir = $this->presensiRecords()->where('status', 'hadir')->count();
-        $terlambat = $this->presensiRecords()->where('status', 'terlambat')->count();
-        $tidakHadir = $totalSiswa - $hadir - $terlambat;
+        // Hitung semua status dalam satu query untuk efisiensi
+        $statusCounts = $this->presensiRecords()
+            ->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        // Ambil setiap hitungan, default ke 0 jika status tersebut tidak ada
+        $hadir = $statusCounts->get('hadir', 0);
+        $terlambat = $statusCounts->get('terlambat', 0);
+        $sakit = $statusCounts->get('sakit', 0);
+        $izin = $statusCounts->get('izin', 0);
+        $alpa = $statusCounts->get('tidak_hadir', 0); // 'tidak_hadir' di DB kita anggap 'Alpa'
 
         return [
             'total_siswa' => $totalSiswa,
             'hadir' => $hadir,
             'terlambat' => $terlambat,
-            'tidak_hadir' => $tidakHadir,
+            'sakit' => $sakit,       // <-- [BARU]
+            'izin' => $izin,         // <-- [BARU]
+            'alpa' => $alpa,         // <-- [BARU] Menggantikan 'tidak_hadir'
             'persentase_hadir' => $totalSiswa > 0 ? round(($hadir + $terlambat) / $totalSiswa * 100, 2) : 0,
         ];
     }
+    // [--- AKHIR PERBAIKAN ---]
+
 
     // Accessor untuk format waktu
     public function getJamMulaiFormattedAttribute()

@@ -459,7 +459,7 @@ Route::middleware(['auth'])->group(function () {
         // URL: /guru/quiz - Nama: guru.quiz.index
         Route::get('/', function () {
             return (new RoleMiddleware)->handle(request(), function () {
-                return app()->call('App\\Http\\Controllers\\QuizController@index');
+                return app()->call('App\\Http\Controllers\\QuizController@index');
             }, 'guru');
         })->name('index');
 
@@ -473,7 +473,7 @@ Route::middleware(['auth'])->group(function () {
         // Route untuk menyimpan kuis
         Route::post('/', function (Illuminate\Http\Request $request) {
             return (new RoleMiddleware)->handle(request(), function () use ($request) {
-                return app()->call('App\\Http\\Controllers\\QuizController@store', ['request' => $request]);
+                return app()->call('App\\Http\Controllers\\QuizController@store', ['request' => $request]);
             }, 'guru');
         })->name('store');
 
@@ -504,7 +504,7 @@ Route::middleware(['auth'])->group(function () {
         // Route untuk menampilkan detail kuis
         Route::get('/{quiz}', function (App\Models\Quiz $quiz) {
             return (new RoleMiddleware)->handle(request(), function () use ($quiz) {
-                return app()->call('App\\Http\\Controllers\\QuizController@show', ['quiz' => $quiz]);
+                return app()->call('App\\Http\Controllers\\QuizController@show', ['quiz' => $quiz]);
             }, 'guru');
         })->name('show');
     });
@@ -700,6 +700,7 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/siswa/presensi/status/{sessionId}', [SiswaPresensiController::class, 'getPresensiStatus'])->name('siswa.presensi.status');
         Route::get('/siswa/presensi/history', [SiswaPresensiController::class, 'history'])->name('siswa.presensi.history');
         Route::get('/siswa/video', [VideoController::class, 'indexSiswa'])->name('siswa.video');
+}); // <-- [PERBAIKAN] Menutup grup 'prefix('siswa')' di sini
 
         Route::prefix('guru')->middleware('auth')->group(function () {
             Route::get('/pesan', [PesanController::class, 'indexGuru'])->name('guru.pesan.index');
@@ -749,13 +750,13 @@ Route::group(['middleware' => ['auth']], function () {
 
             Route::get('/admin/jadwal/create', function () {
                 return (new RoleMiddleware)->handle(request(), function () {
-                    return app()->call('App\\Http\\Controllers\\AdminJadwalController@create');
+                    return app()->call('App\\Http\Controllers\\AdminJadwalController@create');
                 }, 'admin');
             })->name('admin.jadwal.create');
 
             Route::post('/admin/jadwal/store', function () {
                 return (new RoleMiddleware)->handle(request(), function () {
-                    return app()->call('App\\Http\Controllers\\AdminJadwalController@store');
+                    return app()->call('App\\Http\\Controllers\\AdminJadwalController@store');
                 }, 'admin');
             })->name('admin.jadwal.store');
 
@@ -773,14 +774,14 @@ Route::group(['middleware' => ['auth']], function () {
 
             Route::delete('/admin/jadwal/delete/{id}', function ($id) {
                 return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                    return app()->call('App\\Http\\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
+                    return app()->call('App\\Http\Controllers\\AdminJadwalController@destroy', ['id' => $id]);
                 }, 'admin');
             })->name('admin.jadwal.destroy');
         });
         // ====================== Manajemen Presensi (Guru) ======================
         Route::get('/guru/presensi', function () {
             return (new RoleMiddleware)->handle(request(), function () {
-                return app()->call('App\\Http\\Controllers\\PresensiController@index');
+                return app()->call('App\\Http\Controllers\\PresensiController@index');
             }, 'guru');
         })->name('guru.presensi.index');
 
@@ -804,19 +805,19 @@ Route::group(['middleware' => ['auth']], function () {
 
         Route::post('/guru/presensi/{id}/close', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\\Controllers\\PresensiController@close', ['id' => $id]);
+                return app()->call('App\\Http\Controllers\\PresensiController@close', ['id' => $id]);
             }, 'guru');
         })->name('guru.presensi.close');
 
         Route::post('/guru/presensi/{id}/regenerate-qr', function ($id) {
             return (new RoleMiddleware)->handle(request(), function () use ($id) {
-                return app()->call('App\\Http\\Controllers\\PresensiController@regenerateQR', ['id' => $id]);
+                return app()->call('App\\Http\Controllers\\PresensiController@regenerateQR', ['id' => $id]);
             }, 'guru');
         })->name('guru.presensi.regenerate-qr');
 
         Route::get('/guru/presensi/api/active-sessions', function () {
             return (new RoleMiddleware)->handle(request(), function () {
-                return app()->call('App\\Http\\Controllers\\PresensiController@getActiveSessions');
+                return app()->call('App\\Http\Controllers\\PresensiController@getActiveSessions');
             }, 'guru');
         })->name('guru.presensi.api.active-sessions');
 
@@ -829,11 +830,12 @@ Route::group(['middleware' => ['auth']], function () {
 });
 
 
-})->name('guru.presensi.api.stats');
+// })->name('guru.presensi.api.stats'); // <-- [PERBAIKAN] Baris ini adalah syntax error dan telah dihapus/dikomentari
+
 // ====================== Manajemen Presensi (Admin) ======================
 Route::get('/admin/presensi', function () {
     return (new RoleMiddleware)->handle(request(), function () {
-        return app()->call('App\\Http\\Controllers\\AdminPresensiController@index');
+        return app()->call('App\\Http\Controllers\\AdminPresensiController@index');
     }, 'admin');
 })->name('admin.presensi.index');
 
@@ -851,7 +853,7 @@ Route::get('/admin/presensi', function () {
 
     Route::get('/admin/presensi/kelas/{kelasId}', function ($kelasId) {
         return (new RoleMiddleware)->handle(request(), function () use ($kelasId) {
-            return app()->call('App\\Http\\Controllers\\AdminPresensiController@kelasReport', ['kelasId' => $kelasId]);
+            return app()->call('App\\Http\Controllers\\AdminPresensiController@kelasReport', ['kelasId' => $kelasId]);
         }, 'admin');
     })->name('admin.presensi.kelas-report');
 
@@ -883,7 +885,7 @@ Route::get('/admin/presensi/export/pdf', [AdminPresensiController::class, 'expor
 // Tutup sesi presensi (Admin)
 Route::post('/admin/presensi/close/{id}', function ($id) {
     return (new RoleMiddleware)->handle(request(), function () use ($id) {
-        return app()->call('App\\Http\\Controllers\\AdminPresensiController@closeSession', ['id' => $id]);
+        return app()->call('App\\Http\Controllers\\AdminPresensiController@closeSession', ['id' => $id]);
     }, 'admin');
 })->name('admin.presensi.close');
 Route::get('/admin/presensi/detail/{id}', [PresensiController::class, 'detail'])->name('admin.presensi.detail');
@@ -942,3 +944,5 @@ Route::get('/Jadwal', [PelajaranController::class, 'jadwal'])->name('siswa.jadwa
     Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+// } // <-- [PERBAIKAN] Kurung tutup '}' terakhir ini dihapus karena menyebabkan syntax error
