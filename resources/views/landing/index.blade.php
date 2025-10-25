@@ -68,7 +68,7 @@
     <nav class="navbar navbar-expand-lg navbar-light px-4 px-lg-5 py-3 py-lg-0">
         <a href="#" class="navbar-brand p-0">
             <h1 class="text-primary">
-                <img src="{{ asset('images/logoku.webp') }}" alt="Logo LKP Wiyatamandala" class="logo-icon">
+                <img src="{{ asset('landing/img/logolkp.png') }}" alt="Logo LKP Wiyatamandala" class="logo-icon">
                 LKP. WIYATAMANDALA BENGKALIS
             </h1>
         </a>
@@ -89,7 +89,7 @@
     <!-- Hero Carousel -->
     <div id="home" class="header-carousel owl-carousel">
         <div class="header-carousel-item">
-            <img src="{{asset ('landing') }}/img/carousel-1.jpg" class="img-fluid w-100" alt="Pelatihan komputer">
+            <img src="{{ asset('landing/img/bglanding.jpg') }}" class="img-fluid w-100" alt="Pelatihan komputer">
             <div class="carousel-caption">
                 <div class="container">
                     <div class="text-center">

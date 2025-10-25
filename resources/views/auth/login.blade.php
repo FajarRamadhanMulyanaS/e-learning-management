@@ -67,7 +67,7 @@
 
 <style>
     #background-container {
-        background-image: url('{{ asset('images/login_desktop.jpg') }}');
+        background-image: url('{{ asset('landing/img/bglanding.jpg') }}');
     }
 
     /* Ubah background untuk perangkat mobile */
