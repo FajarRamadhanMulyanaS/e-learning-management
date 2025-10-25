@@ -3,9 +3,9 @@
     <div class="container mt-4">
         <h3 class="mb-3">Manajemen Sesi Presensi</h3>
 
-        <!-- Filter -->
         <form method="GET" class="row g-3 mb-3">
-            <div class="col-md-3">
+            {{-- [PERBAIKAN] Mengubah col-md-3 menjadi col-md-2 --}}
+            <div class="col-md-2">
                 <label class="form-label">Kelas</label>
                 <select name="kelas_id" class="form-select">
                     <option value="">Semua Kelas</option>
@@ -17,7 +17,8 @@
                 </select>
             </div>
 
-            <div class="col-md-3">
+            {{-- [PERBAIKAN] Mengubah col-md-3 menjadi col-md-2 --}}
+            <div class="col-md-2">
                 <label class="form-label">Guru</label>
                 <select name="guru_id" class="form-select">
                     <option value="">Semua Guru</option>
@@ -29,8 +30,8 @@
                 </select>
             </div>
 
-            <!-- 🔹 Filter Mata Pelajaran -->
-            <div class="col-md-3">
+            {{-- [PERBAIKAN] Mengubah col-md-3 menjadi col-md-2 --}}
+            <div class="col-md-2">
                 <label class="form-label">Mata Pelajaran</label>
                 <select name="mapel_id" class="form-select">
                     <option value="">Semua Mapel</option>
@@ -42,7 +43,7 @@
                 </select>
             </div>
 
-            <div class="col-md-1 d-none d-md-block"></div>
+            {{-- [PERBAIKAN] Menghapus spacer col-md-1 --}}
 
             <div class="col-md-2">
                 <label class="form-label">Tanggal Mulai</label>
@@ -61,7 +62,6 @@
             </div>
         </form>
 
-        <!-- Tabel Sesi Presensi -->
         <div class="card shadow-sm">
             <div class="card-header bg-light">
                 <h5 class="mb-0"><i class="fas fa-list"></i> Daftar Semua Sesi Presensi</h5>
@@ -78,7 +78,7 @@
                                 <th>Mata Pelajaran</th>
                                 <th>Kelas</th>
                                 <th>Jam Mulai</th>
-                                <th>Mode</th>
+                                {{-- [PERBAIKAN] Menghapus kolom Mode --}}
                                 <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
@@ -94,11 +94,9 @@
                                     <td class="text-center">
                                         {{ \Carbon\Carbon::parse($session->jam_mulai)->format('H:i') }}
                                     </td>
-                                    <td class="text-center">
-                                        <span class="badge {{ $session->mode == 'qr' ? 'bg-info' : 'bg-warning' }}">
-                                            {{ strtoupper($session->mode) }}
-                                        </span>
-                                    </td>
+                                    
+                                    {{-- [PERBAIKAN] Menghapus sel <td> untuk Mode --}}
+
                                     <td class="text-center">
                                         @if ($session->is_closed)
                                             <span class="badge bg-secondary">Selesai</span>
@@ -127,7 +125,8 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted py-3">
+                                    {{-- [PERBAIKAN] Mengubah colspan dari 9 menjadi 8 --}}
+                                    <td colspan="8" class="text-center text-muted py-3">
                                         <i class="fas fa-info-circle"></i> Tidak ada data sesi
                                     </td>
                                 </tr>
@@ -136,7 +135,6 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-3">
                     {{ $sessions->links() }}
                 </div>
@@ -149,7 +147,7 @@
             if (confirm('Apakah Anda yakin ingin menutup sesi ini?')) {
                 fetch(`/admin/presensi/close/${id}`, {
                         method: 'POST',
-                        headers: {
+                        headers:
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
                             'Content-Type': 'application/json'
                         }

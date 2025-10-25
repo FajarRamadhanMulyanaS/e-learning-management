@@ -27,7 +27,7 @@
                 </li>
             </ul>
 
-            {{-- Deskripsi Sesi --}}
+            {{-- Deskripsi Sesi (Kode ini sudah benar) --}}
             <div class="p-3 border rounded bg-light">
                 <h6 class="fw-bold mb-2"><i class="fas fa-info-circle me-1"></i> Deskripsi</h6>
                 <p class="mb-0 text-muted">
@@ -37,7 +37,6 @@
         </div>
     </div>
 
-    <!-- Daftar Siswa -->
     <div class="card shadow-sm">
         <div class="card-header bg-light">
             <h5 class="mb-0">Daftar Siswa</h5>
@@ -60,7 +59,7 @@
                             <th>Nama Siswa</th>
                             <th>Status</th>
                             <th>Waktu Absen</th>
-                            <th>Metode</th>
+                            {{-- [PERBAIKAN] Kolom Metode dihapus --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -70,6 +69,8 @@
                                 $badgeClass = match($status) {
                                     'hadir' => 'bg-success',
                                     'terlambat' => 'bg-warning text-dark',
+                                    'sakit' => 'bg-warning text-dark', // Ditambahkan
+                                    'izin' => 'bg-info', // Ditambahkan
                                     'tidak_hadir' => 'bg-danger',
                                     default => 'bg-secondary'
                                 };
@@ -77,13 +78,14 @@
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>{{ $record->siswa->username ?? '-' }}</td>
-                                <td><span class="badge {{ $badgeClass }}">{{ ucfirst($record->status ?? 'Tidak Hadir') }}</span></td>
+                                <td><span class="badge {{ $badgeClass }}">{{ ucfirst(str_replace('_', ' ', $record->status ?? 'Tidak Hadir')) }}</span></td>
                                 <td>{{ $record->waktu_absen ? \Carbon\Carbon::parse($record->waktu_absen)->format('H:i') : '-' }}</td>
-                                <td>{{ strtoupper($record->metode_absen ?? '-') }}</td>
+                                {{-- [PERBAIKAN] Sel <td> untuk metode dihapus --}}
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center text-muted py-3">
+                                {{-- [PERBAIKAN] colspan diubah dari 5 menjadi 4 --}}
+                                <td colspan="4" class="text-center text-muted py-3">
                                     <i class="fas fa-info-circle"></i> Tidak ada data siswa untuk sesi ini
                                 </td>
                             </tr>

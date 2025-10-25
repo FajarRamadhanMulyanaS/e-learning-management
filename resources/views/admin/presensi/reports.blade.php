@@ -4,41 +4,65 @@
 <div class="container mt-4">
     <h3>Laporan Presensi</h3>
 
-    <!-- Statistik Umum -->
     <div class="row mb-4">
-        <div class="col-md-3">
+        {{-- [PERBAIKAN] Mengubah layout grid menjadi 6 kolom --}}
+        <div class="col-lg-2 col-md-4 col-6 mb-3">
             <div class="card bg-primary text-white">
                 <div class="card-body">
-                    <h4>{{ $stats['total'] }}</h4>
+                    <h4>{{ $stats['total'] ?? 0 }}</h4>
                     <p>Total Record</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-lg-2 col-md-4 col-6 mb-3">
             <div class="card bg-success text-white">
                 <div class="card-body">
-                    <h4>{{ $stats['hadir'] }}</h4>
+                    <h4>{{ $stats['hadir'] ?? 0 }}</h4>
                     <p>Hadir</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
+        <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card bg-warning text-dark"> {{-- Warna text diubah agar terbaca --}}
                 <div class="card-body">
-                    <h4>{{ $stats['terlambat'] }}</h4>
+                    <h4>{{ $stats['terlambat'] ?? 0 }}</h4>
                     <p>Terlambat</p>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
+        {{-- [BARU] Card untuk Sakit --}}
+        <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card bg-warning text-dark"> {{-- Warna text diubah agar terbaca --}}
+                <div class="card-body">
+                    {{-- Pastikan controller mengirim $stats['sakit'] --}}
+                    <h4>{{ $stats['sakit'] ?? 0 }}</h4>
+                    <p>Sakit</p>
+                </div>
+            </div>
+        </div>
+        {{-- [BARU] Card untuk Izin --}}
+        <div class="col-lg-2 col-md-4 col-6 mb-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                     {{-- Pastikan controller mengirim $stats['izin'] --}}
+                    <h4>{{ $stats['izin'] ?? 0 }}</h4>
+                    <p>Izin</p>
+                </div>
+            </div>
+        </div>
+        {{-- [PERBAIKAN] Mengganti Tidak Hadir menjadi Alpa --}}
+        <div class="col-lg-2 col-md-4 col-6 mb-3">
             <div class="card bg-danger text-white">
                 <div class="card-body">
-                    <h4>{{ $stats['tidak_hadir'] }}</h4>
-                    <p>Tidak Hadir</p>
+                    {{-- Pastikan controller mengirim $stats['alpa'] atau $stats['tidak_hadir'] --}}
+                    <h4>{{ $stats['alpa'] ?? ($stats['tidak_hadir'] ?? 0) }}</h4>
+                    <p>Alpa</p>
                 </div>
             </div>
         </div>
     </div>
+    {{-- Akhir Perubahan Statistik --}}
+
 <div class="mb-3 text-end">
     <a href="{{ route('admin.presensi.export.excel', request()->query()) }}" class="btn btn-success btn-sm">
         <i class="fas fa-file-excel"></i> Export Excel
@@ -48,7 +72,6 @@
     </a>
 </div>
 
-    <!-- Filter -->
     <form method="GET" class="row g-3 mb-3">
         <div class="col-md-2">
             <label>Kelas</label>
@@ -101,7 +124,6 @@
         </div>
     </form>
 
-    <!-- Tabel Laporan -->
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -127,11 +149,13 @@
                                 <td>{{ $r->presensiSession->guru->username ?? '-' }}</td>
                                 <td>{{ $r->created_at->format('d M Y') }}</td>
                                 <td>
-                                    <span class="badge 
+                                    <span class="badge
                                         @if($r->status == 'hadir') bg-success
                                         @elseif($r->status == 'terlambat') bg-warning
+                                        @elseif($r->status == 'sakit') bg-warning text-dark
+                                        @elseif($r->status == 'izin') bg-info
                                         @else bg-danger @endif">
-                                        {{ strtoupper($r->status) }}
+                                        {{ $r->status == 'tidak_hadir' ? 'ALPA' : strtoupper($r->status) }}
                                     </span>
                                 </td>
                             </tr>
@@ -142,7 +166,10 @@
                 </table>
             </div>
 
-            {{ $records->links() }}
+            <div class="d-flex justify-content-center">
+                {{ $records->appends(request()->query())->links('pagination::bootstrap-4') }}
+            </div>
+
         </div>
     </div>
 </div>
