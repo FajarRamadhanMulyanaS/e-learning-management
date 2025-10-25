@@ -27,6 +27,7 @@ class PresensiController extends Controller
 
         return view('guru.presensi.index', compact('sessions'));
     }
+    
 
     public function create()
     {
@@ -45,20 +46,19 @@ class PresensiController extends Controller
             'semester_id' => 'nullable|exists:semesters,id',
             'tanggal' => 'required|date',
             'jam_mulai' => 'required|date_format:H:i',
-            'mode' => 'required|in:qr,manual',
             'deskripsi' => 'nullable|string|max:500',
         ]);
 
+        // Karena semua presensi pakai QR, set default mode ke 'qr'
+        $validated['mode'] = 'qr';
         $validated['guru_id'] = Auth::id();
         $validated['is_active'] = true;
         $validated['is_closed'] = false;
 
         $session = PresensiSession::create($validated);
 
-        // Generate QR Code jika mode QR
-        if ($validated['mode'] === 'qr') {
-            $session->generateQRCode();
-        }
+        // Generate QR Code otomatis
+        $session->generateQRCode();
 
         // Buat record presensi untuk semua siswa di kelas
         $this->createPresensiRecords($session);
@@ -104,10 +104,7 @@ class PresensiController extends Controller
             abort(403, 'Anda tidak memiliki akses ke sesi presensi ini');
         }
 
-        if ($session->mode !== 'qr') {
-            return response()->json(['success' => false, 'message' => 'Hanya sesi dengan mode QR yang bisa regenerate QR Code']);
-        }
-
+        // Karena sekarang semua mode adalah QR, aman tanpa pengecekan
         $session->generateQRCode();
 
         return response()->json(['success' => true, 'message' => 'QR Code berhasil diperbarui']);
@@ -146,6 +143,23 @@ public function detail($id)
 
         return response()->json($stats);
     }
+public function updateStatus(Request $request, $id)
+{
+    $record = PresensiRecord::findOrFail($id);
+
+    $validStatuses = ['hadir', 'sakit', 'izin', 'tidak_hadir'];
+
+    if (!in_array($request->status, $validStatuses)) {
+        return response()->json(['success' => false, 'message' => 'Status tidak valid.']);
+    }
+
+    $record->status = $request->status;
+    $record->save();
+
+    return response()->json(['success' => true]);
+}
+
+
 
     private function createPresensiRecords(PresensiSession $session)
     {

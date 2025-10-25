@@ -1,4 +1,4 @@
-@extends('layout_siswa.app')
+@extends('siswa.presensi.layoutkhususpresensi.app')
 @section('konten')
 
 <style>

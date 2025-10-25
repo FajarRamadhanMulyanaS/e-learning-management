@@ -90,25 +90,35 @@ class PresensiRecord extends Model
         return $this->waktu_absen ? $this->waktu_absen->format('H:i:s') : '-';
     }
 
-    // Accessor untuk status dalam bahasa Indonesia
-    public function getStatusTextAttribute()
-    {
-        return match ($this->status) {
-            'hadir' => 'Hadir',
-            'terlambat' => 'Terlambat',
-            'tidak_hadir' => 'Tidak Hadir',
-            default => 'Tidak Hadir'
-        };
-    }
+
+
 
     // Accessor untuk badge class berdasarkan status
-    public function getStatusBadgeClassAttribute()
-    {
-        return match ($this->status) {
-            'hadir' => 'badge-success',
-            'terlambat' => 'badge-warning',
-            'tidak_hadir' => 'badge-danger',
-            default => 'badge-secondary'
-        };
-    }
+
+// Accessor untuk status dalam bahasa Indonesia
+public function getStatusTextAttribute()
+{
+    return match ($this->status) {
+        'hadir' => 'Hadir',
+        'terlambat' => 'Terlambat',
+        'tidak_hadir' => 'Tidak Hadir',
+        'sakit' => 'Sakit',
+        'izin' => 'Izin',
+        default => 'Tidak Hadir'
+    };
+}
+
+// Accessor untuk badge class berdasarkan status
+public function getStatusBadgeClassAttribute()
+{
+    return match ($this->status) {
+        'hadir' => 'badge-success',
+        'terlambat' => 'badge-warning',
+        'tidak_hadir' => 'badge-danger',
+        'sakit' => 'badge-info',
+        'izin' => 'badge-primary',
+        default => 'badge-secondary'
+    };
+}
+
 }
