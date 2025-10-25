@@ -39,10 +39,18 @@
             </div>
         </div>
     </div>
+<div class="mb-3 text-end">
+    <a href="{{ route('admin.presensi.export.excel', request()->query()) }}" class="btn btn-success btn-sm">
+        <i class="fas fa-file-excel"></i> Export Excel
+    </a>
+    <a href="{{ route('admin.presensi.export.pdf', request()->query()) }}" class="btn btn-danger btn-sm">
+        <i class="fas fa-file-pdf"></i> Export PDF
+    </a>
+</div>
 
     <!-- Filter -->
     <form method="GET" class="row g-3 mb-3">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label>Kelas</label>
             <select name="kelas_id" class="form-select">
                 <option value="">Semua Kelas</option>
@@ -53,15 +61,42 @@
                 @endforeach
             </select>
         </div>
-        <div class="col-md-3">
+
+        <div class="col-md-2">
+            <label>Mapel</label>
+            <select name="mapel_id" class="form-select">
+                <option value="">Semua Mapel</option>
+                @foreach ($mapels as $m)
+                    <option value="{{ $m->id }}" {{ request('mapel_id') == $m->id ? 'selected' : '' }}>
+                        {{ $m->nama_mapel }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label>Guru</label>
+            <select name="guru_id" class="form-select">
+                <option value="">Semua Guru</option>
+                @foreach ($gurus as $g)
+                    <option value="{{ $g->id }}" {{ request('guru_id') == $g->id ? 'selected' : '' }}>
+                        {{ $g->username }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col-md-2">
             <label>Tanggal Mulai</label>
             <input type="date" name="tanggal_mulai" class="form-control" value="{{ request('tanggal_mulai') }}">
         </div>
-        <div class="col-md-3">
+
+        <div class="col-md-2">
             <label>Tanggal Selesai</label>
             <input type="date" name="tanggal_selesai" class="form-control" value="{{ request('tanggal_selesai') }}">
         </div>
-        <div class="col-md-3 align-self-end">
+
+        <div class="col-md-2 align-self-end">
             <button class="btn btn-primary w-100"><i class="fas fa-search"></i> Filter</button>
         </div>
     </form>

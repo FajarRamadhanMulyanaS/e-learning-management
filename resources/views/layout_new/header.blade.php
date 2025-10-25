@@ -99,10 +99,7 @@
                                     <span>My Profile</span>
                                 </a>
                             @endif
-                            <a class="dropdown-item">
-                                <i class="ti-settings text-primary"></i>
-                                Settings
-                            </a>
+                           
 
                             <form id="logout-form" action="{{ route('logout') }}" method="POST"
                                 style="display: none;">

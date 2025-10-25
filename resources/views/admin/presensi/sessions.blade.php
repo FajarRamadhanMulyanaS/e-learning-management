@@ -29,6 +29,21 @@
                 </select>
             </div>
 
+            <!-- 🔹 Filter Mata Pelajaran -->
+            <div class="col-md-3">
+                <label class="form-label">Mata Pelajaran</label>
+                <select name="mapel_id" class="form-select">
+                    <option value="">Semua Mapel</option>
+                    @foreach ($mapels as $m)
+                        <option value="{{ $m->id }}" {{ request('mapel_id') == $m->id ? 'selected' : '' }}>
+                            {{ $m->nama_mapel }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-md-1 d-none d-md-block"></div>
+
             <div class="col-md-2">
                 <label class="form-label">Tanggal Mulai</label>
                 <input type="date" name="tanggal_mulai" class="form-control" value="{{ request('tanggal_mulai') }}">
@@ -45,8 +60,6 @@
                 </button>
             </div>
         </form>
-
-       
 
         <!-- Tabel Sesi Presensi -->
         <div class="card shadow-sm">
@@ -96,7 +109,6 @@
                                         @endif
                                     </td>
                                     <td class="text-center">
-
                                         <a href="{{ route('admin.presensi.detail', $session->id) }}"
                                             class="btn btn-sm btn-primary mb-1">
                                             <i class="fas fa-eye"></i> Detail
@@ -107,7 +119,7 @@
                                                 class="d-inline" onsubmit="return confirm('Tutup sesi presensi ini?')">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-warning">
-                                                    <i class="fas fa-times"></i> Tutup Presensi
+                                                    <i class="fas fa-times"></i> Tutup
                                                 </button>
                                             </form>
                                         @endif
@@ -131,6 +143,7 @@
             </div>
         </div>
     </div>
+
     <script>
         function closeSession(id) {
             if (confirm('Apakah Anda yakin ingin menutup sesi ini?')) {

@@ -868,6 +868,8 @@ Route::get('/admin/presensi/active-sessions', [App\Http\Controllers\AdminPresens
 
 Route::get('/admin/presensi/sessions/{id}', [App\Http\Controllers\AdminPresensiController::class, 'showSession'])
     ->name('admin.presensi.session.show');
+Route::get('/admin/presensi/export/excel', [AdminPresensiController::class, 'exportLaporanExcel'])->name('admin.presensi.export.excel');
+Route::get('/admin/presensi/export/pdf', [AdminPresensiController::class, 'exportLaporanPDF'])->name('admin.presensi.export.pdf');
 
 // Tutup sesi presensi (Admin)
 Route::post('/admin/presensi/close/{id}', function ($id) {

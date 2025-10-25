@@ -23,12 +23,6 @@
             </a>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('auth.change-password2') }}">
-                <i class="fa-solid fa-key menu-icon"></i>
-            <span class="menu-title">Ganti Password</span>
-            </a>
-        </li>
 
 
         <li class="nav-item">
@@ -71,16 +65,7 @@
                 <span class="menu-title">Laporan Siswa</span>
             </a>
         </li>
-        <li class="nav-item">
-            @auth
-                @if(Auth::user()->role === 'admin')
-                    <a class="nav-link" href="{{ route('admin.profil_admin', ['id' => Auth::id()]) }}">
-                        <i class="icon-head menu-icon"></i>
-                        <span class="menu-title">Profil</span>
-                    </a>
-                @endif
-            @endauth
-        </li>
+       
 
 
         @endif
