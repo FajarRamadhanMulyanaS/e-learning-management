@@ -160,7 +160,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-4 col-6 mb-3">
                     <div class="card bg-warning text-dark">
                         <div class="card-body">
@@ -188,7 +188,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-lg-2 col-md-4 col-6 mb-3">
                     <div class="card bg-primary text-white">
                         <div class="card-body">
@@ -205,203 +205,224 @@
     {{-- ========================================================== --}}
 
 
-    <div class="card">
-    <div class="card-header">
-        <h5 class="mb-0">Daftar Siswa</h5>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Siswa</th>
-                        <th>Status</th>
-                        <th>Waktu Absen</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($session->presensiRecords as $index => $record)
+    <div class="d-flex justify-content-center mt-4">
+    <div class="card shadow-lg" style="width: 90%; max-width: 1000px;">
+        <div class="card-header text-center bg-primary text-white">
+            <h5 class="mb-0">Daftar Siswa</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive text-center">
+                <table class="table table-striped align-middle">
+                    <thead class="table-light">
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $record->siswa->username }}</td>
-                            <td>
-                                {{-- Ini mengambil class badge dari Model PresensiRecord --}}
-                                <span class="badge {{ $record->status_badge_class }}">
-                                    {{ $record->status_text }}
-                                </span>
-                            </td>
-                            <td>{{ $record->waktu_absen_formatted }}</td>
-                            <td>
-                                <div class="status-buttons d-flex gap-2 justify-content-center">
-                                  @foreach (['hadir' => 'green', 'sakit' => 'orange', 'izin' => 'blue', 'tidak_hadir' => 'red'] as $status => $color)
-                                        <div class="status-circle {{ $record->status === $status ? 'active' : '' }}"
-                                            data-status="{{ $status }}" data-id="{{ $record->id }}"
-                                            style="background-color: {{ $record->status === $status ? $color : 'transparent' }};
-                           border: 2px solid {{ $color }};
-                           width: 25px; height: 25px; border-radius: 50%; cursor: pointer;">
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </td>
+                            <th>No</th>
+                            <th>Nama Siswa</th>
+                            <th>Status</th>
+                            <th>Waktu Absen</th>
+                            <th>Aksi</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($session->presensiRecords as $index => $record)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $record->siswa->username }}</td>
+                                <td>
+                                    <span class="badge {{ $record->status_badge_class }}">
+                                        {{ $record->status_text }}
+                                    </span>
+                                </td>
+                                <td>{{ $record->waktu_absen_formatted }}</td>
+                                <td class="text-center">
+                                    <div class="status-labels d-flex gap-3 justify-content-center mb-1">
+                                        <small class="text-success fw-semibold">Hadir</small>
+                                        <small class="text-info fw-semibold">Izin</small>
+                                        <small class="text-warning fw-semibold">Sakit</small>
+                                        <small class="text-danger fw-semibold">Alpa</small>
+                                    </div>
+
+                                    <div class="status-buttons d-flex gap-3 justify-content-center">
+                                        @foreach (['hadir' => 'green', 'izin' => 'blue', 'sakit' => 'orange', 'tidak_hadir' => 'red'] as $status => $color)
+                                            <div class="status-circle {{ $record->status === $status ? 'active' : '' }}"
+                                                data-status="{{ $status }}" data-id="{{ $record->id }}"
+                                                style="background-color: {{ $record->status === $status ? $color : 'transparent' }};
+                                                    border: 2px solid {{ $color }};
+                                                    width: 25px; height: 25px; border-radius: 50%; cursor: pointer;">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-<style>
-.status-buttons .status-circle.active {
-    box-shadow: 0 0 6px rgba(0,0,0,0.2);
-}
-.status-buttons .status-circle:hover {
-    transform: scale(1.1);
-}
-</style>
 
-{{-- =============================================== --}}
-{{-- ========== BLOK SCRIPT (SUDAH FINAL) ========== --}}
-{{-- =============================================== --}}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Peta untuk warna lingkaran aksi
-    const statusColors = {
-        hadir: 'green',
-        sakit: 'orange',
-        izin: 'blue',
-        tidak_hadir: 'red'
-    };
+    <style>
+        .status-buttons .status-circle.active {
+            box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+        }
 
-    // Peta untuk teks di kolom status tabel
-    const statusTexts = {
-        hadir: 'Hadir',
-        sakit: 'Sakit',
-        izin: 'Izin',
-        tidak_hadir: 'Tidak Hadir' // Teks di tabel
-    };
+        .status-buttons .status-circle:hover {
+            transform: scale(1.1);
+        }
 
-    // Peta untuk kelas badge Bootstrap di tabel
-    const statusBadgeClasses = {
-        hadir: 'bg-success',
-        sakit: 'bg-warning',
-        izin: 'bg-info',
-        tidak_hadir: 'bg-danger', // 'Tidak Hadir' di tabel -> badge merah
-        terlambat: 'bg-warning' 
-    };
+        .status-labels small {
+            font-size: 12px;
+            display: inline-block;
+            width: 40px;
+            text-align: center;
+        }
+    </style>
 
-    // Fungsi untuk update statistik di card atas
-    function updateStats() {
-        let hadirCount = 0;
-        let sakitCount = 0;
-        let izinCount = 0;
-        let alpaCount = 0;
-        
-        // Ambil 'terlambat' dari DOM, karena tidak diatur manual
-        const terlambatCount = parseInt(document.getElementById('stats-terlambat').textContent) || 0;
+    {{-- =============================================== --}}
+    {{-- ========== BLOK SCRIPT (SUDAH FINAL) ========== --}}
+    {{-- =============================================== --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Peta untuk warna lingkaran aksi
+            const statusColors = {
+                hadir: 'green',
+                sakit: 'orange',
+                izin: 'blue',
+                tidak_hadir: 'red'
+            };
 
-        const rows = document.querySelectorAll('tbody tr');
-        const totalSiswa = rows.length;
+            // Peta untuk teks di kolom status tabel
+            const statusTexts = {
+                hadir: 'Hadir',
+                sakit: 'Sakit',
+                izin: 'Izin',
+                tidak_hadir: 'Tidak Hadir' // Teks di tabel
+            };
 
-        rows.forEach(row => {
-            const badge = row.querySelector('td:nth-child(3) .badge');
-            if (!badge) return;
-            
-            const statusText = badge.textContent.trim();
+            // Peta untuk kelas badge Bootstrap di tabel
+            const statusBadgeClasses = {
+                hadir: 'bg-success',
+                sakit: 'bg-warning',
+                izin: 'bg-info',
+                tidak_hadir: 'bg-danger', // 'Tidak Hadir' di tabel -> badge merah
+                terlambat: 'bg-warning'
+            };
 
-            // Memecah perhitungan berdasarkan teks di badge
-            if (statusText === 'Hadir') {
-                hadirCount++;
-            } else if (statusText === 'Sakit') {
-                sakitCount++;
-            } else if (statusText === 'Izin') {
-                izinCount++;
-            } else if (statusText === 'Tidak Hadir') { // Teks "Tidak Hadir" di tabel dihitung sebagai Alpa
-                alpaCount++;
-            }
-            // Status 'Terlambat' sudah dihitung di awal
-        });
+            // Fungsi untuk update statistik di card atas
+            function updateStats() {
+                let hadirCount = 0;
+                let sakitCount = 0;
+                let izinCount = 0;
+                let alpaCount = 0;
 
-        // Hitung ulang persentase
-        const totalHadirDanTerlambat = hadirCount + terlambatCount;
-        const persentase = (totalSiswa > 0) ? Math.round((totalHadirDanTerlambat / totalSiswa) * 100) : 0;
+                // Ambil 'terlambat' dari DOM, karena tidak diatur manual
+                const terlambatCount = parseInt(document.getElementById('stats-terlambat').textContent) || 0;
 
-        // Update angka di DOM
-        document.getElementById('stats-hadir').textContent = hadirCount;
-        document.getElementById('stats-sakit').textContent = sakitCount;
-        document.getElementById('stats-izin').textContent = izinCount;
-        document.getElementById('stats-alpa').textContent = alpaCount;
-        document.getElementById('stats-persentase').textContent = persentase + '%';
-    }
+                const rows = document.querySelectorAll('tbody tr');
+                const totalSiswa = rows.length;
 
-
-    // Event listener untuk lingkaran aksi
-    document.querySelectorAll('.status-circle').forEach(circle => {
-        circle.addEventListener('click', function() {
-            const id = this.dataset.id;
-            const status = this.dataset.status;
-            const parent = this.closest('.status-buttons');
-            const row = this.closest('tr');
-
-            if (this.classList.contains('active')) {
-                return; 
-            }
-
-            fetch(`/guru/presensi/update-status/${id}`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status })
-            })
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
-                }
-                return res.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // 1. Reset lingkaran
-                    parent.querySelectorAll('.status-circle').forEach(el => {
-                        el.classList.remove('active');
-                        el.style.backgroundColor = 'transparent';
-                    });
-
-                    // 2. Aktifkan lingkaran
-                    this.classList.add('active');
-                    this.style.backgroundColor = statusColors[status];
-
-                    // 3. Update badge status di tabel
+                rows.forEach(row => {
                     const badge = row.querySelector('td:nth-child(3) .badge');
-                    
-                    badge.textContent = statusTexts[status]; 
-                    badge.className = 'badge'; 
-                    badge.classList.add(statusBadgeClasses[status]);
+                    if (!badge) return;
 
-                    // 4. Panggil fungsi update statistik
-                    updateStats();
+                    const statusText = badge.textContent.trim();
 
-                    showToast('Status berhasil diperbarui!');
-                } else {
-                    alert(data.message || 'Gagal memperbarui status!');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Terjadi kesalahan. Cek konsol (F12) untuk detail. Pastikan rute dan controller sudah benar.');
+                    // Memecah perhitungan berdasarkan teks di badge
+                    if (statusText === 'Hadir') {
+                        hadirCount++;
+                    } else if (statusText === 'Sakit') {
+                        sakitCount++;
+                    } else if (statusText === 'Izin') {
+                        izinCount++;
+                    } else if (statusText ===
+                        'Tidak Hadir') { // Teks "Tidak Hadir" di tabel dihitung sebagai Alpa
+                        alpaCount++;
+                    }
+                    // Status 'Terlambat' sudah dihitung di awal
+                });
+
+                // Hitung ulang persentase
+                const totalHadirDanTerlambat = hadirCount + terlambatCount;
+                const persentase = (totalSiswa > 0) ? Math.round((totalHadirDanTerlambat / totalSiswa) * 100) : 0;
+
+                // Update angka di DOM
+                document.getElementById('stats-hadir').textContent = hadirCount;
+                document.getElementById('stats-sakit').textContent = sakitCount;
+                document.getElementById('stats-izin').textContent = izinCount;
+                document.getElementById('stats-alpa').textContent = alpaCount;
+                document.getElementById('stats-persentase').textContent = persentase + '%';
+            }
+
+
+            // Event listener untuk lingkaran aksi
+            document.querySelectorAll('.status-circle').forEach(circle => {
+                circle.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const status = this.dataset.status;
+                    const parent = this.closest('.status-buttons');
+                    const row = this.closest('tr');
+
+                    if (this.classList.contains('active')) {
+                        return;
+                    }
+
+                    fetch(`/guru/presensi/update-status/${id}`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                status
+                            })
+                        })
+                        .then(res => {
+                            if (!res.ok) {
+                                throw new Error(`HTTP error! status: ${res.status}`);
+                            }
+                            return res.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // 1. Reset lingkaran
+                                parent.querySelectorAll('.status-circle').forEach(el => {
+                                    el.classList.remove('active');
+                                    el.style.backgroundColor = 'transparent';
+                                });
+
+                                // 2. Aktifkan lingkaran
+                                this.classList.add('active');
+                                this.style.backgroundColor = statusColors[status];
+
+                                // 3. Update badge status di tabel
+                                const badge = row.querySelector('td:nth-child(3) .badge');
+
+                                badge.textContent = statusTexts[status];
+                                badge.className = 'badge';
+                                badge.classList.add(statusBadgeClasses[status]);
+
+                                // 4. Panggil fungsi update statistik
+                                updateStats();
+
+                                showToast('Status berhasil diperbarui!');
+                            } else {
+                                alert(data.message || 'Gagal memperbarui status!');
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert(
+                                'Terjadi kesalahan. Cek konsol (F12) untuk detail. Pastikan rute dan controller sudah benar.');
+                        });
+                });
             });
         });
-    });
-});
 
-function showToast(msg) {
-    const toast = document.createElement('div');
-    toast.textContent = msg;
-    toast.style.cssText = `
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.textContent = msg;
+            toast.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
@@ -413,23 +434,23 @@ function showToast(msg) {
         z-index: 9999;
         animation: fadeInOut 3s ease;
     `;
-    const styleSheet = document.createElement("style");
-    styleSheet.type = "text/css";
-    styleSheet.innerText = `
+            const styleSheet = document.createElement("style");
+            styleSheet.type = "text/css";
+            styleSheet.innerText = `
         @keyframes fadeInOut {
             0%, 100% { opacity: 0; transform: translateY(-20px); }
             10%, 90% { opacity: 1; transform: translateY(0); }
         }
     `;
-    document.head.appendChild(styleSheet);
-    
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-}
-</script>
-{{-- =============================================== --}}
-{{--        AKHIR BLOK SCRIPT DIPERBARUI         --}}
-{{-- =============================================== --}}
+            document.head.appendChild(styleSheet);
+
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+    {{-- =============================================== --}}
+    {{--        AKHIR BLOK SCRIPT DIPERBARUI         --}}
+    {{-- =============================================== --}}
 
 
     @if ($session->mode === 'qr' && $session->qr_code)
@@ -608,7 +629,5 @@ function showToast(msg) {
                 }, 1000);
             });
         </script>
-
-
     @endif
 @endsection

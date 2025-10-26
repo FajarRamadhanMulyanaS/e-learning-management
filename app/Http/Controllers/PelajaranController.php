@@ -6,20 +6,28 @@ use Illuminate\Http\Request;
 use App\Models\Jadwal;
 use App\Models\Semester;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Siswa;
 
 class PelajaranController extends Controller
 {
-    //
-
     public function jadwal()
     {
         $user = Auth::user();
 
-        // --- INI ADALAH BARIS YANG DIPERBAIKI ---
-        $kelasId = optional($user->siswa)->kelas_id;
+        // Ambil data siswa yang sedang login
+        $siswa = $user->siswa;
 
+        if (!$siswa) {
+            return back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+
+        // Ambil kelas ID dari siswa
+        $kelasId = $siswa->kelas_id;
+
+        // Ambil semester aktif
         $activeSemester = Semester::active()->first();
 
+        // Ambil jadwal berdasarkan kelas dan semester aktif
         $jadwal = Jadwal::with(['kelas', 'mapel', 'user'])
             ->when($kelasId, function ($q) use ($kelasId) {
                 $q->where('kelas_id', $kelasId);
@@ -31,8 +39,11 @@ class PelajaranController extends Controller
             ->orderBy('jam_mulai')
             ->get();
 
-        return view('siswa.jadwal', compact('jadwal', 'activeSemester'));
+        // Kirim data ke view
+        return view('siswa.jadwal', compact('jadwal', 'activeSemester', 'siswa'));
     }
+
+    // --- Sisa fungsi tetap ---
     public function indo()
     {
         return view('siswa.pelajaran.bhs_indo');

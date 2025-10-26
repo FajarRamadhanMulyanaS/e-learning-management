@@ -18,7 +18,6 @@
         <tr><th>Guru</th><td>{{ $session->guru->username ?? '-' }}</td></tr>
         <tr><th>Mata Pelajaran</th><td>{{ $session->mapel->nama_mapel ?? '-' }}</td></tr>
         <tr><th>Kelas</th><td>{{ $session->kelas->nama_kelas ?? '-' }}</td></tr>
-        <tr><th>Mode</th><td>{{ strtoupper($session->mode) }}</td></tr>
     </table>
 
     <h4>Daftar Siswa</h4>
@@ -29,7 +28,6 @@
                 <th>Nama Siswa</th>
                 <th>Status</th>
                 <th>Waktu Absen</th>
-                <th>Metode</th>
             </tr>
         </thead>
         <tbody>
@@ -39,7 +37,6 @@
                 <td>{{ $record->siswa->username ?? '-' }}</td>
                 <td>{{ $record->status ?? 'Tidak Hadir' }}</td>
                 <td>{{ $record->waktu_absen ? \Carbon\Carbon::parse($record->waktu_absen)->format('H:i') : '-' }}</td>
-                <td>{{ strtoupper($record->metode_absen ?? '-') }}</td>
             </tr>
             @endforeach
         </tbody>

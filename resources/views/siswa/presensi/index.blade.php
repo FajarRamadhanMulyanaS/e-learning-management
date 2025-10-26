@@ -138,7 +138,6 @@
                             <th>Guru</th>
                             <th>Status</th>
                             <th>Waktu Absen</th>
-                            <th>Metode</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -154,13 +153,6 @@
                                     </span>
                                 </td>
                                 <td>{{ $record->waktu_absen_formatted }}</td>
-                                <td>
-                                    @if($record->metode_absen)
-                                        <span class="badge badge-info">{{ strtoupper($record->metode_absen) }}</span>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
                             </tr>
                         @empty
                             <tr>
