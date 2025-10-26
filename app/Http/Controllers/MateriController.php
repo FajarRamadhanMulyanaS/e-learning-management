@@ -126,8 +126,15 @@ public function update(Request $request, $id)
     // tampilan materi untuk siswa
     public function indexSiswa()
     {
-        // Ambil kelas_id dari user yang sedang login
-        $kelasId = Auth::user()->kelas_id;
+        // Ambil kelas_id dari user yang sedang login melalui relasi siswa
+        $user = Auth::user();
+        
+        // Pastikan user memiliki relasi siswa
+        if (!$user->siswa) {
+            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+        
+        $kelasId = $user->siswa->kelas_id;
 
         // Ambil materi sesuai kelas_id
         $materi = Materi::with(['mapel', 'user'])
@@ -140,8 +147,15 @@ public function update(Request $request, $id)
     // Detail untuk materi Siswa
     public function detailMateri($id)
     {
-        // Ambil kelas_id dari user yang sedang login
-        $kelasId = Auth::user()->kelas_id;
+        // Ambil kelas_id dari user yang sedang login melalui relasi siswa
+        $user = Auth::user();
+        
+        // Pastikan user memiliki relasi siswa
+        if (!$user->siswa) {
+            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+        
+        $kelasId = $user->siswa->kelas_id;
 
         // Ambil materi sesuai id dan kelas_id
         $materi = Materi::with(['mapel', 'user'])

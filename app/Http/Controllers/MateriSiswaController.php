@@ -12,9 +12,19 @@ class MateriSiswaController extends Controller
     // ID untuk mata pelajaran Bahasa Indonesia
     $bahasaIndonesiaId = 1; // Sesuaikan dengan ID yang ada di tabel mapels
 
+    // Ambil kelas_id dari user yang sedang login melalui relasi siswa
+    $user = auth()->user();
+    
+    // Pastikan user memiliki relasi siswa
+    if (!$user->siswa) {
+        return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+    }
+    
+    $kelasId = $user->siswa->kelas_id;
+
     // Ambil data materi berdasarkan mapel_id dan kelas_id yang sedang login
     $materis = Materi::where('mapel_id', $bahasaIndonesiaId)
-                     ->where('kelas_id', auth()->user()->kelas_id) // Sesuaikan dengan atribut kelas di model user
+                     ->where('kelas_id', $kelasId)
                      ->get();
 
     // Ambil nama mata pelajaran
@@ -27,9 +37,19 @@ public function indexMatematika(Request $request)
     // ID untuk mata pelajaran Matematika
     $matematikaId = 2; // Pastikan ID sesuai dengan tabel mapels
 
+    // Ambil kelas_id dari user yang sedang login melalui relasi siswa
+    $user = auth()->user();
+    
+    // Pastikan user memiliki relasi siswa
+    if (!$user->siswa) {
+        return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+    }
+    
+    $kelasId = $user->siswa->kelas_id;
+
     // Ambil data materi yang hanya untuk Matematika dan kelas siswa yang sedang login
     $materis = Materi::where('mapel_id', $matematikaId)
-                     ->where('kelas_id', auth()->user()->kelas_id) // Menyesuaikan kelas siswa yang login
+                     ->where('kelas_id', $kelasId)
                      ->get();
 
     // Ambil nama mata pelajaran untuk ditampilkan

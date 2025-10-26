@@ -111,8 +111,14 @@ class VideoController extends Controller
     public function indexSiswa()
     {
         // Mendapatkan data user yang sedang login
-        $user = auth()->user(); // Ambil data user yang login
-        $kelasId = $user->kelas_id; // Ambil kelas_id dari user
+        $user = auth()->user();
+        
+        // Pastikan user memiliki relasi siswa
+        if (!$user->siswa) {
+            return redirect()->back()->with('error', 'Data siswa tidak ditemukan.');
+        }
+        
+        $kelasId = $user->siswa->kelas_id; // Ambil kelas_id melalui relasi siswa
 
         // Ambil video berdasarkan kelas siswa atau video umum (null kelas)
         $videos = Video::with(['mapel', 'kelas'])
