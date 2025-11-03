@@ -49,8 +49,8 @@
                                 <td>{{ $sessions->firstItem() + $index }}</td>
                                 <td>{{ $session->tanggal->format('d/m/Y') }}</td>
                                 <td>{{ $session->jam_mulai_formatted }}</td>
-                                <td>{{ $session->kelas->nama_kelas }}</td>
-                                <td>{{ $session->mapel->nama_mapel }}</td>
+                                <td>{{ $session->kelas->nama_kelas ?? '-' }}</td>
+                                <td>{{ $session->mapel->nama_mapel ?? '-' }}</td>
                                 <td>
                                     @if($session->is_active && !$session->is_closed)
                                         <span class="badge bg-success">Aktif</span>
