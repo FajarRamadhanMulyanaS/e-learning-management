@@ -674,7 +674,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('guru/tugas/{id}/koreksi', [TugasSiswaController::class, 'koreksiTugas'])->name('guru.koreksiTugas');
 
 
-
+  Route::get('/guru/profil', [ProfileController::class, 'showProfilGuru'])->name('guru.profil.profil_guru');
+    Route::post('/guru/profil/update', [ProfileController::class, 'updateProfilGuru'])->name('guru.profil.update');
 
     Route::put('/guru/profil/{id}', [ProfileController::class, 'updateProfilGuru'])->name('guru.profil.updateProfilGuru');
 

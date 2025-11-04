@@ -5,7 +5,7 @@
       <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © E-Learning</span>
 
     </div>
-    <span class="text-muted d-block text-center text-sm-left d-sm-inline-block mt-2">Distributed By: <a href="https://www.themewagon.com/" target="_blank">Anugrah</a></span>
+
   </footer>
 
  <!-- partial -->
