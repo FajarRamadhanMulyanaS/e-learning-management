@@ -23,7 +23,7 @@
                 <div class="d-flex justify-content-between align-items-center mt-3">
                     <small class="text-muted">
                         <i class="fa-solid fa-user me-1"></i>
-                        Dibuat oleh: <strong>{{ $thread->user->name }}</strong>
+                        Dibuat oleh: <strong>{{ $thread->user->name ?? 'Pengguna Tidak Dikenal' }}</strong>
                     </small>
                     <small class="text-muted">
                         <i class="fa-solid fa-clock me-1"></i>
