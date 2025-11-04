@@ -24,7 +24,13 @@
         </li>
 
 
-
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.landing.index') }}">
+                <i class="fas fa-edit menu-icon"></i>
+                <span class="menu-title">Edit Landing Page</span>
+            </a>
+        </li>
+        
         <li class="nav-item">
             <a class="nav-link" href="{{route('admin.guru-mapel.index')}}">
                 <i class="fas fa-users-cog menu-icon"></i>

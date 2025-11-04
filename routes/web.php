@@ -38,7 +38,7 @@ use App\Http\Controllers\SemesterController; // <-- Tambahkan ini
 use App\Http\Controllers\MapelController; // <-- Tambahkan ini
 use App\Http\Controllers\KelasController; // <-- Tambahkan ini
 use App\Http\Controllers\AdminJadwalController; // <-- Tambahkan ini
-
+use App\Http\Controllers\Admin\LandingContentController;
 Route::get('/', function () {
     return redirect()->route('homepage'); // Redirect to login page
 });
@@ -881,6 +881,12 @@ Route::get('/admin/presensi/sessions/{id}', [App\Http\Controllers\AdminPresensiC
     ->name('admin.presensi.session.show');
 Route::get('/admin/presensi/export/excel', [AdminPresensiController::class, 'exportLaporanExcel'])->name('admin.presensi.export.excel');
 Route::get('/admin/presensi/export/pdf', [AdminPresensiController::class, 'exportLaporanPDF'])->name('admin.presensi.export.pdf');
+
+
+Route::prefix('admin')->middleware('auth')->group(function () {
+    Route::get('/landing', [LandingContentController::class, 'index'])->name('admin.landing.index');
+    Route::post('/landing', [LandingContentController::class, 'update'])->name('admin.landing.update');
+});
 
 // Tutup sesi presensi (Admin)
 Route::post('/admin/presensi/close/{id}', function ($id) {

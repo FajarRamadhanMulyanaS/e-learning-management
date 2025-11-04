@@ -26,6 +26,57 @@
             margin-top: 5px;
         }
 
+    .modal-qr {
+    display: none; /* default disembunyikan */
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-qr.show {
+    display: flex; /* muncul saat class show ditambahkan */
+    opacity: 1;
+}
+
+/* Ukuran QR di modal */
+.modal-qr canvas {
+    width: 450px;        /* ubah ukuran sesuai kebutuhan */
+    height: 450px;       /* pastikan sama agar proporsional */
+    max-width: 90vw;     /* tetap responsif di layar kecil */
+    max-height: 90vh;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+    transform: scale(1);
+    transition: transform 0.3s ease;
+}
+
+/* Efek zoom-in halus saat muncul */
+.modal-qr.show canvas {
+    transform: scale(1.1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 2rem;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+
+
         /* QR Code dengan background biru */
         #qrcode-wrapper {
             background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
@@ -112,17 +163,19 @@
 
         @if ($session->mode === 'qr' && $session->qr_code)
             <div class="card mb-4 shadow-sm border-0">
-
+                <!-- Modal QR -->
+                <div class="modal-qr" id="qrModal" onclick="closeQRModal(event)">
+                    <span class="modal-close" onclick="closeQRModal(event)">&times;</span>
+                    <canvas id="qrcodeModal"></canvas>
+                </div>
 
                 <div class="card-body d-flex flex-column align-items-center justify-content-center py-4">
-                    <div id="qrcode-wrapper" class="p-3 bg-white shadow-sm rounded"
-                        style="display: inline-block; transition: all 0.3s ease;">
+                    <div id="qrcode-wrapper" class="p-3 bg-white shadow-sm rounded cursor-pointer"
+                        style="display: inline-block; transition: all 0.3s ease; cursor: pointer;" onclick="openQRModal()">
                         <canvas id="qrcode"></canvas>
                         <button class="btn btn-outline-primary mt-3" id="downloadQR">
                             <i class="fas fa-download"></i> Download QR Code
                         </button>
-
-
                     </div>
                 </div>
 
@@ -132,6 +185,8 @@
                 </p>
                 <p class="text-danger fw-bold" id="qr-timer"></p>
             </div>
+
+
     </div>
     @endif
 
@@ -206,60 +261,60 @@
 
 
     <div class="d-flex justify-content-center mt-4">
-    <div class="card shadow-lg" style="width: 90%; max-width: 1000px;">
-        <div class="card-header text-center bg-primary text-white">
-            <h5 class="mb-0">Daftar Siswa</h5>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive text-center">
-                <table class="table table-striped align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Siswa</th>
-                            <th>Status</th>
-                            <th>Waktu Absen</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($session->presensiRecords as $index => $record)
+        <div class="card shadow-lg" style="width: 90%; max-width: 1000px;">
+            <div class="card-header text-center bg-primary text-white">
+                <h5 class="mb-0">Daftar Siswa</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive text-center">
+                    <table class="table table-striped align-middle">
+                        <thead class="table-light">
                             <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>{{ $record->siswa->username }}</td>
-                                <td>
-                                    <span class="badge {{ $record->status_badge_class }}">
-                                        {{ $record->status_text }}
-                                    </span>
-                                </td>
-                                <td>{{ $record->waktu_absen_formatted }}</td>
-                                <td class="text-center">
-                                    <div class="status-labels d-flex gap-3 justify-content-center mb-1">
-                                        <small class="text-success fw-semibold">Hadir</small>
-                                        <small class="text-info fw-semibold">Izin</small>
-                                        <small class="text-warning fw-semibold">Sakit</small>
-                                        <small class="text-danger fw-semibold">Alpa</small>
-                                    </div>
+                                <th>No</th>
+                                <th>Nama Siswa</th>
+                                <th>Status</th>
+                                <th>Waktu Absen</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($session->presensiRecords as $index => $record)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $record->siswa->username }}</td>
+                                    <td>
+                                        <span class="badge {{ $record->status_badge_class }}">
+                                            {{ $record->status_text }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $record->waktu_absen_formatted }}</td>
+                                    <td class="text-center">
+                                        <div class="status-labels d-flex gap-3 justify-content-center mb-1">
+                                            <small class="text-success fw-semibold">Hadir</small>
+                                            <small class="text-info fw-semibold">Izin</small>
+                                            <small class="text-warning fw-semibold">Sakit</small>
+                                            <small class="text-danger fw-semibold">Alpa</small>
+                                        </div>
 
-                                    <div class="status-buttons d-flex gap-3 justify-content-center">
-                                        @foreach (['hadir' => 'green', 'izin' => 'blue', 'sakit' => 'orange', 'tidak_hadir' => 'red'] as $status => $color)
-                                            <div class="status-circle {{ $record->status === $status ? 'active' : '' }}"
-                                                data-status="{{ $status }}" data-id="{{ $record->id }}"
-                                                style="background-color: {{ $record->status === $status ? $color : 'transparent' }};
+                                        <div class="status-buttons d-flex gap-3 justify-content-center">
+                                            @foreach (['hadir' => 'green', 'izin' => 'blue', 'sakit' => 'orange', 'tidak_hadir' => 'red'] as $status => $color)
+                                                <div class="status-circle {{ $record->status === $status ? 'active' : '' }}"
+                                                    data-status="{{ $status }}" data-id="{{ $record->id }}"
+                                                    style="background-color: {{ $record->status === $status ? $color : 'transparent' }};
                                                     border: 2px solid {{ $color }};
                                                     width: 25px; height: 25px; border-radius: 50%; cursor: pointer;">
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
     <style>
@@ -278,6 +333,54 @@
             text-align: center;
         }
     </style>
+
+    <script>
+        function openQRModal() {
+            const modal = document.getElementById('qrModal');
+            const qrModalCanvas = document.getElementById('qrcodeModal');
+
+            // Cari elemen QR di wrapper (bisa IMG atau CANVAS)
+            const qrElement = document.querySelector(
+                '#qrcode-wrapper img, #qrcode-wrapper canvas, #qrcode-wrapper #qrcode');
+            if (!qrElement) return;
+
+            const ctx = qrModalCanvas.getContext('2d');
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+
+            // Dapatkan data URL dari elemen QR
+            if (qrElement.tagName === 'IMG') {
+                img.src = qrElement.src;
+            } else if (qrElement.tagName === 'CANVAS') {
+                img.src = qrElement.toDataURL('image/png');
+            } else {
+                // fallback jika ada elemen lain
+                img.src = qrElement.getAttribute('src') || '';
+            }
+
+            img.onload = function() {
+                // skala supaya tidak melebihi layar
+                const maxSize = Math.min(window.innerWidth * 0.9, window.innerHeight * 0.9);
+                let w = img.width;
+                let h = img.height;
+                const ratio = Math.min(maxSize / w, maxSize / h, 1);
+                qrModalCanvas.width = Math.round(w * ratio);
+                qrModalCanvas.height = Math.round(h * ratio);
+                ctx.clearRect(0, 0, qrModalCanvas.width, qrModalCanvas.height);
+                ctx.drawImage(img, 0, 0, qrModalCanvas.width, qrModalCanvas.height);
+            };
+
+            modal.classList.add('show');
+        }
+
+        function closeQRModal(event) {
+            const modal = document.getElementById('qrModal');
+            // Tutup modal hanya jika klik di luar QR atau tombol close
+            if (event.target.classList.contains('modal-qr') || event.target.classList.contains('modal-close')) {
+                modal.classList.remove('show');
+            }
+        }
+    </script>
 
     {{-- =============================================== --}}
     {{-- ========== BLOK SCRIPT (SUDAH FINAL) ========== --}}
@@ -413,7 +516,8 @@
                         .catch(err => {
                             console.error(err);
                             alert(
-                                'Terjadi kesalahan. Cek konsol (F12) untuk detail. Pastikan rute dan controller sudah benar.');
+                                'Terjadi kesalahan. Cek konsol (F12) untuk detail. Pastikan rute dan controller sudah benar.'
+                            );
                         });
                 });
             });
@@ -480,10 +584,14 @@
 
                     const qrElement = qrContainer.querySelector('img') || qrContainer.querySelector('canvas');
                     if (qrElement) {
+                        // Pastikan terlihat seperti tombol dan bisa diklik untuk membuka modal
+                        qrElement.id = 'qrcode';
+                        qrElement.style.cursor = 'pointer';
                         qrElement.style.backgroundColor = '#ffffff';
                         qrElement.style.padding = '10px';
                         qrElement.style.borderRadius = '8px';
                         qrElement.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                        qrElement.addEventListener('click', openQRModal);
                     }
 
                     console.log('QR Code berhasil dibuat.');
