@@ -34,21 +34,21 @@
         <li class="nav-item">
             <a class="nav-link" href="{{route('admin.guru-mapel.index')}}">
                 <i class="fas fa-users-cog menu-icon"></i>
-            <span class="menu-title">Guru Mata Pelajaran</span>
+            <span class="menu-title">Pengajar Mapel</span>
             </a>
         </li>
 
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.siswa.index') }}">
                 <i class="fas fa-users menu-icon"></i>
-            <span class="menu-title">Daftar Siswa</span>
+            <span class="menu-title">Daftar Pelajar</span>
             </a>
         </li>
 
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.guru.index') }}">
                 <i class="fas fa-chalkboard-teacher menu-icon"></i>
-            <span class="menu-title"> Daftar Guru</span>
+            <span class="menu-title"> Daftar Pengajar</span>
             </a>
         </li>
 
@@ -68,7 +68,7 @@
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.laporan.index') }}">
                 <i class="fas fa-chart-bar menu-icon"></i>
-                <span class="menu-title">Laporan Siswa</span>
+                <span class="menu-title">Laporan Pelajar</span>
             </a>
         </li>
        

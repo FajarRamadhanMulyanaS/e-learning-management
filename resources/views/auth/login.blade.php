@@ -26,7 +26,7 @@
 
                 <!-- Input dinamis untuk email/NIS/NIP -->
                 <div class="mb-4">
-                    <label id="dynamic-label" for="identifier" class="form-label">{{ __('Email/NIS/NIP Address') }}</label>
+                    <label id="dynamic-label" for="identifier" class="form-label">{{ __('Masukan ID pelajar') }}</label>
                     <input id="identifier" type="text" class="form-control bg-dark text-white border-0 @error('identifier') is-invalid @enderror" name="identifier" value="{{ old('identifier') }}" required autofocus placeholder="Enter your email/nis/nip">
 
                     @error('identifier')

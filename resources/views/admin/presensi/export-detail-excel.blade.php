@@ -6,7 +6,7 @@
         </tr>
         <tr>
             <th>Tanggal</th>
-            <th>Guru</th>
+            <th>Pengajar</th>
             <th>Mata Pelajaran</th>
             <th>Kelas</th>
             {{-- [PERBAIKAN] Kolom 'Mode' dihapus --}}
@@ -27,7 +27,7 @@
     <thead>
         <tr>
             <th>No</th>
-            <th>Nama Siswa</th>
+            <th>Nama Pelajar</th>
             <th>Status</th>
             <th>Waktu Absen</th>
             {{-- [PERBAIKAN] Kolom 'Metode' dihapus --}}

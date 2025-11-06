@@ -98,9 +98,9 @@
         </div>
 
         <div class="col-md-2">
-            <label>Guru</label>
+            <label>Pengajar</label>
             <select name="guru_id" class="form-select">
-                <option value="">Semua Guru</option>
+                <option value="">Semua Pengajar</option>
                 @foreach ($gurus as $g)
                     <option value="{{ $g->id }}" {{ request('guru_id') == $g->id ? 'selected' : '' }}>
                         {{ $g->username }}
@@ -131,10 +131,10 @@
                     <thead class="table-light">
                         <tr>
                             <th>No</th>
-                            <th>Nama Siswa</th>
+                            <th>Nama Pelajar</th>
                             <th>Kelas</th>
                             <th>Mapel</th>
-                            <th>Guru</th>
+                            <th>pengajar</th>
                             <th>Tanggal</th>
                             <th>Status</th>
                         </tr>

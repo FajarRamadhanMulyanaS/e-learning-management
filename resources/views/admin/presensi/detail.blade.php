@@ -16,7 +16,7 @@
             <h5 class="mb-3">Informasi Sesi</h5>
             <ul class="list-group mb-3">
                 <li class="list-group-item"><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($session->tanggal)->format('d/m/Y') }}</li>
-                <li class="list-group-item"><strong>Guru:</strong> {{ $session->guru->username ?? '-' }}</li>
+                <li class="list-group-item"><strong>Pengajar:</strong> {{ $session->guru->username ?? '-' }}</li>
                 <li class="list-group-item"><strong>Mata Pelajaran:</strong> {{ $session->mapel->nama_mapel ?? '-' }}</li>
                 <li class="list-group-item"><strong>Kelas:</strong> {{ $session->kelas->nama_kelas ?? '-' }}</li>
                 <li class="list-group-item"><strong>Jam Mulai:</strong> {{ \Carbon\Carbon::parse($session->jam_mulai)->format('H:i') }}</li>
@@ -35,7 +35,7 @@
 
     <div class="card shadow-sm">
         <div class="card-header bg-light">
-            <h5 class="mb-0">Daftar Siswa</h5>
+            <h5 class="mb-0">Daftar Pelajar</h5>
         </div>
         <div class="card-body">
             <div class="d-flex justify-content-end mb-3">
@@ -52,7 +52,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Nama Siswa</th>
+                            <th>Nama Pelajar</th>
                             <th>Status</th>
                             <th>Waktu Absen</th>
                             {{-- [PERBAIKAN] Kolom Metode dihapus --}}

@@ -41,9 +41,9 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label for="user_id">Pilih Guru</label>
+                        <label for="user_id">Pilih Pengajar</label>
                         <select name="user_id" class="form-control" required>
-                            <option value="">Pilih Guru</option>
+                            <option value="">Pilih Pengajar</option>
                             @foreach($guru as $g)
                                 <option value="{{ $g->id }}">{{ $g->username }}</option>
                             @endforeach

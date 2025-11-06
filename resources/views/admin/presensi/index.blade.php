@@ -210,7 +210,7 @@
                                 <tr>
                                     <th>Kelas</th>
                                     <th>Mapel</th>
-                                    <th>Guru</th>
+                                    <th>Pengajar</th>
                                     <th>Jam</th>
                                     <th>Mode</th>
                                     <th>Presensi</th>

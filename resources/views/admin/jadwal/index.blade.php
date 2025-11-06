@@ -22,7 +22,7 @@
                             <th>Jam</th>
                             <th>Kelas</th>
                             <th>Mapel</th>
-                            <th>Guru</th>
+                            <th>Pengajar</th>
                             <th>Semester</th>
                             <th>Ruang</th>
                             <th>Aksi</th>

@@ -29,7 +29,7 @@ class AdminPresensiController extends Controller
 
         // Ambil data statistik lengkap untuk dashboard (jika diperlukan)
         $request = new Request(); // Buat request kosong untuk getGeneralStats
-        $generalStats = $this->getGeneralStats($request); 
+        $generalStats = $this->getGeneralStats($request);
 
         $stats = [
             'total_sessions' => $totalSessions,
@@ -65,10 +65,16 @@ class AdminPresensiController extends Controller
             ];
         });
 
-        // Menggunakan ArrayExport yang sudah ada
         return Excel::download(new ArrayExport($exportData->toArray(), [
-            'No', 'Nama Siswa', 'Kelas', 'Mapel', 'Guru', 'Tanggal', 'Status' // Pastikan header sesuai
+            'No',
+            'Nama Pelajar',
+            'Kelas',
+            'Mapel',
+            'Pengajar',
+            'Tanggal',
+            'Status'
         ]), 'laporan_presensi.xlsx');
+
     }
     public function exportLaporanPDF(Request $request)
     {
@@ -144,13 +150,13 @@ class AdminPresensiController extends Controller
             $query->whereDate('tanggal', '<=', $request->tanggal_selesai);
         }
         $mapels = Mapel::all(); // ✅ Tambahan
-            $query->when($request->mapel_id, fn($q) => $q->where('mapel_id', $request->mapel_id)); // ✅ Tambahan
+        $query->when($request->mapel_id, fn($q) => $q->where('mapel_id', $request->mapel_id)); // ✅ Tambahan
         $sessions = $query->orderBy('tanggal', 'desc')
             ->orderBy('jam_mulai', 'desc')
             ->paginate(20);
 
         $kelas = Kelas::all();
-        
+
         $gurus = User::where('role', 'guru')->get();
 
         return view('admin.presensi.sessions', compact('sessions', 'kelas', 'gurus', 'mapels'));
@@ -185,7 +191,7 @@ class AdminPresensiController extends Controller
 
         if ($format === 'pdf') {
             $pdf = Pdf::loadView('admin.presensi.export-detail-pdf', compact('session'))
-                    ->setPaper('a4', 'portrait');
+                ->setPaper('a4', 'portrait');
             return $pdf->download('Presensi_' . $session->kelas->nama_kelas . '.pdf');
         }
 
@@ -235,7 +241,7 @@ class AdminPresensiController extends Controller
 
 
 
-   public function reports(Request $request)
+    public function reports(Request $request)
     {
         $query = PresensiRecord::with([
             'presensiSession.kelas',

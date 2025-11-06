@@ -85,7 +85,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h1><i class="fas fa-users"></i> Daftar Siswa</h1>
+                <h1><i class="fas fa-users"></i> Daftar Pelajar</h1>
             </div>
         </div>
     </div>

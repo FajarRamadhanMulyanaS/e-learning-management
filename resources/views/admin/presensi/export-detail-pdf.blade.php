@@ -15,17 +15,17 @@
 
     <table>
         <tr><th>Tanggal</th><td>{{ \Carbon\Carbon::parse($session->tanggal)->format('d/m/Y') }}</td></tr>
-        <tr><th>Guru</th><td>{{ $session->guru->username ?? '-' }}</td></tr>
+        <tr><th>Pengajar</th><td>{{ $session->guru->username ?? '-' }}</td></tr>
         <tr><th>Mata Pelajaran</th><td>{{ $session->mapel->nama_mapel ?? '-' }}</td></tr>
         <tr><th>Kelas</th><td>{{ $session->kelas->nama_kelas ?? '-' }}</td></tr>
     </table>
 
-    <h4>Daftar Siswa</h4>
+    <h4>Daftar Pelajar</h4>
     <table>
         <thead>
             <tr>
                 <th>No</th>
-                <th>Nama Siswa</th>
+                <th>Nama Pelajar</th>
                 <th>Status</th>
                 <th>Waktu Absen</th>
             </tr>

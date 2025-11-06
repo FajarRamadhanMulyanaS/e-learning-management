@@ -17,10 +17,10 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Nama Siswa</th>
+                <th>Nama Pelajar</th>
                 <th>Kelas</th>
                 <th>Mapel</th>
-                <th>Guru</th>
+                <th>Pengajar</th>
                 <th>Tanggal</th>
                 <th>Status</th>
             </tr>

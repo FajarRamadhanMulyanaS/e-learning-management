@@ -19,9 +19,9 @@
 
             {{-- [PERBAIKAN] Mengubah col-md-3 menjadi col-md-2 --}}
             <div class="col-md-2">
-                <label class="form-label">Guru</label>
+                <label class="form-label">Pengajar</label>
                 <select name="guru_id" class="form-select">
-                    <option value="">Semua Guru</option>
+                    <option value="">Semua Pengajar</option>
                     @foreach ($gurus as $g)
                         <option value="{{ $g->id }}" {{ request('guru_id') == $g->id ? 'selected' : '' }}>
                             {{ $g->username }}
@@ -74,7 +74,7 @@
                             <tr>
                                 <th>No</th>
                                 <th>Tanggal</th>
-                                <th>Guru</th>
+                                <th>pengajar</th>
                                 <th>Mata Pelajaran</th>
                                 <th>Kelas</th>
                                 <th>Jam Mulai</th>

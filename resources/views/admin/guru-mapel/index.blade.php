@@ -2,7 +2,7 @@
 
 @section('konten')
 <div class="container mt-5">
-    <h2 class="text-center mb-4 text-primary">Daftar Guru Mapel</h2>
+    <h2 class="text-center mb-4 text-primary">Daftar Pengajar Mapel</h2>
 
     @if (session('success'))
         <div class="alert alert-success">
@@ -11,7 +11,7 @@
     @endif
 
     <button class="btn btn-success mb-3" data-toggle="modal" data-target="#addGuruMapelModal">
-        <i class="fas fa-plus-circle"></i> Tambah Guru Mapel
+        <i class="fas fa-plus-circle"></i> Tambah Pengajar Mapel
     </button>
 <div class="row">
     <div class="col-md-12">
@@ -63,9 +63,9 @@
                                     @csrf
                                     @method('PUT')
                                     <div class="form-group">
-                                        <label for="user_id">Pilih Guru</label>
+                                        <label for="user_id">Pilih Pengajar</label>
                                         <select name="user_id" class="form-control" required>
-                                            <option value="">Pilih Guru</option>
+                                            <option value="">Pilih Pengajar</option>
                                             @foreach($guru as $g)
                                                 <option value="{{ $g->id }}" {{ $g->id == $guruMapel->user_id ? 'selected' : '' }}>{{ $g->username }}</option>
                                             @endforeach
@@ -121,9 +121,9 @@
                     @csrf
 
                     <div class="form-group">
-                        <label for="user_id">Pilih Guru</label>
+                        <label for="user_id">Pilih Pengajar</label>
                         <select name="user_id" class="form-control" required>
-                            <option value="">Pilih Guru</option>
+                            <option value="">Pilih Pengajar</option>
                             @foreach($guru as $g)
                                 <option value="{{ $g->id }}">{{ $g->username }}</option>
                             @endforeach

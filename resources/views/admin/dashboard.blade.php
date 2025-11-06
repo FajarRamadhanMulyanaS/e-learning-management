@@ -7,7 +7,7 @@
     <div class="row mb-4">
         <div class="col-md-12 text-center">
             <h1 class="display-4 text-primary">Dashboard Admin</h1>
-            <p class="text-muted">Informasi Singkat Mengenai Data Sekolah</p>
+            <p class="text-muted">Informasi Singkat Mengenai Data Pelatihan</p>
             <hr class="my-4" style="width: 200px; border-top: 3px solid #0d6efd;">
         </div>
     </div>
@@ -18,9 +18,9 @@
                     <div class="mb-3">
                         <i class="fas fa-user-graduate fa-3x"></i>
                     </div>
-                    <h5 class="card-title">Total Siswa</h5>
+                    <h5 class="card-title">Total Pelajar</h5>
                     <p class="card-text display-5">{{ $totalSiswa }}</p>
-                    <p class="text-light">Siswa</p>
+                    <p class="text-light">Pelajar</p>
                 </div>
             </div>
         </div>
@@ -31,9 +31,9 @@
                     <div class="mb-3">
                         <i class="fas fa-chalkboard-teacher fa-3x"></i>
                     </div>
-                    <h5 class="card-title">Total Guru</h5>
+                    <h5 class="card-title">Total pengajar</h5>
                     <p class="card-text display-5">{{ $totalGuru }}</p>
-                    <p class="text-light">Guru</p>
+                    <p class="text-light">Pengajar</p>
                 </div>
             </div>
         </div>

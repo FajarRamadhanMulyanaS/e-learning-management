@@ -10,10 +10,13 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 class ArrayExport implements FromArray, WithHeadings, WithStyles
 {
     protected $data;
+    protected $headings;
 
-    public function __construct(array $data)
+    // Constructor sekarang bisa terima headings opsional
+    public function __construct(array $data, array $headings = [])
     {
         $this->data = $data;
+        $this->headings = $headings;
     }
 
     public function array(): array
@@ -23,7 +26,9 @@ class ArrayExport implements FromArray, WithHeadings, WithStyles
 
     public function headings(): array
     {
-        return ['No', 'Nama Siswa', 'Kelas', 'Mapel', 'Guru', 'Tanggal', 'Status'];
+        // Kalau header dikirim dari controller → pakai itu
+        // Kalau tidak → fallback ke default lama
+        return $this->headings ?: ['No', 'Nama Siswa', 'Kelas', 'Mapel', 'Guru', 'Tanggal', 'Status'];
     }
 
     public function styles(Worksheet $sheet)
