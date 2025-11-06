@@ -5,7 +5,7 @@
     <div class="col-md-12 grid-margin">
         <div class="row">
             <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                <h3 class="font-weight-bold">Laporan Siswa</h3>
+                <h3 class="font-weight-bold">Laporan Pelajar</h3>
                 <h6 class="font-weight-normal mb-0">Langkah 1: Pilih kelas yang ingin Anda lihat laporannya.</h6>
             </div>
         </div>
@@ -24,7 +24,7 @@
                                 <h5 class="mb-1">{{ $kelas->nama_kelas }}</h5>
                                 <small>Kode Kelas: {{ $kelas->kode_kelas }}</small>
                             </div>
-                            <span class="badge bg-primary rounded-pill">{{ $kelas->siswa_count }} Siswa</span>
+                            <span class="badge bg-primary rounded-pill">{{ $kelas->siswa_count }} Pelajar</span>
                         </a>
                     @empty
                         <div class="alert alert-warning" role="alert">

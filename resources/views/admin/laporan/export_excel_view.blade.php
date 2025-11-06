@@ -11,8 +11,8 @@ JANGAN tambahkan @include layout/header/footer/side
     <thead>
         <tr style="background-color: #f0f0f0; font-weight: bold;">
             <th>No</th>
-            <th>NIS</th>
-            <th>Nama Siswa</th>
+            <th>ID Pelajar</th>
+            <th>Nama Pelajar</th>
             <th>Rata2 Tugas</th>
             <th>Rata2 Ujian</th>
             <th>Rata2 Quiz</th>

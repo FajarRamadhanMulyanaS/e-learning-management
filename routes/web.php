@@ -140,11 +140,11 @@ Route::middleware(['auth'])->group(function () {
 
     // route untuk Download Excel siswa
     Route::get('/admin/siswa/download-template', function () {
-        $filePath = public_path('templates/template_siswa.xlsx'); // pastikan file ada di folder public/templates
+        $filePath = public_path('templates/template_pelajar.xlsx'); // pastikan file ada di folder public/templates
         if (!file_exists($filePath)) {
              abort(404, 'Template file not found.');
         }
-        return response()->download($filePath, 'template_siswa.xlsx');
+        return response()->download($filePath, 'template_pelajar.xlsx');
     })->name('admin.siswa.downloadTemplateSiswa');
 
     // =====================================================================================================================================
@@ -195,13 +195,13 @@ Route::middleware(['auth'])->group(function () {
         }, 'admin');
     })->name('admin.guru.import'); // Route untuk meng-handle upload Excel
 
-    // route untuk Download Excel guru
+    // route untuk Download Excel pengajar
     Route::get('/admin/guru/download-template', function () {
-        $filePath = public_path('templates/template_guru.xlsx'); // pastikan file ada di folder public/templates
+        $filePath = public_path('templates/template_pengajar.xlsx'); // pastikan file ada di folder public/templates
          if (!file_exists($filePath)) {
              abort(404, 'Template file not found.');
         }
-        return response()->download($filePath, 'template_guru.xlsx');
+        return response()->download($filePath, 'template_pengajar.xlsx');
     })->name('admin.guru.downloadTemplateGuru');
 
     // =====================================================================================================================================

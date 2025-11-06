@@ -29,7 +29,7 @@
                         <thead>
                             <tr>
                                 <th>Mata Pelajaran</th>
-                                <th>Guru Pengampu</th>
+                                <th>pengajar</th>
                                 <th class="text-center">Aksi</th>
                             </tr>
                         </thead>

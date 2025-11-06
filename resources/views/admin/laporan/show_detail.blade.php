@@ -42,8 +42,8 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>NIS</th>
-                                        <th>Nama Siswa</th>
+                                        <th>ID Pelajar</th>
+                                        <th>Nama Pelajar</th>
                                         <th>Rata2 Tugas</th>
                                         <th>Rata2 Ujian</th>
                                         <th>Rata2 Quiz</th>

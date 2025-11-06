@@ -128,7 +128,7 @@
 
                     <!-- Tombol untuk membuka modal tambah siswa -->
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahSiswaModal">
-                        <i class="fas fa-user-plus"></i> Tambah Siswa
+                        <i class="fas fa-user-plus"></i> Tambah Pelajar
                     </button>
                 </div>
             </div>
@@ -164,7 +164,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="tambahSiswaModalLabel">Tambah Siswa</h5>
+                            <h5 class="modal-title" id="tambahSiswaModalLabel">Tambah Pelajar</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -174,13 +174,13 @@
                             <form action="{{ route('admin.siswa.store') }}" method="POST">
                                 @csrf
                                 <div class="form-group">
-                                    <label for="nis">NIS:</label>
+                                    <label for="nis">ID Pelajar:</label>
                                     <input type="text" class="form-control" name="nis" id="nis" required>
                                 </div>
-                                <div class="form-group">
+                            {{--     <div class="form-group">
                                     <label for="nisn">NISN:</label>
                                     <input type="text" class="form-control" name="nisn" id="nisn" required>
-                                </div>
+                                </div> --}}
                                 <div class="form-group">
                                     <label for="username">Nama:</label>
                                     <input type="text" class="form-control" name="username" id="username" required>
@@ -231,8 +231,8 @@
                             <tr>
                                 <th>No</th>
                                 <th>Foto</th>
-                                <th>NIS</th>
-                                <th>NISN</th>
+                                <th>ID Pelajar</th>
+                              {{--   <th>NISN</th> --}}
                                 <th>Nama</th>
                                 <th>Telepon</th>
                                 <th>Kelas</th>
@@ -246,8 +246,8 @@
                             <tr>
                                 <th>No</th>
                                 <th>Foto</th>
-                                <th>NIS</th>
-                                <th>NISN</th>
+                                <th>ID Pelajar</th>
+                            {{--     <th>NISN</th> --}}
                                 <th>Nama</th>
                                 <th>Telepon</th>
                                 <th>Kelas</th>
@@ -270,7 +270,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $user->siswa->nis ?? 'N/A' }}</td> <!-- Akses NIS dari relasi siswa -->
-                                <td>{{ $user->siswa->nisn ?? 'N/A' }}</td> <!-- Akses NISN dari relasi siswa -->
+                            {{--  <!-- {{ $user->siswa->nisn ?? 'N/A' }}</>  Akses NISN dari relasi siswa --> --}}
                                 <td>{{ $user->username }}</td> <!-- Akses username dari tabel users -->
                                 <td>{{ $user->siswa->telepon ?? 'N/A' }}</td> <!-- Akses telepon dari relasi siswa -->
                                 
@@ -304,7 +304,7 @@
                                                 <div class="modal-dialog">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
-                                                            <h5 class="modal-title" id="editSiswaModalLabel">Edit Siswa</h5>
+                                                            <h5 class="modal-title" id="editSiswaModalLabel">Edit Pelajar</h5>
                                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                                 <span aria-hidden="true">&times;</span>
                                                             </button>
@@ -315,13 +315,13 @@
                                                                 @method('POST') <!-- Spoofing Method POST untuk Update -->
 
                                                                 <div class="form-group">
-                                                                    <label for="nis">NIS:</label>
+                                                                    <label for="nis">ID Pelajar:</label>
                                                                     <input type="text" class="form-control" name="nis" value="{{ $user->siswa->nis ?? '' }}" required>
                                                                 </div>
-                                                                <div class="form-group">
+                                                              {{--   <div class="form-group">
                                                                     <label for="nisn">NISN:</label>
                                                                     <input type="text" class="form-control" name="nisn" value="{{ $user->siswa->nisn ?? '' }}" required>
-                                                                </div>
+                                                                </div> --}}
                                                                 <div class="form-group">
                                                                     <label for="username">Nama:</label>
                                                                     <input type="text" class="form-control" name="username" value="{{ $user->username }}" required>

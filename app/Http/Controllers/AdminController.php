@@ -243,67 +243,77 @@ class AdminController extends Controller
     /**
      * Menyimpan data siswa baru ke database.
      */
-    public function storeSiswa(Request $request)
-    {
-        // ... (Kode storeSiswa Anda sudah benar) ...
-         // 1. Validasi Input
-        $validatedData = $request->validate([
-            'username' => 'required|string|max:255|unique:users,username',
-            'nis' => 'required|string|max:20|unique:siswa,nis', // Sesuaikan max length jika perlu
-            'nisn' => 'required|string|max:20|unique:siswa,nisn', // Sesuaikan max length jika perlu
-            'telepon' => 'required|string|max:20',
-            'kelas_id' => 'required|integer|exists:kelas,id', // Validasi kelas_id
-            'gender' => 'required|string|in:Laki-laki,Perempuan',
-            'alamat' => 'required|string|max:255',
-            'tgl_lahir' => 'required|date', // Ubah ke tipe date jika di db juga date
+  public function storeSiswa(Request $request)
+{
+    // 🔹 Ambil NISN terakhir yang dibuat di tahun ini
+    $currentYear = date('Y');
+    $lastNisn = \App\Models\Siswa::where('nisn', 'like', $currentYear . '%')
+        ->orderBy('nisn', 'desc')
+        ->value('nisn');
+
+    // 🔹 Jika ada, ambil 4 digit terakhir untuk diincrement
+    $nextNumber = $lastNisn ? intval(substr($lastNisn, 4)) + 1 : 1;
+    $nisnBaru = $currentYear . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+    // 🔹 Validasi input (tanpa 'nisn')
+    $validatedData = $request->validate([
+        'username' => 'required|string|max:255|unique:users,username',
+        'nis' => 'required|string|max:20|unique:siswa,nis',
+        'telepon' => 'required|string|max:20',
+        'kelas_id' => 'required|integer|exists:kelas,id',
+        'gender' => 'required|string|in:Laki-laki,Perempuan',
+        'alamat' => 'required|string|max:255',
+        'tgl_lahir' => 'required|date',
+    ]);
+
+    DB::beginTransaction();
+    try {
+        // 🔹 Default foto user
+        $defaultPhoto = "images/default.png";
+
+        // 🔹 Buat user baru
+        $user = User::create([
+            'username' => $validatedData['username'],
+            'password' => Hash::make('123456'),
+            'role' => 'siswa',
+            'foto' => $defaultPhoto,
         ]);
 
-        DB::beginTransaction();
-        try {
-            // Path gambar default
-            $defaultPhoto = "images/default.png";
+        // 🔹 Buat siswa baru (dengan NISN auto)
+        Siswa::create([
+            'user_id' => $user->id,
+            'nis' => $validatedData['nis'],
+            'nisn' => $nisnBaru,
+            'telepon' => $validatedData['telepon'],
+            'kelas_id' => $validatedData['kelas_id'],
+            'gender' => $validatedData['gender'],
+            'alamat' => $validatedData['alamat'],
+            'tgl_lahir' => $validatedData['tgl_lahir'],
+        ]);
 
-            // 2. Buat User baru (HANYA info login & role, TANPA kelas_id)
-            $user = User::create([
-                'username' => $validatedData['username'],
-                'password' => Hash::make('123456'), // Ganti default password
-                'role' => 'siswa',
-                'foto' => $defaultPhoto, // Tambahkan foto default
-                // Kolom kelas_id TIDAK disimpan di sini
-            ]);
+        DB::commit();
+        return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan.');
 
-            // 3. Buat Siswa baru (Info profil + kelas_id)
-            $siswa = Siswa::create([
-                'user_id' => $user->id,
-                'nis' => $validatedData['nis'],
-                'nisn' => $validatedData['nisn'],
-                'telepon' => $validatedData['telepon'],
-                'kelas_id' => $validatedData['kelas_id'], // <-- KELAS DISIMPAN DI SINI
-                'gender' => $validatedData['gender'],
-                'alamat' => $validatedData['alamat'],
-                'tgl_lahir' => $validatedData['tgl_lahir'],
-            ]);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error('Error saat admin menambah siswa: ' . $e->getMessage());
 
-            DB::commit();
-            return redirect()->route('admin.siswa.index')->with('success', 'Siswa berhasil ditambahkan.');
-
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error saat admin menambah siswa: ' . $e->getMessage());
-             if (str_contains($e->getMessage(), 'Duplicate entry')) {
-                 if (str_contains($e->getMessage(), 'siswa_nis_unique')) {
-                    return redirect()->back()->withErrors(['nis' => 'NIS sudah terdaftar.'])->withInput();
-                 }
-                 if (str_contains($e->getMessage(), 'siswa_nisn_unique')) {
-                    return redirect()->back()->withErrors(['nisn' => 'NISN sudah terdaftar.'])->withInput();
-                 }
-                  if (str_contains($e->getMessage(), 'users_username_unique')) {
-                    return redirect()->back()->withErrors(['username' => 'Username sudah terdaftar.'])->withInput();
-                 }
+        if (str_contains($e->getMessage(), 'Duplicate entry')) {
+            if (str_contains($e->getMessage(), 'siswa_nis_unique')) {
+                return back()->withErrors(['nis' => 'NIS sudah terdaftar.'])->withInput();
             }
-            return redirect()->back()->withErrors(['error' => 'Gagal menambahkan siswa. Terjadi kesalahan.'])->withInput();
+            if (str_contains($e->getMessage(), 'siswa_nisn_unique')) {
+                return back()->withErrors(['nisn' => 'NISN sudah terdaftar.'])->withInput();
+            }
+            if (str_contains($e->getMessage(), 'users_username_unique')) {
+                return back()->withErrors(['username' => 'Username sudah terdaftar.'])->withInput();
+            }
         }
+
+        return back()->withErrors(['error' => 'Gagal menambahkan siswa. Terjadi kesalahan.'])->withInput();
     }
+}
+
 
     /**
      * Memperbarui data siswa di database.
@@ -322,7 +332,7 @@ class AdminController extends Controller
         $validatedData = $request->validate([
             'username' => ['required','string','max:255', Rule::unique('users')->ignore($user->id)],
             'nis' => ['required','string','max:20', Rule::unique('siswa')->ignore($siswa->id)], // Sesuaikan max length
-            'nisn' => ['required','string','max:20', Rule::unique('siswa')->ignore($siswa->id)], // Sesuaikan max length
+           /*  'nisn' => ['required','string','max:20', Rule::unique('siswa')->ignore($siswa->id)], // Sesuaikan max length */
             'telepon' => 'required|string|max:20',
             'kelas_id' => 'required|integer|exists:kelas,id', // Validasi kelas_id dari dropdown
             'gender' => 'required|string|in:Laki-laki,Perempuan',
@@ -349,7 +359,7 @@ class AdminController extends Controller
 
             // 3. Update Siswa (Info profil + kelas_id)
             $siswa->nis = $validatedData['nis'];
-            $siswa->nisn = $validatedData['nisn'];
+         /*    $siswa->nisn = $validatedData['nisn']; */
             $siswa->telepon = $validatedData['telepon'];
             $siswa->kelas_id = $validatedData['kelas_id']; // <-- KELAS DISIMPAN/DIUPDATE DI SINI
             $siswa->gender = $validatedData['gender'];
@@ -479,11 +489,11 @@ class AdminController extends Controller
      */
     public function downloadTemplate()
     {
-        $filePath = public_path('templates/template_siswa.xlsx');
+        $filePath = public_path('templates/template_pelajar.xlsx');
         if (!file_exists($filePath)) {
             abort(404, 'Template file not found.');
         }
-        return response()->download($filePath, 'template_siswa.xlsx');
+        return response()->download($filePath, 'template_pelajar.xlsx');
     }
 
     /**

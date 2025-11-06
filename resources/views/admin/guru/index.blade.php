@@ -84,7 +84,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h1><i class="fas fa-chalkboard-teacher"></i> Daftar Guru</h1>
+                <h1><i class="fas fa-chalkboard-teacher"></i> Daftar pengajar</h1>
             </div>
         </div>
     </div>
@@ -127,7 +127,7 @@
 
                     <!-- Tombol untuk membuka modal tambah guru -->
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahGuruModal">
-                        <i class="fas fa-user-plus"></i> Tambah Guru
+                        <i class="fas fa-user-plus"></i> Tambah pengajar
                     </button>
                 </div>
             </div>
@@ -163,7 +163,7 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="tambahGuruModalLabel">Tambah Guru</h5>
+                            <h5 class="modal-title" id="tambahGuruModalLabel">Tambah pengajar</h5>
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
@@ -282,7 +282,7 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="editGuruModalLabel">Edit Guru</h5>
+                                                <h5 class="modal-title" id="editGuruModalLabel">Edit pengajar</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
