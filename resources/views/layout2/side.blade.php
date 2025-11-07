@@ -13,7 +13,7 @@
             {{ auth()->user()->username }}
         </div>
         <div class="user-designation">
-            {{ auth()->user()->role }}
+            pengajar
         </div>
       </div>
       <ul class="nav">
@@ -33,7 +33,7 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ route('guru.daftar_siswa') }}">
             <i class="mdi mdi-account-multiple menu-icon"></i>
-            <span class="menu-title">Daftar Siswa</span>
+            <span class="menu-title">Daftar Pelajar</span>
           </a>
         </li>
         <li class="nav-item">
@@ -64,7 +64,7 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ route('guru.tugas-siswa.index') }}">
             <i class="mdi mdi-book-outline menu-icon"></i>
-            <span class="menu-title">Tugas Siswa</span>
+            <span class="menu-title">Tugas Pelajar</span>
           </a>
         </li>
         <li class="nav-item">
@@ -128,7 +128,7 @@
         {{ auth()->user()->username }}
       </div>
       <div class="user-designation">
-        {{ auth()->user()->role }}
+        Pelajar
       </div>
     </div>
     <ul class="nav">

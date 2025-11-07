@@ -17,10 +17,10 @@
 
     <div class="card shadow">
         <div class="card-body">
-            <h5>Data Siswa</h5>
+            <h5>Data Pelajar</h5>
             <table class="table table-bordered">
                 <tr>
-                    <th>NIS</th>
+                    <th>ID Pelajar</th>
                     <td>{{ $siswa->nis }}</td>
                 </tr>
                 <tr>

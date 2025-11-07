@@ -90,7 +90,7 @@
                 </div>
                 {{-- Toggle Switch untuk Visibilitas Jawaban --}}
                 <div class="form-group mb-3">
-                    <label>Visibilitas Jawaban Siswa</label>
+                    <label>Visibilitas Jawaban Pelajar</label>
                     <div class="d-flex align-items-center" style="gap: 15px;">
                         <input type="hidden" name="answers_visible_to_others" value="0">
                         
@@ -100,7 +100,7 @@
                         </label>
 
                         <small class="text-muted">
-                            Aktifkan jika siswa boleh melihat jawaban siswa lain.
+                            Aktifkan jika Pelajar boleh melihat jawaban Pelajar lain.
                         </small>
                     </div>
                 </div>

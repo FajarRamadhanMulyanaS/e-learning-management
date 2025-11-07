@@ -8,9 +8,9 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title">Data Siswa</h5>
+            <h5 class="card-title">Data Pelajar</h5>
             <p><strong>Nama:</strong> {{ $siswa->user->username ?? 'Tidak ada' }}</p>
-            <p><strong>NISN:</strong> {{ $siswa->nisn ?? 'Tidak ada' }}</p>
+            <p><strong>ID Pelajar:</strong> {{ $siswa->nis ?? 'Tidak ada' }}</p>
             <p><strong>Kelas:</strong> {{ $siswa->kelas->nama_kelas ?? 'Tidak ada' }}</p>
         </div>
     </div>

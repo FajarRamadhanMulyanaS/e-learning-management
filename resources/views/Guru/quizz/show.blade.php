@@ -30,7 +30,7 @@
 
     <div class="card shadow-sm">
         <div class="card-header bg-success text-white">
-            <h4 class="mb-0">Jawaban Siswa</h4>
+            <h4 class="mb-0">Jawaban Pelajar</h4>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -38,7 +38,7 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>Nama Siswa</th>
+                            <th>Nama Pelajar</th>
                             <th>Waktu Mengumpulkan</th>
                             <th>Status</th>
                             <th>Nilai</th>

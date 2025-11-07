@@ -21,8 +21,8 @@ class SiswaExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
-            'NISN',
-            'Nama Siswa',
+            'ID Pelajar',
+            'Nama Pelajar',
             'Kelas',
             'Nilai PG',
             'Nilai Essay',

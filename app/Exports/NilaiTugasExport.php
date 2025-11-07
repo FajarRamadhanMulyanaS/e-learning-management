@@ -24,7 +24,7 @@ class NilaiTugasExport implements FromCollection, WithHeadings, WithMapping
     {
         return [
             'No',
-            'Nama Siswa',
+            'Nama Pelajar',
             'Komentar',
             'Nilai',
             'Tanggal Pengumpulan',
@@ -35,7 +35,7 @@ class NilaiTugasExport implements FromCollection, WithHeadings, WithMapping
     {
         return [
             $pengumpulan->id,
-            $pengumpulan->siswa->username ?? 'Tidak ada',
+            $pengumpulan->siswa->user->username ?? 'Tidak ada',
             $pengumpulan->komentar ?? '-',
             $pengumpulan->nilai ?? 'Belum Dinilai',
             $pengumpulan->created_at ? $pengumpulan->created_at->format('d-m-Y H:i') : '-',

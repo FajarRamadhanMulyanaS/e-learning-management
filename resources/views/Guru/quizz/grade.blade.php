@@ -13,7 +13,7 @@
                     <h5>Siswa: <strong>{{ $submission->user->username }}</strong></h5>
                     <p class="text-muted">Waktu Mengumpulkan: {{ $submission->created_at->format('d M Y, H:i') }}</p>
                     <hr>
-                    <h5 class="font-weight-bold">File Jawaban Siswa</h5>
+                    <h5 class="font-weight-bold">File Jawaban Pelajar</h5>
                     <a href="{{ asset('storage/' . $submission->file_path) }}" class="btn btn-primary" target="_blank">
                         <i class="fas fa-download"></i> Unduh / Lihat Jawaban
                     </a>

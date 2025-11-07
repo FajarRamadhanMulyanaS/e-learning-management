@@ -19,7 +19,7 @@
                     <tr>
                         <th>No</th>
                         <th>Pertanyaan</th>
-                        <th>Jawaban Siswa</th>
+                        <th>Jawaban Pelajar</th>
                         <th>Nilai</th>
                     </tr>
                 </thead>

@@ -11,7 +11,7 @@
 <title>Dashboard</title>
 
 <div class="container mt-4">
-    <h3 class="text-center mb-4">Dashboard Guru</h3>
+    <h3 class="text-center mb-4">Dashboard Pengajar</h3>
     <div class="row mb-4">
         <!-- Kelas yang Diampu -->
         <div class="col-md-3">
@@ -27,8 +27,8 @@
         <div class="col-md-3">
             <div class="card text-center shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title text-success"><i class="fas fa-user-graduate"></i> Siswa Binaan</h5>
-                    <p class="h3">{{ $siswa->count() }} Siswa</p>
+                    <h5 class="card-title text-success"><i class="fas fa-user-graduate"></i> Pelajar Binaan</h5>
+                    <p class="h3">{{ $siswa->count() }} Pelajar</p>
                 </div>
             </div>
         </div>

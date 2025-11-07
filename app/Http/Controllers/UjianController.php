@@ -275,6 +275,7 @@ class UjianController extends Controller
             ->select(
                 'siswa.id as siswa_id',
                 'siswa.nisn',
+                'siswa.nis',
                 'users.username as nama_siswa',
                 'kelas.nama_kelas as kelas',  // Nama kelas dari tabel kelas
                 'jawaban_siswa_pilgan.nilai_pg',
@@ -413,7 +414,7 @@ class UjianController extends Controller
                     ->where('hasil_ujian.ujian_id', $ujian_id);
             })
             ->select(
-                'siswa.nisn',
+                'siswa.nis',
                 'users.username as nama_siswa',
                 'kelas.nama_kelas as kelas',
                 'jawaban_siswa_pilgan.nilai_pg',
@@ -425,7 +426,7 @@ class UjianController extends Controller
             ->get();
 
         // Export data ke Excel
-        return Excel::download(new SiswaExport($siswaSudahUjian), 'daftar_siswa_ujian.xlsx');
+        return Excel::download(new SiswaExport($siswaSudahUjian), 'daftar_Pelajar_ujian.xlsx');
     }
 
 

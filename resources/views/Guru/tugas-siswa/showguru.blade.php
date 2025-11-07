@@ -22,7 +22,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <h5 class="text-primary"><i class="fas fa-chalkboard-teacher mr-2"></i> Guru</h5>
+                        <h5 class="text-primary"><i class="fas fa-chalkboard-teacher mr-2"></i> Pengajar</h5>
                         <p class="text-muted">{{ $tugas->guru->username ?? 'Tidak ada' }}</p>
                     </div>
 
@@ -70,12 +70,12 @@
                     <thead class="bg-light">
                         <tr>
                             <th>No</th>
-                            <th>Nama Siswa</th>
+                            <th>Nama Pelajar</th>
                             <th>File Tugas</th>
                             <th>Komentar</th>
                             <th>Tanggal Pengumpulan</th>
                             <th>Nilai</th>
-                            <th>Tindakan</th>
+                         {{--    <th>Tindakan</th> --}}
                         </tr>
                     </thead>
                     <tbody>
@@ -97,11 +97,11 @@
                                     <h5 class="text-primary"><i class="fas fa-eye mr-2"></i> Visibilitas Jawaban</h5>
                                     @if($tugas->answers_visible_to_others)
                                         <p class="text-success fw-bold">
-                                            <i class="fas fa-check-circle mr-2"></i> Aktif (Siswa dapat melihat jawaban lain)
+                                            <i class="fas fa-check-circle mr-2"></i> Aktif (Pelajar dapat melihat jawaban lain)
                                         </p>
                                     @else
                                         <p class="text-muted fw-bold">
-                                            <i class="fas fa-lock mr-2"></i> Pribadi (Siswa hanya melihat jawaban sendiri)
+                                            <i class="fas fa-lock mr-2"></i> Pribadi (Pelajar hanya melihat jawaban sendiri)
                                         </p>
                                     @endif
                                 </div>
@@ -123,11 +123,11 @@
                                 <td>
                                     <!-- Tindakan untuk mengedit atau menghapus jika diperlukan -->
 
-                                    <form action="{{ route('siswa.tugas.destroyTugasSiswa', $pengumpulan->id) }}" method="POST" style="display:inline;">
+                                  {{--   <form action="{{ route('siswa.tugas.destroyTugasSiswa', $pengumpulan->id) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Hapus</button>
-                                    </form>
+                                    </form> --}}
                                 </td>
                             </tr>
                         @endforeach

@@ -8,9 +8,9 @@
             <a href="{{ route('guru.manajemen-ujian.index') }}" class="btn btn-warning text-white">
                 <i class="fas fa-arrow-left"></i> Back
             </a>
-            <a href="#" class="btn btn-primary text-white">
+          {{--   <a href="#" class="btn btn-primary text-white">
                 <i class="fas fa-print"></i> Cetak
-            </a>
+            </a> --}}
             <a href="{{ route('guru.daftar-siswa.export', $ujian_id) }}" class="btn btn-success">
                 <i class="fas fa-file-excel"></i> Export Excel
             </a>
@@ -19,14 +19,14 @@
         </div>
     </div>
 
-    <h5 class="text-info">Daftar Siswa Yang Melaksanakan Ujian <strong>Ujian Nasional 2023</strong></h5>
+    <h5 class="text-info">Daftar Pelajar Yang Melaksanakan Ujian <h5>
 
     <table class="table table-bordered table-hover">
         <thead class="bg-light">
             <tr>
                 <th>No</th>
-                <th>NISN</th>
-                <th>Nama Siswa</th>
+                <th>ID Pelajar</th>
+                <th>Nama Pelajar</th>
                 <th>Kelas</th>
                 <th>Nilai PG</th>
                 <th>Nilai Essay</th>
@@ -38,7 +38,7 @@
             @foreach($siswaSudahUjian as $index => $siswa)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $siswa->nisn }}</td>
+                    <td>{{ $siswa->nis }}</td>
                     <td>{{ $siswa->nama_siswa }}</td>
                     <td>{{ $siswa->kelas }}</td>
                     <td>
@@ -81,7 +81,7 @@
     <div class="alert alert-info mt-3">
         <p><strong>Catatan:</strong></p>
         <ul>
-            <li>Pilih aksi reset jika ingin mereset siswa yang telah mengikuti ujian.</li>
+            <li>Pilih aksi reset jika ingin mereset pelajar yang telah mengikuti ujian.</li>
             <li>Hanya jawaban soal Essay yang bisa dikoreksi.</li>
             <li>Penilaian soal pilihan ganda otomatis oleh sistem.</li>
         </ul>

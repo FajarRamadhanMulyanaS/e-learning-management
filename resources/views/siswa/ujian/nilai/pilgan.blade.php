@@ -28,7 +28,7 @@
                     <tr>
                         <th>No</th>
                         <th>Soal</th>
-                        <th>Jawaban Siswa</th>
+                        <th>Jawaban Pelajar</th>
                         <th>Jawaban Benar</th>
                         <th>Status</th>
                     </tr>

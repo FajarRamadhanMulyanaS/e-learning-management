@@ -43,7 +43,7 @@
     <div class="card-body">
         <h4 class="mb-3">Daftar Materi</h4>
         <p class="text-muted">
-            Anda dapat mengelola materi yang akan diberikan kepada siswa di sini.
+            Anda dapat mengelola materi yang akan diberikan kepada Pelajar di sini.
             Klik tombol <strong>+ Tambah Materi</strong> untuk menambahkan Materi baru.
         </p>
     </div>

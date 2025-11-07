@@ -53,7 +53,7 @@
         </div>
         <div class="card-body">
             <p class="text-muted mb-0">
-                Kelola semua tugas dan ujian yang akan diberikan kepada siswa di halaman ini.  
+                Kelola semua tugas dan ujian yang akan diberikan kepada Pelajar di halaman ini.
                 Klik tombol <strong>Tambah Ujian</strong> untuk membuat ujian baru.
             </p>
         </div>
