@@ -21,13 +21,13 @@
                     <tr class="text-center">
                         <th>No</th>
                         <th>Mata Pelajaran</th>
-                        <th>Guru Pengajar</th>
+                        <th>Pengajar</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($materi as $index => $item)
-                        <tr>
+                        <tr class="text-center">
                             <td class="text-center">{{ $index + 1 }}</td>
                             <td>{{ $item->mapel->nama_mapel }}</td>
                             <td>{{ $item->user->username }}</td>

@@ -188,7 +188,7 @@
         {{ auth()->user()->username }}
       </div>
       <div class="user-designation">
-        {{ auth()->user()->role }}
+     Pelajar
       </div>
     </div>
     <ul class="nav">

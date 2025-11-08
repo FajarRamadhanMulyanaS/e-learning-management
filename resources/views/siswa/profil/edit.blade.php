@@ -28,13 +28,13 @@
                     <input type="text" name="username" id="username" class="form-control" value="{{ $user->username }}" readonly>
                 </div>
                 <div class="mb-3">
-                    <label for="nis" class="form-label">NIS</label>
+                    <label for="nis" class="form-label">ID Pelajar</label>
                     <input type="text" name="nis" id="nis" class="form-control" value="{{ $siswa->nis }}" readonly>
                 </div>
-                <div class="mb-3">
+          {{--       <div class="mb-3">
                     <label for="nisn" class="form-label">NISN</label>
                     <input type="text" name="nisn" id="nisn" class="form-control" value="{{ $siswa->nisn }}" readonly>
-                </div>
+                </div> --}}
                 <div class="mb-3">
                     <label for="email" class="form-label">Email</label>
                     <input type="email" name="email" id="email" class="form-control" value="{{ $user->email }}">

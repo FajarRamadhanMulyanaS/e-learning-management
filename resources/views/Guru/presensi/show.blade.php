@@ -263,7 +263,7 @@
     <div class="d-flex justify-content-center mt-4">
         <div class="card shadow-lg" style="width: 90%; max-width: 1000px;">
             <div class="card-header text-center bg-primary text-white">
-                <h5 class="mb-0">Daftar Siswa</h5>
+                <h5 class="mb-0">Daftar Pelajar</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive text-center">
@@ -271,7 +271,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>No</th>
-                                <th>Nama Siswa</th>
+                                <th>Nama Pelajar</th>
                                 <th>Status</th>
                                 <th>Waktu Absen</th>
                                 <th>Aksi</th>

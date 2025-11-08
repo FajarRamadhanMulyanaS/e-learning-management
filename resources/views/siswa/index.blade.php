@@ -114,7 +114,7 @@
                                 <th>Hari</th>
                                 <th>Jam</th>
                                 <th>Mata Pelajaran</th>
-                                <th>Guru</th>
+                                <th>Pengajar</th>
                                 <th>Ruang</th>
                             </tr>
                         </thead>

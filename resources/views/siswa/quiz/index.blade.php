@@ -21,7 +21,7 @@
                             <th class="text-center">No</th>
                             <th>Judul Kuis</th>
                             <th>Mata Pelajaran</th>
-                            <th>Guru</th>
+                            <th>Pengajar</th>
                             <th class="text-center">Status</th>
                             <th class="text-center">Nilai</th> {{-- 1. Tambah Kolom Nilai --}}
                             <th class="text-center">Aksi</th>

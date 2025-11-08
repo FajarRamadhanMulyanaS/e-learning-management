@@ -16,7 +16,7 @@
                     <h5 class="text-primary"><i class="fas fa-book mr-2"></i> Mata Pelajaran</h5>
                     <p class="text-muted">{{ $tugas->mapel->nama_mapel ?? 'Tidak ada' }}</p>
 
-                    <h5 class="text-primary"><i class="fas fa-chalkboard-teacher mr-2"></i> Guru</h5>
+                    <h5 class="text-primary"><i class="fas fa-chalkboard-teacher mr-2"></i> Pengajar</h5>
                     <p class="text-muted">{{ $tugas->guru->username ?? 'Tidak ada' }}</p>
                 </div>
 

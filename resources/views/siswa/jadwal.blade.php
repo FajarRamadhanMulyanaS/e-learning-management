@@ -49,7 +49,7 @@
                         <th scope="col">Hari</th>
                         <th scope="col">Jam</th>
                         <th scope="col">Mapel</th>
-                        <th scope="col">Guru</th>
+                        <th scope="col">Pengajar</th>
                         <th scope="col">Ruang</th>
                     </tr>
                 </thead>

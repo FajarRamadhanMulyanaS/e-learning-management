@@ -11,7 +11,7 @@
                 </div>
                 <div class="card-body">
                     <p class="text-muted">
-                        Mata Pelajaran: {{ $quiz->guruMapel->mapel->nama_mapel }} | Guru: {{ $quiz->guruMapel->user->username }}
+                        Mata Pelajaran: {{ $quiz->guruMapel->mapel->nama_mapel }} | Pengajar: {{ $quiz->guruMapel->user->username }}
                     </p>
                     <hr>
                     <h5 class="font-weight-bold">Deskripsi / Petunjuk Pengerjaan</h5>

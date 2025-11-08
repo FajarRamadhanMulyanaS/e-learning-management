@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <h5 class="text-primary"><i class="fas fa-chalkboard-teacher mr-2"></i> Guru</h5>
+                        <h5 class="text-primary"><i class="fas fa-chalkboard-teacher mr-2"></i> Pengajar</h5>
                         <p class="text-muted">{{ $tugas->guru->username ?? 'Tidak ada' }}</p>
                     </div>
 
@@ -99,7 +99,7 @@
                         <thead class="bg-light">
                             <tr>
                                 <th>No</th>
-                                <th>Nama Siswa</th>
+                                <th>Nama Pelajar</th>
                                 <th>File Tugas</th>
                                 <th>Komentar</th>
                                 <th>Tanggal Pengumpulan</th>

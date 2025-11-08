@@ -135,7 +135,7 @@
                             <th>No</th>
                             <th>Tanggal</th>
                             <th>Mapel</th>
-                            <th>Guru</th>
+                            <th>Pengajar</th>
                             <th>Status</th>
                             <th>Waktu Absen</th>
                         </tr>

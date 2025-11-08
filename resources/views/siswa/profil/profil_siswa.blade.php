@@ -43,13 +43,13 @@
                     <span>{{ $user->email }}</span>
                 </li>
                 <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span><i class="bi bi-card-text me-2 text-primary"></i><strong>NIS:</strong></span>
+                    <span><i class="bi bi-card-text me-2 text-primary"></i><strong>ID Pelajar:</strong></span>
                     <span>{{ $siswa->nis }}</span>
                 </li>
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+               {{--  <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-card-heading me-2 text-primary"></i><strong>NISN:</strong></span>
                     <span>{{ $siswa->nisn }}</span>
-                </li>
+                </li> --}}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <span><i class="bi bi-geo-alt-fill me-2 text-primary"></i><strong>Alamat:</strong></span>
                     <span>{{ $siswa->alamat }}</span>

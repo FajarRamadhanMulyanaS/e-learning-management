@@ -61,7 +61,7 @@
                     <p><strong>Mata Pelajaran:</strong> {{ $materi->mapel->nama_mapel ?? 'Mata Pelajaran Tidak Ditemukan' }}</p>
                 </div>
                 <div class="col-md-6">
-                    <p><strong>Guru / Pengajar:</strong> {{ $materi->user->username }}</p>
+                    <p><strong>Pengajar:</strong> {{ $materi->user->username }}</p>
                 </div>
             </div>
 
