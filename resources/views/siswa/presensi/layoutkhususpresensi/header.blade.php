@@ -69,4 +69,78 @@
 
 <body>
     <div class="container-scroller">
-     
+        <!-- partial:partials/_navbar.html -->
+        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="navbar-brand-wrapper d-flex align-items-center justify-content-center">
+                <a class="navbar-brand brand-logo" href="index.html">
+                    <img src="{{ asset('landing/img/logolkp.png') }}" 
+                        alt="Logo LKP Wiyatamandala" 
+                        class="logo-icon" 
+                        style="height: 50px; width: auto;">
+                </a>
+              
+            </div>
+
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                    <span class="icon-menu"></span>
+                </button>
+               
+                <ul class="navbar-nav navbar-nav-right">
+
+                    <li class="nav-item dropdown d-flex">
+                      
+                      
+                    </li>
+                    <li class="nav-item dropdown d-flex mr-4">
+                        <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center"
+                            id="notificationDropdown" href="#" data-toggle="dropdown">
+                            <i class="icon-cog"></i>
+                        </a>
+                    
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list"
+                            aria-labelledby="notificationDropdown">
+                            <p class="mb-0 font-weight-normal float-left dropdown-header">Settings</p>
+                    
+                            {{-- Profil --}}
+                            @if(auth()->user()->isGuru())
+                            <a class="dropdown-item preview-item" href="{{ route('guru.profil.profil_guru') }}">
+                                <i class="icon-head"></i> Profile
+                            </a>
+                            @endif
+                    
+                            @if(auth()->user()->isSiswa())
+                            <a class="dropdown-item preview-item" href="{{ route('siswa.profil_siswa') }}">
+                                <i class="icon-head"></i> Profile
+                            </a>
+                            @endif
+                    
+                         
+                               {{-- Ganti Password --}}
+        <a class="dropdown-item preview-item"  href="{{ route('auth.change-password') }}">
+            <i class="mdi mdi-key-variant"></i> Ganti Password
+        </a>
+
+                    
+                            <div class="dropdown-divider"></div>
+                    
+                            {{-- Logout --}}
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                @csrf
+                            </form>
+                            <a class="dropdown-item d-flex align-items-center" href="#"
+                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <i class="icon-inbox"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                    
+                  
+                </ul>
+                  <button class="sidebar-toggle d-flex align-items-center justify-content-center ms-2"
+    id="sidebarToggle" aria-label="Toggle sidebar">
+    <i class="mdi mdi-menu"></i>
+</button>
+
+            </div>
+        </nav>

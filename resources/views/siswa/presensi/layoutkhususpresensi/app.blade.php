@@ -1,13 +1,18 @@
 @include('siswa.presensi.layoutkhususpresensi.header') <!-- Include Header -->
 
-<div class="container-fluid">
-    <div class="row">
+
         @include('siswa.presensi.layoutkhususpresensi.side') <!-- Include Sidebar -->
 
 
             @yield('konten') <!-- Yield untuk Konten Utama -->
 
-    </div>
-</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
 
-
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+    });
+</script>
