@@ -1,15 +1,7 @@
-@include('layout_siswa.header') <!-- Include Header -->
+@include('layout_siswa.header')
 
-<div class="container-fluid">
-    <div class="row">
-        @include('layout_siswa.side') <!-- Include Sidebar -->
+@include('layout_siswa.side')
 
+@yield('konten')
 
-            @yield('konten') <!-- Yield untuk Konten Utama -->
-
-    </div>
-</div>
-
-
-
-@include('layout_siswa.footer') <!-- Include Footer -->
+@include('layout_siswa.footer')

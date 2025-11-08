@@ -10,6 +10,7 @@
         display: flex;
         flex-direction: column;
         z-index: 1000;
+        transition: all 0.3s ease;
     }
 
     /* agar konten utama tidak tertutup sidebar */
@@ -60,6 +61,65 @@
         .main-panel {
             margin-left: 220px;
             width: calc(100% - 220px);
+        }
+    }
+
+    /* Update sidebar styles for mobile responsiveness */
+    @media (max-width: 768px) {
+        .sidebar {
+            width: 0;
+            overflow: hidden;
+        }
+
+        .sidebar.active {
+            width: 240px;
+        }
+
+        .main-panel {
+            margin-left: 0 !important;
+            width: 100% !important;
+        }
+
+        .user-profile {
+            margin-top: 60px;
+            padding: 15px;
+        }
+
+        .user-profile img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .user-name {
+            font-size: 14px;
+        }
+
+        .nav-item {
+            font-size: 14px;
+        }
+
+        .menu-title {
+            font-size: 13px;
+        }
+    }
+
+    /* Toggle button for mobile */
+    .sidebar-toggle {
+        display: none;
+        position: fixed;
+        left: 10px;
+        top: 10px;
+        z-index: 1001;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px;
+        border-radius: 4px;
+    }
+
+    @media (max-width: 768px) {
+        .sidebar-toggle {
+            display: block;
         }
     }
 </style>
@@ -201,7 +261,7 @@
                     {{ auth()->user()->username }}
                 </div>
                 <div class="user-designation">
-                  Pelajar
+                    Pelajar
                 </div>
             </div>
             <ul class="nav">

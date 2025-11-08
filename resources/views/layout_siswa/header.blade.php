@@ -78,12 +78,7 @@
                         class="logo-icon" 
                         style="height: 50px; width: auto;">
                 </a>
-                <a class="navbar-brand brand-logo-mini" href="index.html">
-                    <img src="{{ asset('landing/img/logolkp.png') }}" 
-                        alt="Logo Mini LKP Wiyatamandala" 
-                        class="logo-icon" 
-                        style="height: 40px; width: auto;">
-                </a>
+              
             </div>
 
             <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
@@ -142,9 +137,10 @@
                     
                   
                 </ul>
-                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-                    data-toggle="offcanvas">
-                    <span class="icon-menu"></span>
-                </button>
+                  <button class="sidebar-toggle d-flex align-items-center justify-content-center ms-2"
+    id="sidebarToggle" aria-label="Toggle sidebar">
+    <i class="mdi mdi-menu"></i>
+</button>
+
             </div>
         </nav>
