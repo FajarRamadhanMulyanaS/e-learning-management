@@ -3,20 +3,104 @@
     <style>
         .container-fluid {
             background-color: white;
-
+            padding: 15px;
         }
 
         h1 {
             font-family: Times, sans-serif;
-            margin-left: 60px;
-            margin-top: 20px
+            margin-left: 15px;
+            margin-top: 20px;
+            font-size: 24px;
         }
 
         .content {
-            margin-left: 60px;
+            margin-left: 15px;
+        }
 
+        /* Responsive styles */
+        @media screen and (max-width: 768px) {
+            h1 {
+                font-size: 20px;
+                margin-left: 10px;
+            }
+
+            .content {
+                margin-left: 10px;
+            }
+
+            .card-header h5 {
+                font-size: 16px;
+            }
+
+            /* Table responsive styles */
+            .table {
+                font-size: 12px;
+            }
+
+            .table th,
+            .table td {
+                padding: 8px 4px;
+                white-space: nowrap;
+            }
+
+            /* Make table scrollable horizontally */
+            .card-body {
+                padding: 10px;
+                overflow-x: auto;
+            }
+
+            /* Breadcrumb responsive */
+            .breadcrumb {
+                font-size: 12px;
+                padding: 8px 0;
+            }
+
+            /* Adjust card spacing */
+            .card {
+                margin: 10px;
+            }
+
+            /* Table header adjustments */
+            thead th {
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            /* Table body adjustments */
+            tbody td {
+                font-size: 11px;
+            }
+        }
+
+        /* Additional responsive breakpoint for very small devices */
+        @media screen and (max-width: 480px) {
+            h1 {
+                font-size: 18px;
+            }
+
+            .card-header h5 {
+                font-size: 14px;
+            }
+
+            .table {
+                font-size: 11px;
+            }
+
+            .breadcrumb {
+                font-size: 11px;
+            }
+        }
+
+        /* Keep table header visible while scrolling */
+        .table thead th {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 1;
         }
     </style>
+
+    <!-- Rest of your existing HTML code remains the same -->
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
@@ -33,13 +117,13 @@
     </div>
     <br>
     <div class="card">
-       <div class="card-header bg-primary text-white text-center">
-    <h5 class="mb-0">
-        <i class="fa-solid fa-list"></i> Jadwal Kelas 
-    <strong>{{ $siswa->kelas->nama_kelas ?? '-' }}</strong>
+        <div class="card-header bg-primary text-white text-center">
+            <h5 class="mb-0">
+                <i class="fa-solid fa-list"></i> Jadwal Kelas
+                <strong>{{ $siswa->kelas->nama_kelas ?? '-' }}</strong>
 
-    </h5>
-</div>
+            </h5>
+        </div>
 
         <div class="card-body">
             <table class="table table-hover" id="datatablesSimple">

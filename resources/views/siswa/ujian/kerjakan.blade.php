@@ -1,6 +1,113 @@
 @extends('layout_siswa.app')
 
 @section('konten')
+<style>
+    /* Base styles */
+    .container {
+        padding: 15px;
+    }
+
+    .card {
+        margin-bottom: 20px;
+        border-radius: 8px;
+    }
+
+    .card-header h3 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+    /* Table styles */
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        width: 35%;
+        background-color: #f8f9fa;
+    }
+
+    /* Responsive styles */
+    @media screen and (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+
+        .card-header h3 {
+            font-size: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
+        }
+
+        /* Table responsive */
+        .table {
+            font-size: 13px;
+        }
+
+        .table th, 
+        .table td {
+            padding: 8px;
+        }
+
+        /* Button adjustments */
+        .btn {
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .btn i {
+            font-size: 12px;
+        }
+
+        /* Stack columns on mobile */
+        .col-md-6 {
+            margin-bottom: 15px;
+        }
+    }
+
+    /* Small mobile devices */
+    @media screen and (max-width: 480px) {
+        .container {
+            padding: 5px;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+        }
+
+        .card-title {
+            font-size: 16px;
+        }
+
+        /* Smaller table text */
+        .table {
+            font-size: 12px;
+        }
+
+        .table th, 
+        .table td {
+            padding: 6px;
+        }
+
+        /* Adjust button size */
+        .btn {
+            font-size: 13px;
+            padding: 6px 12px;
+        }
+
+        .btn i {
+            font-size: 11px;
+        }
+
+        /* Make table scrollable if needed */
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+</style>
+
 <div class="container mt-5">
     <!-- Title Section -->
     <div class="card shadow mb-4">
@@ -18,44 +125,46 @@
                 <i class="fas fa-arrow-left"></i> Kembali
             </a>
 
-            <table class="table table-bordered table-striped">
-                <tr>
-                    <th>Nama Ujian</th>
-                    <td>: {{ $ujian->judul }}</td>
-                </tr>
-                <tr>
-                    <th>Mata Pelajaran</th>
-                    <td>: {{ $ujian->mapel->nama_mapel ?? 'Tidak Ada' }}</td>
-                </tr>
-                <tr>
-                    <th>Pengajar</th>
-                    <td>: {{ $ujian->user->username ?? 'Tidak Ada' }}</td>
-                </tr>
-                <tr>
-                    <th>Batas Waktu Ujian</th>
-                    <td>: {{ $ujian->waktu_pengerjaan }} Menit</td>
-                </tr>
-                <tr>
-                    <th>Status Soal Pilihan Ganda</th>
-                    <td>
-                        @if ($ujian->pilihanGanda->count() > 0)
-                            : Ada {{ $ujian->pilihanGanda->count() }} Soal Pilihan Ganda
-                        @else
-                            : Tidak Ada Soal Pilihan Ganda
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <th>Status Soal Essay</th>
-                    <td>
-                        @if ($ujian->essay->count() > 0)
-                            : Ada {{ $ujian->essay->count() }} Soal Essay
-                        @else
-                            : Tidak Ada Soal Essay
-                        @endif
-                    </td>
-                </tr>
-            </table>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <th>Nama Ujian</th>
+                        <td>: {{ $ujian->judul }}</td>
+                    </tr>
+                    <tr>
+                        <th>Mata Pelajaran</th>
+                        <td>: {{ $ujian->mapel->nama_mapel ?? 'Tidak Ada' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Pengajar</th>
+                        <td>: {{ $ujian->user->username ?? 'Tidak Ada' }}</td>
+                    </tr>
+                    <tr>
+                        <th>Batas Waktu Ujian</th>
+                        <td>: {{ $ujian->waktu_pengerjaan }} Menit</td>
+                    </tr>
+                    <tr>
+                        <th>Status Soal Pilihan Ganda</th>
+                        <td>
+                            @if ($ujian->pilihanGanda->count() > 0)
+                                : Ada {{ $ujian->pilihanGanda->count() }} Soal Pilihan Ganda
+                            @else
+                                : Tidak Ada Soal Pilihan Ganda
+                            @endif
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Status Soal Essay</th>
+                        <td>
+                            @if ($ujian->essay->count() > 0)
+                                : Ada {{ $ujian->essay->count() }} Soal Essay
+                            @else
+                                : Tidak Ada Soal Essay
+                            @endif
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 
